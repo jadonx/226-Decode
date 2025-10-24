@@ -9,10 +9,12 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 
 @Config
-@TeleOp(name="Turret Prototype Test")
-public class TurretPrototypeTest extends OpMode {
+@TeleOp(name="Spindexer Turret Prototype")
+public class SpindexerTurretPrototype extends OpMode {
     public static double shooterSpeed;
     public static double spinSpeed;
 
@@ -20,10 +22,17 @@ public class TurretPrototypeTest extends OpMode {
 
     public static double spindexerSpeed;
 
+    // Turret/Spindexer Servos
     CRServo leftServo, rightServo;
     CRServo spindexerServo;
 
+    // Launcher Motors
     DcMotor shooter1, shooter2, spinner;
+
+    // Color Sensor
+    NormalizedColorSensor colorSensor;
+
+    float[] hsv = new float[3];
 
     FtcDashboard dashboard;
     TelemetryPacket packet;
@@ -46,6 +55,8 @@ public class TurretPrototypeTest extends OpMode {
         turretSpeed = 0;
         spindexerSpeed = 0;
 
+        colorSensor = hardwareMap.get(NormalizedColorSensor.class, "colorSensor");
+
         dashboard = FtcDashboard.getInstance();
         packet = new TelemetryPacket();
     }
@@ -61,5 +72,22 @@ public class TurretPrototypeTest extends OpMode {
         rightServo.setPower(turretSpeed);
 
         spindexerServo.setPower(spindexerSpeed);
+
+        NormalizedRGBA colors = colorSensor.getNormalizedColors();
+        // Convert RGB → HSV
+        android.graphics.Color.RGBToHSV(
+                (int) (colors.red * 255),
+                (int) (colors.green * 255),
+                (int) (colors.blue * 255),
+                hsv
+        );
+
+        packet.put("Hue ", hsv[0]);
+
+        if (hsv[0] > 205 && hsv[0] < 260) {
+            packet.put("Purple", null);
+        } else if (hsv[0] > 140 && hsv[0] < 190) {
+            packet.put("Green", null);
+        }
     }
 }
