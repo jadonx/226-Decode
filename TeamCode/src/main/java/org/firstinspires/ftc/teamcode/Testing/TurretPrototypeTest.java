@@ -18,7 +18,10 @@ public class TurretPrototypeTest extends OpMode {
 
     public static double turretSpeed;
 
+    public static double spindexerSpeed;
+
     CRServo leftServo, rightServo;
+    CRServo spindexerServo;
 
     DcMotor shooter1, shooter2, spinner;
 
@@ -36,9 +39,12 @@ public class TurretPrototypeTest extends OpMode {
         leftServo = hardwareMap.get(CRServo.class, "leftCRServo");
         rightServo = hardwareMap.get(CRServo.class, "rightCRServo");
 
+        spindexerServo = hardwareMap.get(CRServo.class, "spindexerServo");
+
         shooterSpeed = 0;
         spinSpeed = 0;
         turretSpeed = 0;
+        spindexerSpeed = 0;
 
         dashboard = FtcDashboard.getInstance();
         packet = new TelemetryPacket();
@@ -53,5 +59,7 @@ public class TurretPrototypeTest extends OpMode {
 
         leftServo.setPower(turretSpeed);
         rightServo.setPower(turretSpeed);
+
+        spindexerServo.setPower(spindexerSpeed);
     }
 }
