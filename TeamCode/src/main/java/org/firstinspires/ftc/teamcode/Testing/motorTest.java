@@ -1,22 +1,12 @@
-package org.firstinspires.ftc.teamcode.testStuff;
+package org.firstinspires.ftc.teamcode.Testing;
 
 import android.graphics.Color;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.LLResultTypes;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.SwitchableLight;
-
-
-import java.util.List;
 
 @Config
 @TeleOp(name = "Motor testing")
