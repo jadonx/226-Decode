@@ -26,4 +26,5 @@ android {
 dependencies {
     implementation project(':FtcRobotController')
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.xr.runtime:runtime:1.0.0-alpha07'
 }
