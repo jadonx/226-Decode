@@ -27,12 +27,19 @@ android {
 repositories {
     maven {
         url = 'https://maven.brott.dev/'
+        url = "https://mymaven.bylazar.com/releases"
     }
 }
 
 dependencies {
     implementation project(':FtcRobotController')
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    // PedroPathing
+    implementation 'com.pedropathing:ftc:2.0.3'
+    implementation 'com.pedropathing:telemetry:1.0.0'
+    implementation 'com.bylazar:fullpanels:1.0.6'
+
 
     // RoadRunner
     implementation "com.acmerobotics.roadrunner:ftc:0.1.23"
