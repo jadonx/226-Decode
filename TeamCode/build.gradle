@@ -35,4 +35,23 @@ dependencies {
     implementation project(':FtcRobotController')
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.xr.runtime:runtime:1.0.0-alpha07'
+
+
+    // PedroPathing
+    implementation 'com.pedropathing:ftc:2.0.3'
+    implementation 'com.pedropathing:telemetry:1.0.0'
+    implementation 'com.bylazar:fullpanels:1.0.6'
+
+
+    // RoadRunner
+    implementation "com.acmerobotics.roadrunner:ftc:0.1.23"
+    implementation "com.acmerobotics.roadrunner:core:1.0.1"
+    implementation "com.acmerobotics.roadrunner:actions:1.0.1"
+
+    // Dashboard
+    implementation "com.acmerobotics.dashboard:dashboard:0.5.0"
+
+    // NextFTC
+    implementation 'dev.nextftc:ftc:1.0.1'
+    implementation 'dev.nextftc:hardware:1.0.1'
 }
