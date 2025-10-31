@@ -14,6 +14,7 @@ public class shooterTest extends OpMode {
     public static double coverPos;
     public static double basePos;
     DcMotorEx shooter1, shooter2, spinner;
+
     Servo base;
 
 
