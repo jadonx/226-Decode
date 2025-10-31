@@ -4,7 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Subsystems.AS5600Encoder;
+import org.firstinspires.ftc.teamcode.AS5600Encoder;
 
 @Config
 @TeleOp(name = "Encoder testing")
