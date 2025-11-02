@@ -34,6 +34,8 @@ repositories {
 dependencies {
     implementation project(':FtcRobotController')
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.xr.runtime:runtime:1.0.0-alpha07'
+
 
     // PedroPathing
     implementation 'com.pedropathing:ftc:2.0.3'

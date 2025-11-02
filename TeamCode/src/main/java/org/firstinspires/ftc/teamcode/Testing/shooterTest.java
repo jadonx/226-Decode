@@ -12,8 +12,10 @@ public class shooterTest extends OpMode {
     public static double shooterSpeed;
     public static double spinSpeed;
     public static double coverPos;
+    public static double spinDexerPos;
     DcMotorEx shooter1, shooter2, spinner;
-    Servo base;
+
+    Servo spinDexer;
 
 
 
@@ -21,7 +23,7 @@ public class shooterTest extends OpMode {
         shooter1 = hardwareMap.get(DcMotorEx.class, "shooter1");
         shooter2 = hardwareMap.get(DcMotorEx.class, "shooter2");
         spinner = hardwareMap.get(DcMotorEx.class, "spinner");
-        base = hardwareMap.get(Servo.class, "base");
+        spinDexer = hardwareMap.get(Servo.class, "spinDexerServo");
         shooterSpeed = 0;
     }
 
@@ -45,6 +47,14 @@ public class shooterTest extends OpMode {
             shooterSpeed = 1;
             shooter1.setPower(shooterSpeed);
             shooter2.setPower(shooterSpeed);
+        }
+
+        if(gamepad1.dpad_down){
+            spinDexer.setPosition(1);
+        }
+
+        if(gamepad1.dpad_up){
+            spinDexer.setPosition(0);
         }
 
         telemetry.addData("Speed", shooterSpeed);
