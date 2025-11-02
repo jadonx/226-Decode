@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.ftc.Gamepads;
 import dev.nextftc.ftc.NextFTCOpMode;
@@ -9,7 +11,7 @@ import dev.nextftc.hardware.driving.MecanumDriverControlled;
 import dev.nextftc.hardware.impl.Direction;
 import dev.nextftc.hardware.impl.IMUEx;
 import dev.nextftc.hardware.impl.MotorEx;
-
+@TeleOp (name = "TeleOpNextFTC")
 public class Drivetrain extends NextFTCOpMode {
     private MotorEx frontLeftMotor;
     private MotorEx frontRightMotor;

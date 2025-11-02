@@ -45,17 +45,17 @@ public class SpindexerTurretPrototype extends OpMode {
         spinner = hardwareMap.get(DcMotorEx.class, "spinner");
         spinner.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        leftServo = hardwareMap.get(CRServo.class, "leftCRServo");
-        rightServo = hardwareMap.get(CRServo.class, "rightCRServo");
+        // leftServo = hardwareMap.get(CRServo.class, "leftCRServo");
+        // rightServo = hardwareMap.get(CRServo.class, "rightCRServo");
 
-        spindexerServo = hardwareMap.get(CRServo.class, "spindexerServo");
+        // spindexerServo = hardwareMap.get(CRServo.class, "spindexerServo");
 
         shooterSpeed = 0;
         spinSpeed = 0;
         turretSpeed = 0;
         spindexerSpeed = 0;
 
-        colorSensor = hardwareMap.get(NormalizedColorSensor.class, "colorSensor");
+        // colorSensor = hardwareMap.get(NormalizedColorSensor.class, "colorSensor");
 
         dashboard = FtcDashboard.getInstance();
         packet = new TelemetryPacket();
@@ -68,26 +68,26 @@ public class SpindexerTurretPrototype extends OpMode {
 
         spinner.setPower(spinSpeed);
 
-        leftServo.setPower(turretSpeed);
-        rightServo.setPower(turretSpeed);
+//        leftServo.setPower(turretSpeed);
+//        rightServo.setPower(turretSpeed);
+//
+//        spindexerServo.setPower(spindexerSpeed);
 
-        spindexerServo.setPower(spindexerSpeed);
-
-        NormalizedRGBA colors = colorSensor.getNormalizedColors();
-        // Convert RGB → HSV
-        android.graphics.Color.RGBToHSV(
-                (int) (colors.red * 255),
-                (int) (colors.green * 255),
-                (int) (colors.blue * 255),
-                hsv
-        );
-
-        packet.put("Hue ", hsv[0]);
-
-        if (hsv[0] > 205 && hsv[0] < 260) {
-            packet.put("Purple", null);
-        } else if (hsv[0] > 140 && hsv[0] < 190) {
-            packet.put("Green", null);
-        }
+//        NormalizedRGBA colors = colorSensor.getNormalizedColors();
+//        // Convert RGB → HSV
+//        android.graphics.Color.RGBToHSV(
+//                (int) (colors.red * 255),
+//                (int) (colors.green * 255),
+//                (int) (colors.blue * 255),
+//                hsv
+//        );
+//
+//        packet.put("Hue ", hsv[0]);
+//
+//        if (hsv[0] > 205 && hsv[0] < 260) {
+//            packet.put("Purple", null);
+//        } else if (hsv[0] > 140 && hsv[0] < 190) {
+//            packet.put("Green", null);
+//        }
     }
 }
