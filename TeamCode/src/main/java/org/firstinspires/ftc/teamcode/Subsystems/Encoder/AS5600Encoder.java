@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Subsystems;
+package org.firstinspires.ftc.teamcode.Subsystems.Encoder;
 
 import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
@@ -21,7 +21,6 @@ public class AS5600Encoder extends I2cDeviceSynchDevice<I2cDeviceSynch> {
 
     @Override
     protected boolean doInitialize() {
-
         return true;
     }
 

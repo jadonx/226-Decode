@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.Subsystems.AS5600Encoder;
+import org.firstinspires.ftc.teamcode.Subsystems.Encoder.AS5600Encoder;
 
 @Config
 @TeleOp(name = "Shooter test")
