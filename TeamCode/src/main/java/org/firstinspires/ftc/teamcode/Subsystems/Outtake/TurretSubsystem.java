@@ -1,58 +1,41 @@
 package org.firstinspires.ftc.teamcode.Subsystems.Outtake;
 
-import static org.firstinspires.ftc.teamcode.Subsystems.Outtake.TurretConstant.kD;
-import static org.firstinspires.ftc.teamcode.Subsystems.Outtake.TurretConstant.kI;
-import static org.firstinspires.ftc.teamcode.Subsystems.Outtake.TurretConstant.kP;
-
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.IMU;
 
-import org.firstinspires.ftc.teamcode.Subsystems.Encoder.AS5600Encoder;
-import org.firstinspires.ftc.teamcode.Subsystems.Limelight.LLSubsystem;
 
-
+@Config
 public class TurretSubsystem {
     private CRServo turretLeft, turretRight;
-    private AS5600Encoder turretEncoder;
     private OpMode opMode;
     private IMU imu;
     private PIDController pid;
-    private LLSubsystem limelight;
+    public static double kP = 0.02;
+    public static double kI = 0.0;
+    public static double kD = 0.0008;
 
-    public TurretSubsystem(OpMode _opMode, LLSubsystem _limelight) {
+    public TurretSubsystem(OpMode _opMode) {
         opMode = _opMode;
-        limelight = _limelight;
     }
 
     public void init() {
+        opMode.telemetry = new MultipleTelemetry(opMode.telemetry, FtcDashboard.getInstance().getTelemetry());
         turretLeft = opMode.hardwareMap.get(CRServo.class, TurretConstant.HMServoTurretLeft);
         turretRight = opMode.hardwareMap.get(CRServo.class, TurretConstant.HMServoTurretRight);
-        turretEncoder = opMode.hardwareMap.get(AS5600Encoder.class, TurretConstant.HMEncoder);
-
-        imu = opMode.hardwareMap.get(IMU.class, TurretConstant.HMIMU);
-
-        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
-                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD));
-        imu.initialize(parameters);
 
         pid = new PIDController(kP, kI, kD);
         pid.setTolerance(0.5);
     }
 
-    public void trackTarget() {
-        limelight.update();
+    public void trackTarget(double tX) {
+        pid.setPID(kP, kI, kD);
 
-        if (!limelight.hasTarget()) {
-            setPower(0);
-            return;
-        }
-
-        double tx = limelight.getTargetX();
-        double correction = pid.calculate(tx, 0);
+        double correction = pid.calculate(tX, 0);
 
         correction = Math.max(Math.min(correction, 0.6), -0.6);
 
@@ -60,19 +43,20 @@ public class TurretSubsystem {
             setPower(0);
             return;
         }
-
-
-        setPower(correction);
+        setPower(-correction);
+        opMode.telemetry.addData("tX", tX);
+        opMode.telemetry.addData("Correction", correction);
+        opMode.telemetry.addData("Error", pid.getPositionError());
+        opMode.telemetry.addData("kP", kP);
+        opMode.telemetry.addData("kI", kI);
+        opMode.telemetry.addData("kD", kD);
+        opMode.telemetry.update();
     }
-
     private void setPower(double power) {
-        turretLeft.setPower(power);
+        turretLeft.setPower(-power);
         turretRight.setPower(-power);
     }
-
     public void manualPower(double power) {
         setPower(power);
     }
-
-
 }

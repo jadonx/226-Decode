@@ -1,32 +1,33 @@
 package org.firstinspires.ftc.teamcode.Subsystems.Outtake;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Subsystems.Limelight.LLSubsystem;
-
+@Config
 @TeleOp(name = "Turret", group = "Testing")
 public class TurretS extends OpMode {
     private TurretSubsystem turret;
-    private LLSubsystem limelight;
     private FtcDashboard dashboard;
-
+    private Limelight3A limelight;
+    private LLResult result;
+    private double tX;
 
     private boolean trackingEnabled = false;
     private boolean togglePressed = false;
 
     @Override
     public void init() {
-        dashboard = FtcDashboard.getInstance();
-        telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
 
-        limelight = new LLSubsystem(this);
-        limelight.init();
-
-        turret = new TurretSubsystem(this, limelight);
+        turret = new TurretSubsystem(this);
         turret.init();
+
+        limelight = hardwareMap.get(Limelight3A.class, "LL");
+        limelight.pipelineSwitch(1);
+        limelight.start();
 
         telemetry.addLine("Turret Initialized");
         telemetry.addLine("Press [X] to toggle auto-tracking mode");
@@ -35,6 +36,15 @@ public class TurretS extends OpMode {
 
     @Override
     public void loop() {
+        result = limelight.getLatestResult();
+
+
+        if(result != null) {
+            tX = result.getTx();
+        } else {
+            tX = 0;
+        }
+
         if (gamepad1.x && !togglePressed) {
             trackingEnabled = !trackingEnabled;
             togglePressed = true;
@@ -43,7 +53,7 @@ public class TurretS extends OpMode {
         }
 
         if (trackingEnabled) {
-            turret.trackTarget();
+            turret.trackTarget(tX);
             telemetry.addLine("Mode: Tracking Apriltag");
         } else {
             double manualPower = gamepad1.right_stick_x * 0.5; // reduce sensitivity
@@ -52,10 +62,6 @@ public class TurretS extends OpMode {
         }
 
         telemetry.addData("Tracking Enabled", trackingEnabled);
-        telemetry.addData("Target X", limelight.getTargetX());
-        telemetry.addData("kP", TurretConstant.kP);
-        telemetry.addData("kI", TurretConstant.kI);
-        telemetry.addData("kD", TurretConstant.kD);
         telemetry.update();
     }
 }
