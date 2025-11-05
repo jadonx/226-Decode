@@ -24,18 +24,15 @@ public class Spindexer {
     private double hueSum;
     private double hueCount;
 
-    private enum SpindexerHolderStatus { NONE, GREEN, PURPLE }
-    /*
-    Index: Popper Angle Over Color Sensor
-    0: 35-45
-    1: 155-165
-    2: 275-285
-    */
-    private SpindexerHolderStatus[] spindexerHolder = new SpindexerHolderStatus[3];
+    // 3 Indexes For Each Holder
+    // 2 Indexes: Sum Of Hue Data, Hue Data Count (We take average)
+    private double[][] holderHueValues = new double[3][2];
 
-    // Spindexer Popper
-    private DcMotor popper;
-    private Servo popperServo;
+    // Min/Max Angles For Each Spindexer Holder
+    private int[][] holderAngles = {{35, 45}, {155, 165}, {275, 285}};
+
+    public enum HolderStatus { NONE, GREEN, PURPLE }
+    private HolderStatus[] holderStatus = {HolderStatus.NONE, HolderStatus.NONE, HolderStatus.NONE};
 
     // Spindexer PID Values
     private double kP, kD;
@@ -51,9 +48,6 @@ public class Spindexer {
 
         hueSum = 0;
         hueCount = 0;
-
-        popper = hardwareMap.get(DcMotor.class, "spinner");
-        popperServo = hardwareMap.get(Servo.class, "spinDexerServo");
 
         kP = 0.005;
         kD = 0.0001;
@@ -102,23 +96,52 @@ public class Spindexer {
     /*
     COLOR SENSOR CODE
      */
+    public HolderStatus[] getHolderColors() {
+        double currentAngle = getAngle();
+
+        getHolderColorsHelper(0, currentAngle);
+        getHolderColorsHelper(1, currentAngle);
+        getHolderColorsHelper(2, currentAngle);
+
+        return holderStatus;
+    }
 
     // Green Hue: 150-180
     // Purple Hue: 150-240
-    public double getSpindexerHolderColors() {
-        return 0.0;
-    }
+    public void getHolderColorsHelper(int index, double currentAngle) {
+        // Get angle range where color sensor can see holder
+        int minAngle = holderAngles[index][0];
+        int maxAngle = holderAngles[index][1];
 
-    public double getColorAtAngle(double minAngle, double maxAngle) {
-        double currentAngle = getAngle();
-
+        // If 10ms has passed (lag to help performance) and currentAngle is in between our desired angles
         if (colorSensorTimer.milliseconds() > 10 && currentAngle > minAngle && currentAngle < maxAngle) {
-            hueSum += getHue();
-            hueCount++;
+            // Add the detected hue to the hue sum
+            holderHueValues[index][0] += getHue();
+            // Add one to the amount of hues we've collected
+            holderHueValues[index][1]++;
+            // Reset timer
             colorSensorTimer.reset();
         }
+        // Once our holder has passed the color sensor
+        else if (currentAngle > maxAngle) {
+            // Get the average hue detected in our holder
+            double avgHue = holderHueValues[index][0] / holderHueValues[index][1];
 
-        return hueSum / hueCount;
+            // Determine status of holder based on hue value
+            if (avgHue > 160 && avgHue < 180) {
+                holderStatus[index] = HolderStatus.GREEN;
+            }
+            else if (avgHue > 180 && avgHue < 240) {
+                holderStatus[index] = HolderStatus.PURPLE;
+            }
+            else {
+                holderStatus[index] = HolderStatus.NONE;
+            }
+
+            // Reset hue sum and hue count for next rotation
+            holderHueValues[index][0] = 0;
+            holderHueValues[index][1] = 0;
+        }
     }
 
     private double getHue() {
@@ -133,21 +156,5 @@ public class Spindexer {
         );
 
         return hsv[0];
-    }
-    
-
-    /*
-    POPPER CODE
-     */
-    public void engagePopper() {
-
-    }
-
-    public void disengagePopper() {
-
-    }
-
-    public void spinPopper() {
-
     }
 }
