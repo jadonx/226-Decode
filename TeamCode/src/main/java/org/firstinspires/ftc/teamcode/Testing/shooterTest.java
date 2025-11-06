@@ -33,9 +33,9 @@ public class shooterTest extends OpMode {
         spinDexer = hardwareMap.get(Servo.class, "spinDexerServo");
         cover = hardwareMap.get(Servo.class, "cover");
         bigSpin = hardwareMap.get(CRServo.class, "leftCRServo");
-        turret1 = hardwareMap.get(CRServo.class, "turret1");
-        turret2 = hardwareMap.get(CRServo.class, "turret2");
-        turretEncoder = hardwareMap.get(AS5600Encoder.class, "turretEncoder");
+        turret1 = hardwareMap.get(CRServo.class, "TL");
+        turret2 = hardwareMap.get(CRServo.class, "TR");
+        turretEncoder = hardwareMap.get(AS5600Encoder.class, "TE");
         spinEncoder = hardwareMap.get(AS5600Encoder.class, "spinEncoder");
         shooterSpeed = 0;
         coverPos = 0;
@@ -72,13 +72,14 @@ public class shooterTest extends OpMode {
             spinDexer.setPosition(0);
         }
 
-        if(gamepad2.dpad_down){
-            coverPos += 0.05;
+        if(gamepad2.dpad_down && coverPos < 1){
+            coverPos += 0.005;
             cover.setPosition(coverPos);
         }
 
         if(gamepad2.dpad_up){
-            coverPos -= 0.05;
+
+            coverPos -= 0.005;
             cover.setPosition(coverPos);
         }
 
@@ -94,15 +95,26 @@ public class shooterTest extends OpMode {
         }
 
         if(gamepad1.dpad_right){
-            bigSpin.setPower(1);
+            bigSpin.setPower(0.2);
         }
 
         if(gamepad1.dpad_left){
-            bigSpin.setPower(-1);
+            bigSpin.setPower(-0.2);
         }
 
         telemetry.addData("Speed", shooterSpeed);
-        telemetry.addData("Angle", turretEncoder.getAngleDegrees());
-        telemetry.addData("Angle", spinEncoder.getAngleDegrees ());
+        telemetry.addData("cover pos", coverPos);
+        telemetry.addData("turret Angle", turretEncoder.getAngleDegrees());
+        telemetry.addData("spin Angle", spinEncoder.getAngleDegrees ());
     }
+
+    public static double angleToServoPos(double angle) {
+        double minAngle = 52.0;
+        double maxAngle = 74.5;
+        double servoPos = (angle - minAngle) / (maxAngle - minAngle);
+
+
+        return Math.max(0.0, Math.min(1.0, servoPos));
+    }
+
 }
