@@ -21,8 +21,6 @@ public class Spindexer {
     float[] hsv = new float[3];
 
     private ElapsedTime colorSensorTimer;
-    private double hueSum;
-    private double hueCount;
 
     // 3 Indexes For Each Holder
     // 2 Indexes: Sum Of Hue Data, Hue Data Count (We take average)
@@ -32,7 +30,13 @@ public class Spindexer {
     private int[][] holderAngles = {{35, 45}, {155, 165}, {275, 285}};
 
     public enum HolderStatus { NONE, GREEN, PURPLE }
-    private HolderStatus[] holderStatus = {HolderStatus.NONE, HolderStatus.NONE, HolderStatus.NONE};
+    private HolderStatus[] holderStatuses = {HolderStatus.NONE, HolderStatus.NONE, HolderStatus.NONE};
+
+    // COLOR SENSOR HOLDER TEST
+    private double[] holderHueValue = new double[2];
+    private HolderStatus holderStatus = HolderStatus.NONE;
+    private double avgHue = 0;
+    private boolean hueAvgCollected = false;
 
     // Spindexer PID Values
     private double kP, kD;
@@ -45,9 +49,6 @@ public class Spindexer {
 
         colorSensor = hardwareMap.get(NormalizedColorSensor.class, "colorSensor");
         colorSensorTimer = new ElapsedTime();
-
-        hueSum = 0;
-        hueCount = 0;
 
         kP = 0.005;
         kD = 0.0001;
@@ -96,6 +97,8 @@ public class Spindexer {
     /*
     COLOR SENSOR CODE
      */
+
+    /*
     public HolderStatus[] getHolderColors() {
         double currentAngle = getAngle();
 
@@ -105,9 +108,11 @@ public class Spindexer {
 
         return holderStatus;
     }
+     */
 
     // Green Hue: 150-180
     // Purple Hue: 150-240
+    /*
     public void getHolderColorsHelper(int index, double currentAngle) {
         // Get angle range where color sensor can see holder
         int minAngle = holderAngles[index][0];
@@ -142,6 +147,41 @@ public class Spindexer {
             holderHueValues[index][0] = 0;
             holderHueValues[index][1] = 0;
         }
+    }
+     */
+
+    /*
+    COLOR SENSOR CODE TEST METHODS (SINGLE HOLDER)
+     */
+    public double getHolderColor(int minAngle, int maxAngle) {
+        double current = getAngle();
+
+        if (colorSensorTimer.milliseconds() > 10 && current > minAngle && current < maxAngle) {
+            holderHueValue[0] += getHue();
+            holderHueValue[1]++;
+            colorSensorTimer.reset();
+
+            hueAvgCollected = false;
+        }
+        else if ((current < minAngle || current > maxAngle) && !hueAvgCollected) {
+            avgHue = holderHueValue[0] / holderHueValue[1];
+
+            if (avgHue > 150 && avgHue < 170) {
+                holderStatus = HolderStatus.GREEN;
+            }
+            else if (avgHue > 230 && avgHue < 250) {
+                holderStatus = HolderStatus.PURPLE;
+            }
+            else {
+                holderStatus = HolderStatus.NONE;
+            }
+
+            holderHueValue[0] = 0;
+            holderHueValue[1] = 0;
+            hueAvgCollected = true;
+        }
+
+        return avgHue;
     }
 
     private double getHue() {
