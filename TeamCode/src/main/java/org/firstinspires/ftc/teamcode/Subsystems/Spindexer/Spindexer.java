@@ -41,7 +41,7 @@ public class Spindexer {
     // Spindexer PID Values
     private double kP, kD;
     private double lastError;
-    private ElapsedTime PIDtimer;
+    private ElapsedTime pidTimer;
 
     public Spindexer(HardwareMap hardwareMap) {
         spindexerServo = hardwareMap.get(CRServo.class, "leftCRServo");
@@ -54,7 +54,7 @@ public class Spindexer {
         kD = 0.0001;
         lastError = 0;
 
-        PIDtimer = new ElapsedTime();
+        pidTimer = new ElapsedTime();
     }
 
     /*
@@ -63,14 +63,14 @@ public class Spindexer {
     public void goToAngle(double target) {
         double error = getAngleError(target, getAngle());
 
-        double derivative = (error - lastError) / PIDtimer.seconds();
+        double derivative = (error - lastError) / pidTimer.seconds();
 
         double output = (kP * error) + (kD * derivative);
 
         spindexerServo.setPower(output);
 
         lastError = error;
-        PIDtimer.reset();
+        pidTimer.reset();
     }
 
     public void constantSpin(double power) {
