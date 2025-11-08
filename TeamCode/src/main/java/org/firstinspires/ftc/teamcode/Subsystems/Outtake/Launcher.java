@@ -10,7 +10,7 @@ public class Launcher {
 
     // RPM Calculations
     private int last = 0;
-    private final double ticksPerRev = 112;
+    private final double ticksPerRev = 28;
     private ElapsedTime rpmTimer;
 
     // RPM PID
@@ -24,6 +24,9 @@ public class Launcher {
 
         shooter1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         shooter2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        shooter1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        shooter2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         rpmTimer = new ElapsedTime();
 
