@@ -11,13 +11,22 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.Subsystems.Outtake.TurretS;
-import org.firstinspires.ftc.teamcode.Subsystems.Outtake.TurretSubsystem;
+import org.firstinspires.ftc.teamcode.Subsystems.Outtake.TurretLLSubsystem;
 
 @TeleOp(name="FieldCentricDrive")
 public class FieldCentric extends OpMode {
     DcMotor frontLeft, frontRight, backLeft, backRight;
     IMU imu;
+<<<<<<< Updated upstream
+=======
+    private TurretLLSubsystem turret;
+    private FtcDashboard dashboard;
+    private Limelight3A limelight;
+    private double tX;
+
+    private boolean trackingEnabled = false;
+    private boolean togglePressed = false;
+>>>>>>> Stashed changes
 
     @Override
     public void init() {
@@ -36,6 +45,20 @@ public class FieldCentric extends OpMode {
                 RevHubOrientationOnRobot.UsbFacingDirection.UP));
 
         imu.initialize(parameters);
+<<<<<<< Updated upstream
+=======
+
+        turret = new TurretLLSubsystem(this);
+        turret.init();
+
+        limelight = hardwareMap.get(Limelight3A.class, "LL");
+        limelight.pipelineSwitch(1);
+        limelight.start();
+
+        telemetry.addLine("Turret Initialized");
+        telemetry.addLine("Press [X] to toggle auto-tracking mode");
+        telemetry.update();
+>>>>>>> Stashed changes
     }
 
     @Override

@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 
 @Config
-public class TurretSubsystem {
+public class TurretLLSubsystem {
     private CRServo turretLeft, turretRight;
     private OpMode opMode;
     private IMU imu;
@@ -19,7 +19,7 @@ public class TurretSubsystem {
     public static double kI = 0.0;
     public static double kD = 0.0008;
 
-    public TurretSubsystem(OpMode _opMode) {
+    public TurretLLSubsystem(OpMode _opMode) {
         opMode = _opMode;
     }
 

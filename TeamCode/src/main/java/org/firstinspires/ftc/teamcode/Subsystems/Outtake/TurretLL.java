@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @Config
 @TeleOp(name = "Turret", group = "Testing")
-public class TurretS extends OpMode {
-    private TurretSubsystem turret;
+public class TurretLL extends OpMode {
+    private TurretLLSubsystem turret;
     private FtcDashboard dashboard;
     private Limelight3A limelight;
     private LLResult result;
@@ -22,7 +22,7 @@ public class TurretS extends OpMode {
     @Override
     public void init() {
 
-        turret = new TurretSubsystem(this);
+        turret = new TurretLLSubsystem(this);
         turret.init();
 
         limelight = hardwareMap.get(Limelight3A.class, "LL");
