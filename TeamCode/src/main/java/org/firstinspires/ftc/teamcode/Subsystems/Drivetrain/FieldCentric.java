@@ -18,7 +18,10 @@ public class FieldCentric extends OpMode {
     DcMotor frontLeft, frontRight, backLeft, backRight;
     IMU imu;
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
     private TurretLLSubsystem turret;
     private FtcDashboard dashboard;
     private Limelight3A limelight;
