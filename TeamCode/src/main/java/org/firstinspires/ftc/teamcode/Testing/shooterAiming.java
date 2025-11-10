@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Testing;
 
 import android.graphics.Color;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -14,11 +15,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import java.util.List;
 
-
+@Config
 @TeleOp (name = "Shooter Aiming")
 public class shooterAiming extends OpMode {
-    DcMotorEx shooter1, shooter2, spinner, pusher;
-    Servo angleAdjust;
+    DcMotorEx shooter1, shooter2, spinner, spinDexer;
+    Servo cover;
     Limelight3A limelight;
     NormalizedColorSensor colorSensor;
     double anglePos, angleDegree;
@@ -27,10 +28,10 @@ public class shooterAiming extends OpMode {
     double id = -1;
 
     double camDeg = 19.47883;
-    double camH = 4.75;
-    double targetH = 18.75;
-
-    double initialVelocity;
+    double camH = 12;
+    double targetH = 39;
+    public static double distance = 140;
+    double initialVelocity = 246.81;
     double gravity = 386.09;
 
 
@@ -39,17 +40,18 @@ public class shooterAiming extends OpMode {
         shooter1 = hardwareMap.get(DcMotorEx.class, "shooter1");
         shooter2 = hardwareMap.get(DcMotorEx.class, "shooter2");
         spinner = hardwareMap.get(DcMotorEx.class, "spinner");
-        pusher = hardwareMap.get(DcMotorEx.class, "puhser");
-        angleAdjust = hardwareMap.get(Servo.class, "angleAdjust");
-        colorSensor = hardwareMap.get(NormalizedColorSensor.class, "sensor_color");
 
-        limelight = hardwareMap.get(Limelight3A.class, "LimeLight");
-        limelight.pipelineSwitch(1);
-        limelight.start();
+        cover = hardwareMap.get(Servo.class, "cover");
+        //colorSensor = hardwareMap.get(NormalizedColorSensor.class, "sensor_color");
+
+        //limelight = hardwareMap.get(Limelight3A.class, "LimeLight");
+        //limelight.pipelineSwitch(1);
+        //limelight.start();
 
     }
 
     public void loop(){
+        /*
         LLResult result = limelight.getLatestResult();
 
         if(result != null){
@@ -75,19 +77,24 @@ public class shooterAiming extends OpMode {
             telemetry.addData("Saturation", hsv[1]);
             telemetry.addData("Light", hsv[2]);
 
-            if(gamepad1.a){
-                spinner.setPower(1);
-                pusher.setPower(1);
-                shooter1.setPower(1);
-                shooter2.setPower(1);
-            }
+        }
+        */
+        telemetry.addData("Angle Needed", getNeededAngle(distance));
+        telemetry.addData("pos Needed", degreeToPos(getNeededAngle(distance)));
+        cover.setPosition(degreeToPos(getNeededAngle(distance)));
 
-            if(gamepad1.b){
-                spinner.setPower(0);
-                pusher.setPower(0);
-                shooter1.setPower(0);
-                shooter2.setPower(0);
-            }
+        if(gamepad1.a){
+            spinner.setPower(1);
+            spinDexer.setPower(1);
+            shooter1.setPower(1);
+            shooter2.setPower(1);
+        }
+
+        if(gamepad1.b){
+            spinner.setPower(0);
+            spinDexer.setPower(0);
+            shooter1.setPower(0);
+            shooter2.setPower(0);
         }
 
 
@@ -98,7 +105,7 @@ public class shooterAiming extends OpMode {
 
         return (targetH - camH) / Math.tan(totalAngleRad);
     }
-
+    /*
     private double getNeededAngle(double distance){
         double degree = 0;
 
@@ -110,7 +117,32 @@ public class shooterAiming extends OpMode {
         return Math.toDegrees(degree);
     }
 
-    private double degreeToPos(double degree){
-        return degree;
+     */
+    private double getNeededAngle(double distance) {
+        double v = initialVelocity;
+        double g = gravity;
+        double y = targetH - camH;
+
+        double term = v*v*v*v - g * (g * distance * distance + 2 * y * v * v);
+        if (term < 0) {
+            return 52;
+        }
+
+
+        double tanThetaHigh = (v*v + Math.sqrt(term)) / (g * distance);
+        double thetaRad = Math.atan(tanThetaHigh);
+        double thetaDeg = Math.toDegrees(thetaRad);
+
+        return thetaDeg;
+    }
+
+
+    private double degreeToPos(double angle){
+        double minAngle = 52.0;
+        double maxAngle = 74.5;
+        double servoPos = (angle - minAngle) / (maxAngle - minAngle);
+
+
+        return Math.max(0.0, Math.min(1.0, servoPos));
     }
 }

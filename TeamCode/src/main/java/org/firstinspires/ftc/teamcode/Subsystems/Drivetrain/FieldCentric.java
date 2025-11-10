@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -8,11 +11,20 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.Subsystems.Outtake.TurretS;
+import org.firstinspires.ftc.teamcode.Subsystems.Outtake.TurretSubsystem;
 
 @TeleOp(name="FieldCentricDrive")
 public class FieldCentric extends OpMode {
     DcMotor frontLeft, frontRight, backLeft, backRight;
     IMU imu;
+    private TurretSubsystem turret;
+    private FtcDashboard dashboard;
+    private Limelight3A limelight;
+    private double tX;
+
+    private boolean trackingEnabled = false;
+    private boolean togglePressed = false;
 
     @Override
     public void init() {
@@ -31,10 +43,37 @@ public class FieldCentric extends OpMode {
                 RevHubOrientationOnRobot.UsbFacingDirection.UP));
 
         imu.initialize(parameters);
+
+        turret = new TurretSubsystem(this);
+        turret.init();
+
+        limelight = hardwareMap.get(Limelight3A.class, "LL");
+        limelight.pipelineSwitch(1);
+        limelight.start();
+
+        telemetry.addLine("Turret Initialized");
+        telemetry.addLine("Press [X] to toggle auto-tracking mode");
+        telemetry.update();
     }
 
     @Override
     public void loop() {
+        LLResult result = limelight.getLatestResult();
+
+
+        if(result != null) {
+            tX = result.getTx();
+        } else {
+            tX = 0;
+        }
+
+        if (gamepad1.x && !togglePressed) {
+            trackingEnabled = !trackingEnabled;
+            togglePressed = true;
+        } else if (!gamepad1.x) {
+            togglePressed = false;
+        }
+
         double y = -gamepad1.left_stick_y;
         double x = gamepad1.left_stick_x;
         double rx = gamepad1.right_stick_x;
@@ -60,7 +99,20 @@ public class FieldCentric extends OpMode {
         frontRight.setPower(frontRightPower);
         backRight.setPower(backRightPower);
 
-        telemetry.addData("Bot Rotation: ", botHeading);
+        if (trackingEnabled) {
+            turret.trackTarget(tX);
+            telemetry.addLine("Mode: Tracking Apriltag");
+            telemetry.addData("Bot Rotation: ", botHeading);
+            telemetry.addData("Tracking Enabled", trackingEnabled);
+
+        } else {
+            double manualPower = gamepad2.right_stick_x * 0.5; // reduce sensitivity
+            turret.manualPower(manualPower);
+            telemetry.addLine("Mode: Manual Control");
+            telemetry.addData("Bot Rotation: ", botHeading);
+            telemetry.addData("Tracking Enabled", trackingEnabled);
+
+        }
         telemetry.update();
     }
 }
