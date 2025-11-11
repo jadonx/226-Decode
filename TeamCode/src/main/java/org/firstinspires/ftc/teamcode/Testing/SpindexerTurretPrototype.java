@@ -22,12 +22,14 @@ public class SpindexerTurretPrototype extends OpMode {
 
     public static double spindexerSpeed;
 
+    public static double intakeSpeed;
+
     // Turret/Spindexer Servos
     CRServo leftServo, rightServo;
     CRServo spindexerServo;
 
     // Launcher Motors
-    DcMotor shooter1, shooter2, spinner;
+    DcMotor shooter1, shooter2, spinner, intake;
 
     // Color Sensor
     NormalizedColorSensor colorSensor;
@@ -45,6 +47,8 @@ public class SpindexerTurretPrototype extends OpMode {
         spinner = hardwareMap.get(DcMotorEx.class, "spinner");
         spinner.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        intake = hardwareMap.get(DcMotorEx.class, "intake");
+
         // leftServo = hardwareMap.get(CRServo.class, "leftCRServo");
         // rightServo = hardwareMap.get(CRServo.class, "rightCRServo");
 
@@ -54,6 +58,7 @@ public class SpindexerTurretPrototype extends OpMode {
         spinSpeed = 0;
         turretSpeed = 0;
         spindexerSpeed = 0;
+        intakeSpeed = 0;
 
         // colorSensor = hardwareMap.get(NormalizedColorSensor.class, "colorSensor");
 
@@ -68,26 +73,6 @@ public class SpindexerTurretPrototype extends OpMode {
 
         spinner.setPower(spinSpeed);
 
-//        leftServo.setPower(turretSpeed);
-//        rightServo.setPower(turretSpeed);
-//
-//        spindexerServo.setPower(spindexerSpeed);
-
-//        NormalizedRGBA colors = colorSensor.getNormalizedColors();
-//        // Convert RGB → HSV
-//        android.graphics.Color.RGBToHSV(
-//                (int) (colors.red * 255),
-//                (int) (colors.green * 255),
-//                (int) (colors.blue * 255),
-//                hsv
-//        );
-//
-//        packet.put("Hue ", hsv[0]);
-//
-//        if (hsv[0] > 205 && hsv[0] < 260) {
-//            packet.put("Purple", null);
-//        } else if (hsv[0] > 140 && hsv[0] < 190) {
-//            packet.put("Green", null);
-//        }
+        intake.setPower(intakeSpeed);
     }
 }

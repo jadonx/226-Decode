@@ -21,6 +21,13 @@ public class FieldCentric extends OpMode {
     DcMotor frontLeft, frontRight, backLeft, backRight,intake;
     CRServo bigSpin;
     IMU imu;
+    private TurretSubsystem turret;
+    private FtcDashboard dashboard;
+    private Limelight3A limelight;
+    private double tX;
+
+    private boolean trackingEnabled = false;
+    private boolean togglePressed = false;
 
     @Override
     public void init() {
@@ -41,6 +48,17 @@ public class FieldCentric extends OpMode {
                 RevHubOrientationOnRobot.UsbFacingDirection.UP));
 
         imu.initialize(parameters);
+
+        turret = new TurretSubsystem(this);
+        turret.init();
+
+        limelight = hardwareMap.get(Limelight3A.class, "LL");
+        limelight.pipelineSwitch(1);
+        limelight.start();
+
+        telemetry.addLine("Turret Initialized");
+        telemetry.addLine("Press [X] to toggle auto-tracking mode");
+        telemetry.update();
     }
 
     @Override
@@ -80,7 +98,20 @@ public class FieldCentric extends OpMode {
         frontRight.setPower(frontRightPower);
         backRight.setPower(backRightPower);
 
-        telemetry.addData("Bot Rotation: ", botHeading);
+        if (trackingEnabled) {
+            turret.trackTarget(tX);
+            telemetry.addLine("Mode: Tracking Apriltag");
+            telemetry.addData("Bot Rotation: ", botHeading);
+            telemetry.addData("Tracking Enabled", trackingEnabled);
+
+        } else {
+            double manualPower = gamepad2.right_stick_x * 0.5; // reduce sensitivity
+            turret.manualPower(manualPower);
+            telemetry.addLine("Mode: Manual Control");
+            telemetry.addData("Bot Rotation: ", botHeading);
+            telemetry.addData("Tracking Enabled", trackingEnabled);
+
+        }
         telemetry.update();
 
 
