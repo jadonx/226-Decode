@@ -42,8 +42,8 @@ public class DrivingTesting extends OpMode {
     public boolean isJammed;
 
     public static double unJamTime = 250;
-    public static double jamThreshold = 100;
-    public static double angleDiff = 3;
+    public static double jamThreshold = 250;
+    public static double angleDiff = 2.75;
     private ElapsedTime runtime = new ElapsedTime();
     AS5600Encoder spinEncoder;
 
@@ -86,7 +86,7 @@ public class DrivingTesting extends OpMode {
     @Override
     public void loop() {
         double y = gamepad1.left_stick_y;
-        double x = gamepad1.left_stick_x;
+        double x = -gamepad1.left_stick_x;
         double rx = gamepad1.right_stick_x;
 
         double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
@@ -186,6 +186,8 @@ public class DrivingTesting extends OpMode {
 
         telemetry.addData("spin Angle", spinEncoder.getAngleDegrees ());
         telemetry.addData("isJammed?", isJammed);
+        telemetry.addData("jamStart?", jamStart);
+        telemetry.addData("jamCool?", jamCool);
         telemetry.addData("runtime", runtime.milliseconds());
         telemetry.update();
 
