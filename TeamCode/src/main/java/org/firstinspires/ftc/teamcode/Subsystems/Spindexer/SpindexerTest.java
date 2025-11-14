@@ -49,13 +49,13 @@ public class SpindexerTest extends OpMode {
             spindexer.updatePID(kP, kD);
         }
 
-        // holderStatus = spindexer.getHolderColors();
+         holderStatus = spindexer.getHolderColors();
 
-//        packet.put("Holder 1 (35-45) ", holderStatus[0]);
-//        packet.put("Holder 2 (155-165) ", holderStatus[1]);
-//        packet.put("Holder 3 (275-285) ", holderStatus[2]);
+        packet.put("Holder 1 (96-110) ", holderStatus[0]);
+        packet.put("Holder 2 (211-227) ", holderStatus[1]);
+        packet.put("Holder 3 (334-347) ", holderStatus[2]);
 
-        packet.put("Holder Value/Status ", spindexer.getHolderColor(minAngle, maxAngle));
+        // packet.put("Holder Value/Status ", spindexer.getHolderColor(minAngle, maxAngle));
 
         packet.put("Target Angle ", targetAngle);
         packet.put("Current Angle ", spindexer.getAngle());

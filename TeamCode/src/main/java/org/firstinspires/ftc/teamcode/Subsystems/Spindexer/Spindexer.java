@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Subsystems.Encoder.AS5600Encoder;
 
 public class Spindexer {
@@ -22,32 +23,33 @@ public class Spindexer {
 
     private ElapsedTime colorSensorTimer;
 
-    // 3 Indexes For Each Holder
-    // 2 Indexes: Sum Of Hue Data, Hue Data Count (We take average)
-    private double[][] holderHueValues = new double[3][2];
-
-    // Min/Max Angles For Each Spindexer Holder
-    private int[][] holderAngles = {{35, 45}, {155, 165}, {275, 285}};
-
+    // Color Sensor Logic
     public enum HolderStatus { NONE, GREEN, PURPLE }
     private HolderStatus[] holderStatuses = {HolderStatus.NONE, HolderStatus.NONE, HolderStatus.NONE};
 
-    // COLOR SENSOR HOLDER TEST
-    private double[] holderHueValue = new double[2];
-    private HolderStatus holderStatus = HolderStatus.NONE;
-    private double avgHue = 0;
-    private boolean hueAvgCollected = false;
+    // Min/Max Angles For Each Spindexer Holder
+    private int[][] holderAngles = {{96, 110}, {211, 227}, {334, 347}};
+    // 3 Indexes For Each Holder
+    // 2 Indexes: Sum Of Hue Data, Hue Data Count (We take average)
+    private double[][] holderHueValues = new double[3][2];
+    // Boolean values of whether each holder has been checked
+    private boolean[] hueAvgCollected = new boolean[3];
 
     // Spindexer PID Values
     private double kP, kD;
     private double lastError;
     private ElapsedTime pidTimer;
 
-    public Spindexer(HardwareMap hardwareMap) {
-        spindexerServo = hardwareMap.get(CRServo.class, "leftCRServo");
-        spindexerEncoder = hardwareMap.get(AS5600Encoder.class, "spinEncoder");
+    // Spindexer Launch Angles
+    private int[] holderLaunchAngles = {172, 290, 53};
+    private int holderLaunchIndex;
+    private ElapsedTime launchTimer;
 
-        colorSensor = hardwareMap.get(NormalizedColorSensor.class, "colorSensor");
+    public Spindexer(HardwareMap hardwareMap) {
+        spindexerServo = hardwareMap.get(CRServo.class, Constants.HMServospinDexer);
+        spindexerEncoder = hardwareMap.get(AS5600Encoder.class, Constants.HMSpindexerEncoder);
+
+        colorSensor = hardwareMap.get(NormalizedColorSensor.class, Constants.HMColorSensor);
         colorSensorTimer = new ElapsedTime();
 
         kP = 0.005;
@@ -55,6 +57,9 @@ public class Spindexer {
         lastError = 0;
 
         pidTimer = new ElapsedTime();
+
+        holderLaunchIndex = 0;
+        launchTimer = new ElapsedTime();
     }
 
     /*
@@ -97,91 +102,44 @@ public class Spindexer {
     /*
     COLOR SENSOR CODE
      */
-
-    /*
     public HolderStatus[] getHolderColors() {
-        double currentAngle = getAngle();
+        getHolderColorsHelper(0);
+        getHolderColorsHelper(1);
+        getHolderColorsHelper(2);
 
-        getHolderColorsHelper(0, currentAngle);
-        getHolderColorsHelper(1, currentAngle);
-        getHolderColorsHelper(2, currentAngle);
-
-        return holderStatus;
+        return holderStatuses;
     }
-     */
 
-    // Green Hue: 150-180
-    // Purple Hue: 150-240
-    /*
-    public void getHolderColorsHelper(int index, double currentAngle) {
-        // Get angle range where color sensor can see holder
-        int minAngle = holderAngles[index][0];
-        int maxAngle = holderAngles[index][1];
-
-        // If 10ms has passed (lag to help performance) and currentAngle is in between our desired angles
-        if (colorSensorTimer.milliseconds() > 10 && currentAngle > minAngle && currentAngle < maxAngle) {
-            // Add the detected hue to the hue sum
-            holderHueValues[index][0] += getHue();
-            // Add one to the amount of hues we've collected
-            holderHueValues[index][1]++;
-            // Reset timer
-            colorSensorTimer.reset();
-        }
-        // Once our holder has passed the color sensor
-        else if (currentAngle > maxAngle) {
-            // Get the average hue detected in our holder
-            double avgHue = holderHueValues[index][0] / holderHueValues[index][1];
-
-            // Determine status of holder based on hue value
-            if (avgHue > 160 && avgHue < 180) {
-                holderStatus[index] = HolderStatus.GREEN;
-            }
-            else if (avgHue > 180 && avgHue < 240) {
-                holderStatus[index] = HolderStatus.PURPLE;
-            }
-            else {
-                holderStatus[index] = HolderStatus.NONE;
-            }
-
-            // Reset hue sum and hue count for next rotation
-            holderHueValues[index][0] = 0;
-            holderHueValues[index][1] = 0;
-        }
-    }
-     */
-
-    /*
-    COLOR SENSOR CODE TEST METHODS (SINGLE HOLDER)
-     */
-    public double getHolderColor(int minAngle, int maxAngle) {
+    public void getHolderColorsHelper(int holderIndex) {
         double current = getAngle();
 
+        int minAngle = holderAngles[holderIndex][0];
+        int maxAngle = holderAngles[holderIndex][1];
+
         if (colorSensorTimer.milliseconds() > 10 && current > minAngle && current < maxAngle) {
-            holderHueValue[0] += getHue();
-            holderHueValue[1]++;
+            holderHueValues[holderIndex][0] += getHue();
+            holderHueValues[holderIndex][1]++;
             colorSensorTimer.reset();
 
-            hueAvgCollected = false;
+            hueAvgCollected[holderIndex] = false;
         }
-        else if ((current < minAngle || current > maxAngle) && !hueAvgCollected) {
-            avgHue = holderHueValue[0] / holderHueValue[1];
+        else if ((current < minAngle || current > maxAngle) && !hueAvgCollected[holderIndex]) {
+            double avgHue = holderHueValues[holderIndex][0] / holderHueValues[holderIndex][1];
 
             if (avgHue > 150 && avgHue < 170) {
-                holderStatus = HolderStatus.GREEN;
+                holderStatuses[holderIndex] = HolderStatus.GREEN;
             }
             else if (avgHue > 230 && avgHue < 250) {
-                holderStatus = HolderStatus.PURPLE;
+                holderStatuses[holderIndex] = HolderStatus.PURPLE;
             }
             else {
-                holderStatus = HolderStatus.NONE;
+                holderStatuses[holderIndex] = HolderStatus.NONE;
             }
 
-            holderHueValue[0] = 0;
-            holderHueValue[1] = 0;
-            hueAvgCollected = true;
+            holderHueValues[holderIndex][0] = 0;
+            holderHueValues[holderIndex][1] = 0;
+            hueAvgCollected[holderIndex] = true;
         }
-
-        return avgHue;
     }
 
     private double getHue() {
@@ -196,5 +154,16 @@ public class Spindexer {
         );
 
         return hsv[0];
+    }
+
+    /*
+    SORTER LAUNCH CODE
+     */
+    public void launchSpin() {
+        if (launchTimer.seconds() > 1.5) {
+            goToAngle(holderLaunchAngles[holderLaunchIndex%3]);
+            holderLaunchIndex++;
+            launchTimer.reset();
+        }
     }
 }
