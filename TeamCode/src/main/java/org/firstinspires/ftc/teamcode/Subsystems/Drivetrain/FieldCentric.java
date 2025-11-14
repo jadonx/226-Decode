@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Subsystems.Outtake.TurretS;
 import org.firstinspires.ftc.teamcode.Subsystems.Outtake.TurretSubsystem;
 
@@ -31,17 +32,17 @@ public class FieldCentric extends OpMode {
 
     @Override
     public void init() {
-        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
-        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
-        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
-        backRight = hardwareMap.get(DcMotor.class, "backRight");
-        intake = hardwareMap.get(DcMotorEx.class, "intake");
-        bigSpin = hardwareMap.get(CRServo.class, "leftCRServo");
+        frontLeft = hardwareMap.get(DcMotor.class, Constants.HMMotorFrontLeft);
+        frontRight = hardwareMap.get(DcMotor.class, Constants.HMMotorFrontRight);
+        backLeft = hardwareMap.get(DcMotor.class, Constants.HMMotorBackLeft);
+        backRight = hardwareMap.get(DcMotor.class, Constants.HMMotorBackRight);
+        intake = hardwareMap.get(DcMotorEx.class, Constants.HMMotorIntake);
+        bigSpin = hardwareMap.get(CRServo.class, Constants.HMServospinDexer);
 
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        imu = hardwareMap.get(IMU.class, "imu");
+        imu = hardwareMap.get(IMU.class, Constants.HMimu);
 
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
@@ -52,7 +53,7 @@ public class FieldCentric extends OpMode {
         turret = new TurretSubsystem(this);
         turret.init();
 
-        limelight = hardwareMap.get(Limelight3A.class, "LL");
+        limelight = hardwareMap.get(Limelight3A.class, Constants.HMLimelight);
         limelight.pipelineSwitch(1);
         limelight.start();
 
