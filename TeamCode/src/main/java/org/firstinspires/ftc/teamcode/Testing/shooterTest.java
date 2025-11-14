@@ -36,8 +36,8 @@ public class shooterTest extends OpMode {
     public boolean isJammed;
 
     public static double unJamTime = 250;
-    public static double jamThreshold = 100;
-    public static double angleDiff = 3;
+    public static double jamThreshold = 250;
+    public static double angleDiff = 2.5;
 
     private ElapsedTime runtime = new ElapsedTime();
     DcMotorEx shooter1, shooter2, spinner, intake;
@@ -63,7 +63,7 @@ public class shooterTest extends OpMode {
         turretEncoder = hardwareMap.get(AS5600Encoder.class,  HMTurretEncoder);
         spinEncoder = hardwareMap.get(AS5600Encoder.class, HMSpindexerEncoder );
         shooterSpeed = 0;
-        coverPos = 0;
+        coverPos = 1;
         popper.setPosition(0);
         runtime.reset();
         bigSpinSpeed =0;
@@ -75,7 +75,6 @@ public class shooterTest extends OpMode {
 
     public void loop(){
         if(gamepad1.a){
-            shooterSpeed = 0;
             shooter1.setPower(shooterSpeed);
             shooter2.setPower(shooterSpeed);
         }
@@ -86,12 +85,11 @@ public class shooterTest extends OpMode {
         }
 
 
-        shooter1.setPower(shooterSpeed);
-        shooter2.setPower(shooterSpeed);
+
 
 
         if(gamepad1.y){
-            shooterSpeed = 1;
+            shooterSpeed = 0.1;
             shooter1.setPower(shooterSpeed);
             shooter2.setPower(shooterSpeed);
         }
@@ -105,21 +103,27 @@ public class shooterTest extends OpMode {
         }
 
         if(gamepad2.dpad_down && coverPos < 1){
-            coverPos += 0.005;
+            coverPos += 0.03;
             cover.setPosition(coverPos);
         }
 
         if(gamepad2.dpad_up){
 
-            coverPos -= 0.005;
+            coverPos -= 0.03;
             cover.setPosition(coverPos);
         }
 
         if(gamepad2.a){
+            if(turret1.getPower() < 0.05 && turret2.getPower() > -0.05){
+                turret1.setPower(1);
+                turret2.setPower(1);
+            } else{
+                turret1.setPower(-turret1.getPower());
+                turret2.setPower(-turret2.getPower());
+            }
 
-            turret1.setPower(1);
-            turret2.setPower(1);
         }
+
 
 
         if(gamepad2.y){
@@ -147,7 +151,7 @@ public class shooterTest extends OpMode {
             bigSpin.setPower(0);
         }
 
-        if(Math.abs(bigSpinSpeed) > 0.05 && !isJammed){
+        if(Math.abs(bigSpinSpeed) > 0.05 && !isJammed && intake.getPower() > 0.05 ){
             if(Math.abs(spinEncoder.getAngleDegrees() - lastAngle) < angleDiff){
                 if(jamStart == -1){
                     jamStart = runtime.milliseconds();
