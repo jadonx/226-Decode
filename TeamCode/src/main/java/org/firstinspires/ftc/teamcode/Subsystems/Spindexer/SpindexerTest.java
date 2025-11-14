@@ -60,6 +60,8 @@ public class SpindexerTest extends OpMode {
         packet.put("Target Angle ", targetAngle);
         packet.put("Current Angle ", spindexer.getAngle());
 
+        packet.put("Hue ", spindexer.getHue());
+
         dashboard.sendTelemetryPacket(packet);
     }
 }

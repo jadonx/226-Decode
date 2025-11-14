@@ -142,7 +142,7 @@ public class Spindexer {
         }
     }
 
-    private double getHue() {
+    public double getHue() {
         NormalizedRGBA colors = colorSensor.getNormalizedColors();
 
         // Convert RGB → HSV
