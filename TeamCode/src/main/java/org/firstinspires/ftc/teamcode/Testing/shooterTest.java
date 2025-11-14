@@ -1,11 +1,24 @@
 package org.firstinspires.ftc.teamcode.Testing;
 
+import static org.firstinspires.ftc.teamcode.Constants.HMMotorIntake;
+import static org.firstinspires.ftc.teamcode.Constants.HMMotorPopper;
+import static org.firstinspires.ftc.teamcode.Constants.HMMotorShooter1;
+import static org.firstinspires.ftc.teamcode.Constants.HMMotorShooter2;
+import static org.firstinspires.ftc.teamcode.Constants.HMServoPopper;
+import static org.firstinspires.ftc.teamcode.Constants.HMServoTurretLeft;
+import static org.firstinspires.ftc.teamcode.Constants.HMServoTurretRight;
+import static org.firstinspires.ftc.teamcode.Constants.HMServobackSpin;
+import static org.firstinspires.ftc.teamcode.Constants.HMServospinDexer;
+import static org.firstinspires.ftc.teamcode.Constants.HMSpindexerEncoder;
+import static org.firstinspires.ftc.teamcode.Constants.HMTurretEncoder;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Subsystems.Encoder.AS5600Encoder;
 
@@ -14,11 +27,22 @@ import org.firstinspires.ftc.teamcode.Subsystems.Encoder.AS5600Encoder;
 public class shooterTest extends OpMode {
     public static double shooterSpeed;
     public static double spinSpeed;
+    public static double bigSpinSpeed;
     public static double coverPos;
-    public static double spinDexerPos;
-    DcMotorEx shooter1, shooter2, spinner;
+    public static double spinDexerPos =0;
+    public double jamStart = -1;
+    public double jamCool = -1;
+    public double lastAngle = -1;
+    public boolean isJammed;
 
-    Servo spinDexer, cover;
+    public static double unJamTime = 250;
+    public static double jamThreshold = 100;
+    public static double angleDiff = 3;
+
+    private ElapsedTime runtime = new ElapsedTime();
+    DcMotorEx shooter1, shooter2, spinner, intake;
+
+    Servo popper, cover;
     AS5600Encoder turretEncoder, spinEncoder;
 
     CRServo bigSpin, turret1, turret2;
@@ -27,18 +51,26 @@ public class shooterTest extends OpMode {
 
 
     public void init(){
-        shooter1 = hardwareMap.get(DcMotorEx.class, "shooter1");
-        shooter2 = hardwareMap.get(DcMotorEx.class, "shooter2");
-        spinner = hardwareMap.get(DcMotorEx.class, "spinner");
-        spinDexer = hardwareMap.get(Servo.class, "spinDexerServo");
-        cover = hardwareMap.get(Servo.class, "cover");
-        bigSpin = hardwareMap.get(CRServo.class, "leftCRServo");
-        turret1 = hardwareMap.get(CRServo.class, "TL");
-        turret2 = hardwareMap.get(CRServo.class, "TR");
-        turretEncoder = hardwareMap.get(AS5600Encoder.class, "TE");
-        spinEncoder = hardwareMap.get(AS5600Encoder.class, "spinEncoder");
+        shooter1 = hardwareMap.get(DcMotorEx.class, HMMotorShooter1);
+        shooter2 = hardwareMap.get(DcMotorEx.class, HMMotorShooter2 );
+        spinner = hardwareMap.get(DcMotorEx.class, HMMotorPopper);
+        intake = hardwareMap.get(DcMotorEx.class, HMMotorIntake);
+        popper = hardwareMap.get(Servo.class, HMServoPopper);
+        cover = hardwareMap.get(Servo.class, HMServobackSpin);
+        bigSpin = hardwareMap.get(CRServo.class, HMServospinDexer );
+        turret1 = hardwareMap.get(CRServo.class, HMServoTurretLeft );
+        turret2 = hardwareMap.get(CRServo.class, HMServoTurretRight);
+        turretEncoder = hardwareMap.get(AS5600Encoder.class,  HMTurretEncoder);
+        spinEncoder = hardwareMap.get(AS5600Encoder.class, HMSpindexerEncoder );
         shooterSpeed = 0;
         coverPos = 0;
+        popper.setPosition(0);
+        runtime.reset();
+        bigSpinSpeed =0;
+        intake.setPower(0);
+        bigSpin.setPower(0);
+        spinSpeed = 0;
+        isJammed = false;
     }
 
     public void loop(){
@@ -53,10 +85,10 @@ public class shooterTest extends OpMode {
             spinner.setPower(spinSpeed);
         }
 
-        if(gamepad1.x){
-            shooter1.setPower(shooterSpeed);
-            shooter2.setPower(shooterSpeed);
-        }
+
+        shooter1.setPower(shooterSpeed);
+        shooter2.setPower(shooterSpeed);
+
 
         if(gamepad1.y){
             shooterSpeed = 1;
@@ -65,11 +97,11 @@ public class shooterTest extends OpMode {
         }
 
         if(gamepad1.dpad_up){
-            spinDexer.setPosition(0.75);
+            popper.setPosition(0.75);
         }
 
         if(gamepad1.dpad_down){
-            spinDexer.setPosition(0);
+            popper.setPosition(0);
         }
 
         if(gamepad2.dpad_down && coverPos < 1){
@@ -89,32 +121,80 @@ public class shooterTest extends OpMode {
             turret2.setPower(1);
         }
 
-        if(gamepad2.b){
-            turret1.setPower(-1);
-            turret2.setPower(-1);
+
+        if(gamepad2.y){
+            turret1.setPower(0);
+            turret2.setPower(0);
+        }
+
+        if(gamepad2.x){
+            intake.setPower(1);
+
         }
 
         if(gamepad1.dpad_right){
-            bigSpin.setPower(0.2);
+            bigSpinSpeed = 1;
+            bigSpin.setPower(bigSpinSpeed);
         }
 
         if(gamepad1.dpad_left){
-            bigSpin.setPower(-0.2);
+            bigSpinSpeed = -1;
+            bigSpin.setPower(-1);
         }
+
+        if(gamepad1.right_bumper){
+            bigSpinSpeed = 0;
+            bigSpin.setPower(0);
+        }
+
+        if(Math.abs(bigSpinSpeed) > 0.05 && !isJammed){
+            if(Math.abs(spinEncoder.getAngleDegrees() - lastAngle) < angleDiff){
+                if(jamStart == -1){
+                    jamStart = runtime.milliseconds();
+                }
+
+                if(runtime.milliseconds() - jamStart > jamThreshold){
+                    isJammed = true;
+
+
+                }
+            } else{
+                jamStart = -1;
+            }
+        }
+
+        if(isJammed){
+            if(jamCool == -1){
+                jamCool = runtime.milliseconds();
+            }
+            bigSpin.setPower(-0.5);
+            intake.setPower(-1);
+            if(runtime.milliseconds() - jamCool > unJamTime){
+                 bigSpin.setPower(bigSpinSpeed);
+                 intake.setPower(1);
+                 jamCool = -1;
+                isJammed = false;
+                jamStart = -1;
+            }
+        }
+
+
+        if(!isJammed){
+            lastAngle = spinEncoder.getAngleDegrees();
+        }
+
+
+
 
         telemetry.addData("Speed", shooterSpeed);
         telemetry.addData("cover pos", coverPos);
         telemetry.addData("turret Angle", turretEncoder.getAngleDegrees());
         telemetry.addData("spin Angle", spinEncoder.getAngleDegrees ());
+        telemetry.addData("isJammed?", isJammed);
+        telemetry.addData("runtime", runtime.milliseconds());
+        telemetry.addData("bigSPinSpeed", bigSpinSpeed);
     }
 
-    public static double angleToServoPos(double angle) {
-        double minAngle = 52.0;
-        double maxAngle = 74.5;
-        double servoPos = (angle - minAngle) / (maxAngle - minAngle);
 
-
-        return Math.max(0.0, Math.min(1.0, servoPos));
-    }
 
 }
