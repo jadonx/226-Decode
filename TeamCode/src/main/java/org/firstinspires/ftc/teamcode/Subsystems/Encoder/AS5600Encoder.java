@@ -12,6 +12,10 @@ public class AS5600Encoder extends I2cDeviceSynchDevice<I2cDeviceSynch> {
 
     private static final I2cAddr ADDRESS_AS5600 = I2cAddr.create7bit(0x36);
     private static final int ANGLE_REG = 0x0E;
+    private static final double GEAR_RATIO = 3.0; // encoder spins 3x faster than turret
+    private double zeroOffset = 0.0;
+    private double lastAngle = 0.0;
+    private double accumulatedAngle = 0.0;
 
     public AS5600Encoder(I2cDeviceSynch deviceSynch) {
         super(deviceSynch, true);
@@ -28,6 +32,33 @@ public class AS5600Encoder extends I2cDeviceSynchDevice<I2cDeviceSynch> {
         byte[] rawBytes = deviceClient.read(ANGLE_REG, 2);
         int raw = ((rawBytes[0] & 0x0F) << 8) | (rawBytes[1] & 0xFF);
         return raw * (360.0 / 4096.0);
+    }
+
+    // --- NEW METHOD: real turret angle (0–360°) ---
+    public double getTurretAngleDegrees() {
+        double angle = getAngleDegrees() * GEAR_RATIO;
+        return angle % 360.0;
+    }
+
+    public void resetTurretAngle() {
+        zeroOffset = getTurretAngleDegrees();
+    }
+
+    public double getRelativeTurretAngleDegrees() {
+        return (getTurretAngleDegrees() - zeroOffset + 360.0) % 360.0;
+    }
+
+    public double getCurrentPosition() {
+        double currentAngle = getAngleDegrees();
+        double delta = currentAngle - lastAngle;
+
+        if (delta < -180) delta += 360;
+        else if (delta > 180) delta -= 360;
+
+        accumulatedAngle += delta;
+        lastAngle = currentAngle;
+
+        return accumulatedAngle;
     }
 
     @Override

@@ -11,10 +11,10 @@ public class DriveTrainMotorTest extends OpMode {
 
     @Override
     public void init() {
-        frontLeft = hardwareMap.get(DcMotorEx.class, "");
-        frontRight = hardwareMap.get(DcMotorEx.class, "");
-        backLeft = hardwareMap.get(DcMotorEx.class, "");
-        backRight = hardwareMap.get(DcMotorEx.class, "");
+        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
+        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
+        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
+        backRight = hardwareMap.get(DcMotor.class, "backRight");
     }
 
     @Override

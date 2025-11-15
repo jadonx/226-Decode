@@ -41,9 +41,9 @@ public class DrivingTesting extends OpMode {
     public double lastAngle = -1;
     public boolean isJammed;
 
-    public static double unJamTime = 250;
-    public static double jamThreshold = 100;
-    public static double angleDiff = 3;
+    public static double unJamTime = 100;
+    public static double jamThreshold = 75;
+    public static double angleDiff = 2;
     private ElapsedTime runtime = new ElapsedTime();
     AS5600Encoder spinEncoder;
 
@@ -86,7 +86,7 @@ public class DrivingTesting extends OpMode {
     @Override
     public void loop() {
         double y = gamepad1.left_stick_y;
-        double x = gamepad1.left_stick_x;
+        double x = -gamepad1.left_stick_x;
         double rx = gamepad1.right_stick_x;
 
         double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
@@ -95,8 +95,9 @@ public class DrivingTesting extends OpMode {
             imu.resetYaw();
         }
         if(gamepad1.b){
-            bigSpin.setPower(1);
-            intake.setPower(1);
+            bigSpinSpeed = 1;
+            bigSpin.setPower(bigSpinSpeed);
+            intake.setPower(0.9);
         }
 
         if(gamepad1.y){
@@ -150,11 +151,11 @@ public class DrivingTesting extends OpMode {
             if(jamCool == -1){
                 jamCool = runtime.milliseconds();
             }
-            bigSpin.setPower(-0.5);
-            intake.setPower(-1);
+            bigSpin.setPower(-1);
+            intake.setPower(-0.9);
             if(runtime.milliseconds() - jamCool > unJamTime){
                 bigSpin.setPower(bigSpinSpeed);
-                intake.setPower(1);
+                intake.setPower(0.9);
                 jamCool = -1;
                 isJammed = false;
                 jamStart = -1;
@@ -186,6 +187,8 @@ public class DrivingTesting extends OpMode {
 
         telemetry.addData("spin Angle", spinEncoder.getAngleDegrees ());
         telemetry.addData("isJammed?", isJammed);
+        telemetry.addData("jamStart?", jamStart);
+        telemetry.addData("jamCool?", jamCool);
         telemetry.addData("runtime", runtime.milliseconds());
         telemetry.update();
 
