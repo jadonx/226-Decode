@@ -6,17 +6,21 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Subsystems.Outtake.TurretS;
 import org.firstinspires.ftc.teamcode.Subsystems.Outtake.TurretSubsystem;
 
 @TeleOp(name="FieldCentricDrive")
 public class FieldCentric extends OpMode {
-    DcMotor frontLeft, frontRight, backLeft, backRight;
+    DcMotor frontLeft, frontRight, backLeft, backRight,intake;
+    CRServo bigSpin;
     IMU imu;
     private TurretSubsystem turret;
     private FtcDashboard dashboard;
@@ -28,15 +32,17 @@ public class FieldCentric extends OpMode {
 
     @Override
     public void init() {
-        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
-        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
-        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
-        backRight = hardwareMap.get(DcMotor.class, "backRight");
+        frontLeft = hardwareMap.get(DcMotor.class, Constants.HMMotorFrontLeft);
+        frontRight = hardwareMap.get(DcMotor.class, Constants.HMMotorFrontRight);
+        backLeft = hardwareMap.get(DcMotor.class, Constants.HMMotorBackLeft);
+        backRight = hardwareMap.get(DcMotor.class, Constants.HMMotorBackRight);
+        intake = hardwareMap.get(DcMotorEx.class, Constants.HMMotorIntake);
+        bigSpin = hardwareMap.get(CRServo.class, Constants.HMServospinDexer);
 
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        imu = hardwareMap.get(IMU.class, "imu");
+        imu = hardwareMap.get(IMU.class, Constants.HMimu);
 
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
@@ -47,7 +53,7 @@ public class FieldCentric extends OpMode {
         turret = new TurretSubsystem(this);
         turret.init();
 
-        limelight = hardwareMap.get(Limelight3A.class, "LL");
+        limelight = hardwareMap.get(Limelight3A.class, Constants.HMLimelight);
         limelight.pipelineSwitch(1);
         limelight.start();
 
@@ -58,23 +64,7 @@ public class FieldCentric extends OpMode {
 
     @Override
     public void loop() {
-        LLResult result = limelight.getLatestResult();
-
-
-        if(result != null) {
-            tX = result.getTx();
-        } else {
-            tX = 0;
-        }
-
-        if (gamepad1.x && !togglePressed) {
-            trackingEnabled = !trackingEnabled;
-            togglePressed = true;
-        } else if (!gamepad1.x) {
-            togglePressed = false;
-        }
-
-        double y = -gamepad1.left_stick_y;
+        double y = gamepad1.left_stick_y;
         double x = gamepad1.left_stick_x;
         double rx = gamepad1.right_stick_x;
 
@@ -83,6 +73,16 @@ public class FieldCentric extends OpMode {
         if (gamepad1.a) {
             imu.resetYaw();
         }
+        if(gamepad1.b){
+            bigSpin.setPower(1);
+            intake.setPower(1);
+        }
+
+        if(gamepad1.y){
+            bigSpin.setPower(0);
+            intake.setPower(0);
+        }
+
 
         // Rotate the movement direction counter to the bot's rotation
         double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
@@ -114,5 +114,7 @@ public class FieldCentric extends OpMode {
 
         }
         telemetry.update();
+
+
     }
 }
