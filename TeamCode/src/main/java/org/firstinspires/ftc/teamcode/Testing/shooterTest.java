@@ -35,9 +35,9 @@ public class shooterTest extends OpMode {
     public double lastAngle = -1;
     public boolean isJammed;
 
-    public static double unJamTime = 250;
-    public static double jamThreshold = 250;
-    public static double angleDiff = 2.5;
+    public static double unJamTime = 100;
+    public static double jamThreshold = 50;
+    public static double angleDiff = 2;
 
     private ElapsedTime runtime = new ElapsedTime();
     DcMotorEx shooter1, shooter2, spinner, intake;
@@ -88,18 +88,16 @@ public class shooterTest extends OpMode {
 
 
 
-        if(gamepad1.y){
-            shooterSpeed = 0.1;
-            shooter1.setPower(shooterSpeed);
-            shooter2.setPower(shooterSpeed);
+        if(gamepad1.y && (spinEncoder.getAngleDegrees() > 290.05 || spinEncoder.getAngleDegrees() < 289.5)){
+            bigSpin.setPower(0.1);
         }
 
         if(gamepad1.dpad_up){
-            popper.setPosition(0.75);
+            popper.setPosition(0.85);
         }
 
         if(gamepad1.dpad_down){
-            popper.setPosition(0);
+            popper.setPosition(0.1);
         }
 
         if(gamepad2.dpad_down && coverPos < 1){

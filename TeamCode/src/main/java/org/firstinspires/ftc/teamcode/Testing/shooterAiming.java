@@ -26,6 +26,7 @@ public class shooterAiming extends OpMode {
     double tx = 0;
     double ty = 0;
     double id = -1;
+    double shooterSpeed = 1;
 
     double camDeg = 19.47883;
     double camH = 12;
@@ -81,13 +82,18 @@ public class shooterAiming extends OpMode {
         */
         telemetry.addData("Angle Needed", getNeededAngle(distance));
         telemetry.addData("pos Needed", degreeToPos(getNeededAngle(distance)));
-        cover.setPosition(degreeToPos(getNeededAngle(distance)));
+
+        if(distance > 52){
+            cover.setPosition(degreeToPos(getNeededAngle(distance)));
+        } else{
+            shooterSpeed = getNeededPower(distance);
+        }
+
 
         if(gamepad1.a){
-            spinner.setPower(1);
-            spinDexer.setPower(1);
-            shooter1.setPower(1);
-            shooter2.setPower(1);
+
+            shooter1.setPower(shooterSpeed);
+            shooter2.setPower(shooterSpeed);
         }
 
         if(gamepad1.b){
@@ -134,6 +140,11 @@ public class shooterAiming extends OpMode {
         double thetaDeg = Math.toDegrees(thetaRad);
 
         return thetaDeg;
+    }
+
+    private double getNeededPower(double distance) {
+
+        return (0.00581395*distance)+0.697674;
     }
 
 

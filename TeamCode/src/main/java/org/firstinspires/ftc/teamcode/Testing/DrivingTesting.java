@@ -41,9 +41,9 @@ public class DrivingTesting extends OpMode {
     public double lastAngle = -1;
     public boolean isJammed;
 
-    public static double unJamTime = 250;
-    public static double jamThreshold = 250;
-    public static double angleDiff = 2.75;
+    public static double unJamTime = 100;
+    public static double jamThreshold = 75;
+    public static double angleDiff = 2;
     private ElapsedTime runtime = new ElapsedTime();
     AS5600Encoder spinEncoder;
 
@@ -95,8 +95,9 @@ public class DrivingTesting extends OpMode {
             imu.resetYaw();
         }
         if(gamepad1.b){
-            bigSpin.setPower(1);
-            intake.setPower(1);
+            bigSpinSpeed = 1;
+            bigSpin.setPower(bigSpinSpeed);
+            intake.setPower(0.9);
         }
 
         if(gamepad1.y){
@@ -150,11 +151,11 @@ public class DrivingTesting extends OpMode {
             if(jamCool == -1){
                 jamCool = runtime.milliseconds();
             }
-            bigSpin.setPower(-0.5);
-            intake.setPower(-1);
+            bigSpin.setPower(-1);
+            intake.setPower(-0.9);
             if(runtime.milliseconds() - jamCool > unJamTime){
                 bigSpin.setPower(bigSpinSpeed);
-                intake.setPower(1);
+                intake.setPower(0.9);
                 jamCool = -1;
                 isJammed = false;
                 jamStart = -1;
