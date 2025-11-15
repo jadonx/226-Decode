@@ -14,8 +14,12 @@ public class Intake {
     }
 
     public void runIntake() {
-        intake.setPower(0.5);
+        intake.setPower(0.8);
         isIntaking = true;
+    }
+
+    public void unjamIntake() {
+        intake.setPower(-0.8);
     }
 
     public void stopIntake() {

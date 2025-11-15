@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
+package org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -9,11 +9,11 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
-public class SimpleDriveTrain {
+public class FieldCentricDrive {
     private DcMotor frontLeft, frontRight, backLeft, backRight;
     private IMU imu;
 
-    public SimpleDriveTrain(HardwareMap hardwareMap) {
+    public FieldCentricDrive(HardwareMap hardwareMap) {
         frontLeft = hardwareMap.get(DcMotorEx.class, "");
         frontRight = hardwareMap.get(DcMotorEx.class, "");
         backLeft = hardwareMap.get(DcMotorEx.class, "");
