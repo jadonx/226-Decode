@@ -1,15 +1,21 @@
 package org.firstinspires.ftc.teamcode;
 
 public class Constants {
+    //Drivetrain Hardware Map Names
+
+
+
+    public static String HMMotorSpinner = "spinner";
+
     public static String HMimu = "imu";
     public static String HMSpindexerEncoder = "spinDexerEncoder";
     public static String HMTurretEncoder = "turretEncoder";
     public static String HMPinPointer = "pinpointer";
 
-    public static String HMServoFrontLeft = "frontLeft";
-    public static String HMServoFrontRight = "frontRight";
-    public static String HMServoBackLeft = "backLeft";
-    public static String HMServoBackRight = "backRight";
+    public static String HMMotorFrontLeft = "frontLeft";
+    public static String HMMotorFrontRight = "frontRight";
+    public static String HMMotorBackLeft = "backLeft";
+    public static String HMMotorBackRight = "backRight";
 
     public static String HMLimelight = "limelight";
 
