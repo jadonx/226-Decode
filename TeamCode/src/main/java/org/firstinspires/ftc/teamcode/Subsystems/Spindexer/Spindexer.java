@@ -16,9 +16,8 @@ public class Spindexer {
     private AS5600Encoder spindexerEncoder;
 
     // PID VARIABLES
-    private double kP, kI, kD;
-    private double integralSum;
-    private double lastError;
+    private double kP = 0.01, kI = 0, kD = 0;
+    private double lastError = 0;
     private ElapsedTime pidTimer;
 
     private int[] launchHolderAngles = {40, 190, 290};
@@ -32,8 +31,6 @@ public class Spindexer {
         spindexerServo = hardwareMap.get(CRServo.class, Constants.HMServospinDexer);
         spindexerEncoder = hardwareMap.get(AS5600Encoder.class, Constants.HMSpindexerEncoder);
 
-        kP = 0.01; kI = 0; kD = 0;
-        lastError = 0;
         pidTimer = new ElapsedTime();
 
         colorSensor = hardwareMap.get(NormalizedColorSensor.class, Constants.HMColorSensor);
@@ -63,7 +60,7 @@ public class Spindexer {
 
         double derivative = (error - lastError) / pidTimer.seconds();
 
-        double output = (kP * error) + (kI * integralSum) + (kD * derivative);
+        double output = (kP * error) + (kD * derivative);
 
         spindexerServo.setPower(output);
 
@@ -75,8 +72,9 @@ public class Spindexer {
         double error = targetAngle - currentAngle;
 
         // Normalize error to the range (-180, 180]
-        error = (error + 180) % 360 - 180;
-        return error;
+        error = (error + 180) % 360;
+        if (error < 0) error += 360;
+        return error - 180;
     }
 
     public double getAngle() {

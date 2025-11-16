@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -7,6 +8,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class LaunchArtifactCommand {
     private final Spindexer spindexer;
+    private final Popper popper;
 
     private int[] launchAngleSequence = new int[3];
     private ElapsedTime timer;
@@ -16,8 +18,9 @@ public class LaunchArtifactCommand {
 
     private int target;
 
-    public LaunchArtifactCommand(Spindexer spindexer) {
+    public LaunchArtifactCommand(Spindexer spindexer, Popper popper) {
         this.spindexer = spindexer;
+        this.popper = popper;
         timer = new ElapsedTime();
 
         reachedFirst = false; reachedSecond = false; reachedThird = false;
@@ -29,40 +32,36 @@ public class LaunchArtifactCommand {
         target = launchAngleSequence[0];
     }
 
-    public void update(Telemetry telemetry) {
+    public void update(TelemetryPacket packet) {
         spindexer.goToAngle(target);
 
-        if (!reachedFirst && spindexerReachedTarget(spindexer.getAngle(), target)) {
+        if (!reachedFirst && spindexerReachedTarget(spindexer.getAngle(), target) && target == launchAngleSequence[0]) {
             timer.reset();
             reachedFirst = true;
         }
-
-        if (reachedFirst && !reachedSecond && timer.seconds() > 3) {
+        else if (reachedFirst && !reachedSecond && timer.seconds() > 3) {
             target = launchAngleSequence[1];
         }
-
-        if (!reachedSecond && spindexerReachedTarget(spindexer.getAngle(), target)) {
+        else if (!reachedSecond && spindexerReachedTarget(spindexer.getAngle(), target) && target == launchAngleSequence[1]) {
             timer.reset();
             reachedSecond = true;
         }
-
-        if (reachedSecond && !reachedThird && timer.seconds() > 3) {
+        else if (reachedSecond && !reachedThird && timer.seconds() > 3) {
             target = launchAngleSequence[2];
         }
-
-        if (!reachedThird && spindexerReachedTarget(spindexer.getAngle(), target)) {
+        else if (!reachedThird && spindexerReachedTarget(spindexer.getAngle(), target) && target == launchAngleSequence[2]) {
             timer.reset();
             reachedThird = true;
         }
-
-        if (reachedThird && timer.seconds() > 3) {
+        else if (reachedThird && timer.seconds() > 3) {
             isFinished = true;
         }
 
-        telemetry.addData("timer ", timer.seconds());
-        telemetry.addData("reached first ", reachedFirst);
-        telemetry.addData("reached second ", reachedSecond);
-        telemetry.addData("reached third ", reachedThird);
+        packet.put("timer ", timer.seconds());
+        packet.put("target ", target);
+        packet.put("reached first ", reachedFirst);
+        packet.put("reached second ", reachedSecond);
+        packet.put("reached third ", reachedThird);
     }
 
     public boolean isFinished() {

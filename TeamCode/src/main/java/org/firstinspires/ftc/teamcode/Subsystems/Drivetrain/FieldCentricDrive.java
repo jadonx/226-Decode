@@ -56,6 +56,13 @@ public class FieldCentricDrive {
         backRight.setPower(backRightPower);
     }
 
+    public void stopDrive() {
+        frontLeft.setPower(0);
+        backLeft.setPower(0);
+        frontRight.setPower(0);
+        backRight.setPower(0);
+    }
+
     public void resetIMU() {
         imu.resetYaw();
     }
