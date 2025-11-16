@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -14,11 +13,10 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.Subsystems.Outtake.TurretS;
 import org.firstinspires.ftc.teamcode.Subsystems.Outtake.TurretSubsystem;
 
 @TeleOp(name="FieldCentricDrive")
-public class FieldCentric extends OpMode {
+public class FieldCentricLL extends OpMode {
     DcMotor frontLeft, frontRight, backLeft, backRight,intake;
     CRServo bigSpin;
     IMU imu;

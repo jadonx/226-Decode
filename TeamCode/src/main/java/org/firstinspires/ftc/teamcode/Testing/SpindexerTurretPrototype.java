@@ -3,14 +3,18 @@ package org.firstinspires.ftc.teamcode.Testing;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @Config
 @TeleOp(name="Spindexer Turret Prototype")
@@ -30,6 +34,10 @@ public class SpindexerTurretPrototype extends OpMode {
 
     // Launcher Motors
     DcMotor shooter1, shooter2, spinner, intake;
+
+    // Drive Motors
+    DcMotor frontLeft, frontRight, backLeft, backRight;
+    IMU imu;
 
     // Color Sensor
     NormalizedColorSensor colorSensor;
@@ -52,7 +60,15 @@ public class SpindexerTurretPrototype extends OpMode {
         // leftServo = hardwareMap.get(CRServo.class, "leftCRServo");
         // rightServo = hardwareMap.get(CRServo.class, "rightCRServo");
 
-        // spindexerServo = hardwareMap.get(CRServo.class, "spindexerServo");
+        spindexerServo = hardwareMap.get(CRServo.class, "leftCRServo");
+
+        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
+        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
+        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
+        backRight = hardwareMap.get(DcMotor.class, "backRight");
+
+        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         shooterSpeed = 0;
         spinSpeed = 0;
@@ -60,7 +76,7 @@ public class SpindexerTurretPrototype extends OpMode {
         spindexerSpeed = 0;
         intakeSpeed = 0;
 
-        // colorSensor = hardwareMap.get(NormalizedColorSensor.class, "colorSensor");
+         colorSensor = hardwareMap.get(NormalizedColorSensor.class, "colorSensor");
 
         dashboard = FtcDashboard.getInstance();
         packet = new TelemetryPacket();
@@ -74,5 +90,21 @@ public class SpindexerTurretPrototype extends OpMode {
         spinner.setPower(spinSpeed);
 
         intake.setPower(intakeSpeed);
+
+        spindexerServo.setPower(spindexerSpeed);
+
+        double y = -gamepad1.left_stick_y;
+        double x = gamepad1.left_stick_x;
+        double rx = gamepad1.right_stick_x;
+
+        double frontLeftPower = (y + x + rx);
+        double backLeftPower = (y - x + rx);
+        double frontRightPower = (y - x - rx);
+        double backRightPower = (y + x - rx);
+
+        frontLeft.setPower(frontLeftPower);
+        backLeft.setPower(backLeftPower);
+        frontRight.setPower(frontRightPower);
+        backRight.setPower(backRightPower);
     }
 }
