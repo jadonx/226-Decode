@@ -21,6 +21,8 @@ public class Spindexer {
     private double lastError;
     private ElapsedTime pidTimer;
 
+    private int[] launchHolderAngles = {40, 190, 290};
+
     // COLOR SENSOR VARIABLES
     private NormalizedColorSensor colorSensor;
     float[] hsv = new float[3];
@@ -61,8 +63,6 @@ public class Spindexer {
 
         double derivative = (error - lastError) / pidTimer.seconds();
 
-        integralSum = integralSum + (error * pidTimer.seconds());
-
         double output = (kP * error) + (kI * integralSum) + (kD * derivative);
 
         spindexerServo.setPower(output);
@@ -87,6 +87,27 @@ public class Spindexer {
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;
+    }
+
+    // Returns the sequence of shooting angles starting from the closest (for shooting)
+    public int[] getLaunchAngleSequence() {
+        int current = (int) getAngle();
+
+        int a = launchHolderAngles[0], b = launchHolderAngles[1], c = launchHolderAngles[2];
+
+        int da = Math.abs(current - a);
+        int db = Math.abs(current - b);
+        int dc = Math.abs(current - c);
+
+        if (da <= db && da <= dc) {
+            return new int[] {a, b, c};
+        }
+        else if (db <= da && db <= dc) {
+            return new int[] {b, c, a};
+        }
+        else {
+            return new int[] {c, a, b};
+        }
     }
 
     /*

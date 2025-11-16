@@ -18,7 +18,9 @@ public class TurretEncoderTester extends OpMode {
 
     @Override
     public void loop() {
-        telemetry.addData("Turret Angle (Degrees): ", turretEncoder.getAngleDegreesTurret());
+        telemetry.addData("Turret Angle (Degrees): ", turretEncoder.getCurrentPosition());
+        telemetry.addData("Turret Angle (Degrees): ", turretEncoder.getRelativeTurretAngleDegrees());
+        telemetry.addData("Turret Angle (Degrees): ", turretEncoder.getTurretAngleDegrees());
         telemetry.addData("Turret Angle (Degrees): ", turretEncoder.getAngleDegrees());
         telemetry.update();
     }

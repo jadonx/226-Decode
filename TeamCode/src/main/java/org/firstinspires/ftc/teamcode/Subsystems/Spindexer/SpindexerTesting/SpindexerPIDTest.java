@@ -27,7 +27,7 @@ public class SpindexerPIDTest extends OpMode {
         packet = new TelemetryPacket();
         dashboard = FtcDashboard.getInstance();
 
-        kP = 0.01; kI = 0; kD = 0;
+        kP = 0; kI = 0; kD = 0;
     }
 
     @Override

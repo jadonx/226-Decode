@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class UnjammerSystem {
-    private Intake intake;
-    private Spindexer spindexer;
+    private final Intake intake;
+    private final Spindexer spindexer;
 
     private boolean isJammed;
     private double jamStartTime;
@@ -20,14 +20,19 @@ public class UnjammerSystem {
         timer = new ElapsedTime();
     }
 
-    public void runIntakeSpindexer() {
-        intake.runIntake();
+    public void runIntakeSpindexer(float intakePower) {
+        intake.runIntake(intakePower);
         spindexer.runSpindexer();
     }
 
-    public void periodic() {
+    public void stopIntakeSpindexer() {
+        intake.stopIntake();
+        spindexer.stopSpindexer();
+    }
+
+    public void periodic(float intakePower) {
         if (!isJammed) {
-            runIntakeSpindexer();
+            runIntakeSpindexer(intakePower);
         }
 
         // Checks whether intake is intaking and is not jammed

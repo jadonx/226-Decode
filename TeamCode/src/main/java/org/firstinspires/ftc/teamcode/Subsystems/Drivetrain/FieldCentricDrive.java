@@ -8,21 +8,27 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.Constants;
 
 public class FieldCentricDrive {
     private DcMotor frontLeft, frontRight, backLeft, backRight;
     private IMU imu;
 
     public FieldCentricDrive(HardwareMap hardwareMap) {
-        frontLeft = hardwareMap.get(DcMotorEx.class, "");
-        frontRight = hardwareMap.get(DcMotorEx.class, "");
-        backLeft = hardwareMap.get(DcMotorEx.class, "");
-        backRight = hardwareMap.get(DcMotorEx.class, "");
+        frontLeft = hardwareMap.get(DcMotorEx.class, Constants.HMMotorFrontLeft);
+        frontRight = hardwareMap.get(DcMotorEx.class, Constants.HMMotorFrontRight);
+        backLeft = hardwareMap.get(DcMotorEx.class, Constants.HMMotorBackLeft);
+        backRight = hardwareMap.get(DcMotorEx.class, Constants.HMMotorBackRight);
 
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        imu = hardwareMap.get(IMU.class, "");
+        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        imu = hardwareMap.get(IMU.class, Constants.HMimu);
 
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,

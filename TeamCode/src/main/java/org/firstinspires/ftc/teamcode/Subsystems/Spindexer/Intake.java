@@ -4,17 +4,19 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.Constants;
+
 public class Intake {
     private DcMotor intake;
     private boolean isIntaking;
 
     public Intake(HardwareMap hardwareMap) {
-        intake = hardwareMap.get(DcMotorEx.class, "");
+        intake = hardwareMap.get(DcMotorEx.class, Constants.HMMotorIntake);
         isIntaking = false;
     }
 
-    public void runIntake() {
-        intake.setPower(0.8);
+    public void runIntake(float intakePower) {
+        intake.setPower(intakePower);
         isIntaking = true;
     }
 
