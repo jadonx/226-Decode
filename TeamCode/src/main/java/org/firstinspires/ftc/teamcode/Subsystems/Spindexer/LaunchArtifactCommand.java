@@ -21,11 +21,12 @@ public class LaunchArtifactCommand {
         MOVE_TO_SECOND_LAUNCH,
         LAUNCH_SECOND,
         MOVE_TO_THIRD_LAUNCH,
-        LAUNCH_THIRD
+        LAUNCH_THIRD,
+        FINISHED
     }
     private State currentState = State.MOVE_TO_FIRST_LAUNCH;
-    private long stateStartTime = 0;
-    private final long waitTime = 1000;
+    private double stateStartTime = 0;
+    private final double waitTime = 1000;
     private ElapsedTime timer;
 
     public LaunchArtifactCommand(Spindexer spindexer, Popper popper) {
@@ -39,6 +40,7 @@ public class LaunchArtifactCommand {
     public void start() {
         launchAngleSequence = spindexer.getLaunchAngleSequence();
         target = launchAngleSequence[0];
+        spindexer.goToAngle(target);
         timer = new ElapsedTime();
     }
 
@@ -75,10 +77,54 @@ public class LaunchArtifactCommand {
     }
 
     public void update(TelemetryPacket packet) {
+        switch (currentState) {
+            case MOVE_TO_FIRST_LAUNCH:
+                if(spindexerReachedTarget(spindexer.getAngle(), target)) {
+                    currentState = State.LAUNCH_FIRST;
+                    stateStartTime = timer.milliseconds();
+                }
+                break;
+            case LAUNCH_FIRST:
+                if (timer.milliseconds() - stateStartTime > waitTime) {
+                    currentState = State.MOVE_TO_SECOND_LAUNCH;
+                    target = launchAngleSequence[1];
+                    spindexer.goToAngle(target);
+                }
+                break;
+            case MOVE_TO_SECOND_LAUNCH:
+                if(spindexerReachedTarget(spindexer.getAngle(), target)) {
+                    currentState = State.LAUNCH_SECOND;
+                    stateStartTime = timer.milliseconds();
+                }
+                break;
+            case LAUNCH_SECOND:
+                if (timer.milliseconds() - stateStartTime > waitTime) {
+                    currentState = State.MOVE_TO_THIRD_LAUNCH;
+                    target = launchAngleSequence[2];
+                    spindexer.goToAngle(target);
+                }
+                break;
+            case MOVE_TO_THIRD_LAUNCH:
+                if (spindexerReachedTarget(spindexer.getAngle(), target)) {
+                    currentState = State.LAUNCH_THIRD;
+                    stateStartTime = timer.milliseconds();
+                }
+                break;
+            case LAUNCH_THIRD:
+                if (timer.milliseconds() - stateStartTime > waitTime) {
+                    currentState = State.FINISHED;
+                }
+                break;
+            case FINISHED:
+                break;
+        }
+
+        packet.put("state ", currentState);
+        packet.put("target ", target);
     }
 
     public boolean isFinished() {
-        return false;
+        return currentState == State.FINISHED;
     }
 
     public boolean spindexerReachedTarget(double currentAngle, double targetAngle) {

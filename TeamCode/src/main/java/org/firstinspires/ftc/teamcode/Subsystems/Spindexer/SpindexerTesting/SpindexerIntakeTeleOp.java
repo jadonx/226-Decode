@@ -21,7 +21,7 @@ public class SpindexerIntakeTeleOp extends OpMode {
     Intake intake;
     Spindexer spindexer;
     UnjammerSystem unjamSystem;
-    Popper popper;
+    // Popper popper;
 
     LaunchArtifactCommand launchArtifactCommand;
 
@@ -37,7 +37,7 @@ public class SpindexerIntakeTeleOp extends OpMode {
         intake = new Intake(hardwareMap);
         spindexer = new Spindexer(hardwareMap);
         unjamSystem = new UnjammerSystem(intake, spindexer);
-        popper = new Popper(hardwareMap);
+        // popper = new Popper(hardwareMap);
 
         packet = new TelemetryPacket();
         dashboard = FtcDashboard.getInstance();
@@ -67,12 +67,12 @@ public class SpindexerIntakeTeleOp extends OpMode {
 
         // SPINDEXER LAUNCH LOGIC
         if (gamepad1.a) {
-            launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper);
+            launchArtifactCommand = new LaunchArtifactCommand(spindexer, null);
             launchArtifactCommand.start();
         }
 
         if (launchArtifactCommand != null && !launchArtifactCommand.isFinished()) {
-            launchArtifactCommand.testPID(packet);
+            launchArtifactCommand.testPID(packet);  
         }
 
         packet.put("spindexer current angle ", spindexer.getAngle());
@@ -86,6 +86,6 @@ public class SpindexerIntakeTeleOp extends OpMode {
     public void stop() {
         unjamSystem.stopIntakeSpindexer();
         drive.stopDrive();
-        popper.deactivatePopper();
+        // popper.deactivatePopper();
     }
 }

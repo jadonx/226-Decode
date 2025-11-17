@@ -60,7 +60,7 @@ public class Spindexer {
 
         double derivative = (error - lastError) / pidTimer.seconds();
 
-        double output = (kP * error) + (kD * derivative);
+        double output = (kP * error) + (-kD * derivative);
 
         spindexerServo.setPower(output);
 
