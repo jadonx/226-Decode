@@ -89,11 +89,11 @@ public class shooterTest extends OpMode {
 
 
         if(gamepad1.y && (spinEncoder.getAngleDegrees() > 290.05 || spinEncoder.getAngleDegrees() < 289.5)){
-            bigSpin.setPower(0.1);
+            bigSpin.setPower(0.025);
         }
 
         if(gamepad1.dpad_up){
-            popper.setPosition(0.85);
+            popper.setPosition(0.80);
         }
 
         if(gamepad1.dpad_down){
@@ -188,7 +188,8 @@ public class shooterTest extends OpMode {
 
 
 
-        telemetry.addData("Speed", shooterSpeed);
+        telemetry.addData("Power", shooterSpeed);
+        telemetry.addData("Velocity", shooter1.getVelocity());
         telemetry.addData("cover pos", coverPos);
         telemetry.addData("turret Angle", turretEncoder.getAngleDegrees());
         telemetry.addData("spin Angle", spinEncoder.getAngleDegrees ());

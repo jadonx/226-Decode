@@ -1,5 +1,11 @@
 package org.firstinspires.ftc.teamcode.Testing;
 
+import static org.firstinspires.ftc.teamcode.Constants.HMMotorPopper;
+import static org.firstinspires.ftc.teamcode.Constants.HMMotorShooter1;
+import static org.firstinspires.ftc.teamcode.Constants.HMMotorShooter2;
+import static org.firstinspires.ftc.teamcode.Constants.HMServoPopper;
+import static org.firstinspires.ftc.teamcode.Constants.HMServobackSpin;
+
 import android.graphics.Color;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -19,7 +25,7 @@ import java.util.List;
 @TeleOp (name = "Shooter Aiming")
 public class shooterAiming extends OpMode {
     DcMotorEx shooter1, shooter2, spinner, spinDexer;
-    Servo cover;
+    Servo cover, popper;
     Limelight3A limelight;
     NormalizedColorSensor colorSensor;
     double anglePos, angleDegree;
@@ -38,16 +44,17 @@ public class shooterAiming extends OpMode {
 
 
     public void init(){
-        shooter1 = hardwareMap.get(DcMotorEx.class, "shooter1");
-        shooter2 = hardwareMap.get(DcMotorEx.class, "shooter2");
-        spinner = hardwareMap.get(DcMotorEx.class, "spinner");
-
-        cover = hardwareMap.get(Servo.class, "cover");
+        shooter1 = hardwareMap.get(DcMotorEx.class, HMMotorShooter1);
+        shooter2 = hardwareMap.get(DcMotorEx.class, HMMotorShooter2);
+        spinner = hardwareMap.get(DcMotorEx.class, HMMotorPopper);
+        popper = hardwareMap.get(Servo.class, HMServoPopper);
+        cover = hardwareMap.get(Servo.class, HMServobackSpin);
         //colorSensor = hardwareMap.get(NormalizedColorSensor.class, "sensor_color");
 
         //limelight = hardwareMap.get(Limelight3A.class, "LimeLight");
         //limelight.pipelineSwitch(1);
         //limelight.start();
+        popper.setPosition(0.2);
 
     }
 
@@ -82,6 +89,7 @@ public class shooterAiming extends OpMode {
         */
         telemetry.addData("Angle Needed", getNeededAngle(distance));
         telemetry.addData("pos Needed", degreeToPos(getNeededAngle(distance)));
+        telemetry.addData("Shooter Speed", shooterSpeed);
 
         if(distance > 52){
             cover.setPosition(degreeToPos(getNeededAngle(distance)));
@@ -94,6 +102,11 @@ public class shooterAiming extends OpMode {
 
             shooter1.setPower(shooterSpeed);
             shooter2.setPower(shooterSpeed);
+            spinner.setPower(1);
+        }
+
+        if(gamepad1.x){
+            popper.setPosition(0.8);
         }
 
         if(gamepad1.b){
@@ -143,7 +156,7 @@ public class shooterAiming extends OpMode {
     }
 
     private double getNeededPower(double distance) {
-
+        //also try 0.00375
         return (0.00581395*distance)+0.697674;
     }
 
@@ -156,4 +169,6 @@ public class shooterAiming extends OpMode {
 
         return Math.max(0.0, Math.min(1.0, servoPos));
     }
+
+
 }
