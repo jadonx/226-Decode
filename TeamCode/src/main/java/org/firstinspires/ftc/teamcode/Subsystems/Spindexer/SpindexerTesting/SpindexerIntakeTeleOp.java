@@ -72,7 +72,7 @@ public class SpindexerIntakeTeleOp extends OpMode {
         }
 
         if (launchArtifactCommand != null && !launchArtifactCommand.isFinished()) {
-            launchArtifactCommand.update(packet);
+            launchArtifactCommand.testPID(packet);
         }
 
         packet.put("spindexer current angle ", spindexer.getAngle());

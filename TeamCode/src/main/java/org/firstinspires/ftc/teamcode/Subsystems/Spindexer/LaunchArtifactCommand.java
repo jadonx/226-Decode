@@ -11,30 +11,41 @@ public class LaunchArtifactCommand {
     private final Popper popper;
 
     private int[] launchAngleSequence = new int[3];
-    private ElapsedTime timer;
-
-    private boolean reachedFirst, reachedSecond, reachedThird;
-    private boolean isFinished;
-
     private int target;
+
+    // private boolean reachedFirst, reachedSecond, reachedThird;
+    // private boolean isFinished;
+    private enum State {
+        MOVE_TO_FIRST_LAUNCH,
+        LAUNCH_FIRST,
+        MOVE_TO_SECOND_LAUNCH,
+        LAUNCH_SECOND,
+        MOVE_TO_THIRD_LAUNCH,
+        LAUNCH_THIRD
+    }
+    private State currentState = State.MOVE_TO_FIRST_LAUNCH;
+    private long stateStartTime = 0;
+    private final long waitTime = 1000;
+    private ElapsedTime timer;
 
     public LaunchArtifactCommand(Spindexer spindexer, Popper popper) {
         this.spindexer = spindexer;
         this.popper = popper;
-        timer = new ElapsedTime();
 
-        reachedFirst = false; reachedSecond = false; reachedThird = false;
-        isFinished = false;
+        // reachedFirst = false; reachedSecond = false; reachedThird = false;
+        // isFinished = false;
     }
 
     public void start() {
         launchAngleSequence = spindexer.getLaunchAngleSequence();
         target = launchAngleSequence[0];
+        timer = new ElapsedTime();
     }
 
-    public void update(TelemetryPacket packet) {
+    public void testPID(TelemetryPacket packet) {
         spindexer.goToAngle(target);
 
+        /*
         if (!reachedFirst && spindexerReachedTarget(spindexer.getAngle(), target) && target == launchAngleSequence[0]) {
             timer.reset();
             reachedFirst = true;
@@ -56,16 +67,18 @@ public class LaunchArtifactCommand {
         else if (reachedThird && timer.seconds() > 3) {
             isFinished = true;
         }
+         */
 
         packet.put("timer ", timer.seconds());
         packet.put("target ", target);
-        packet.put("reached first ", reachedFirst);
-        packet.put("reached second ", reachedSecond);
-        packet.put("reached third ", reachedThird);
+        packet.put("launch sequence ", launchAngleSequence[0] + " " + launchAngleSequence[1] + " " + launchAngleSequence[2]);
+    }
+
+    public void update(TelemetryPacket packet) {
     }
 
     public boolean isFinished() {
-        return isFinished;
+        return false;
     }
 
     public boolean spindexerReachedTarget(double currentAngle, double targetAngle) {
