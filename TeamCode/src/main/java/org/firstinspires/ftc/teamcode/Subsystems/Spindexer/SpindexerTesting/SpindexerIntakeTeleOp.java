@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain.FieldCentricDrive;
+import org.firstinspires.ftc.teamcode.Subsystems.Outtake.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.LaunchArtifactCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.Popper;
@@ -21,9 +22,13 @@ public class SpindexerIntakeTeleOp extends OpMode {
     Intake intake;
     Spindexer spindexer;
     UnjammerSystem unjamSystem;
-    // Popper popper;
+    Popper popper;
+    Launcher launcher;
 
     LaunchArtifactCommand launchArtifactCommand;
+
+    // 0.015, 0, -0.001
+    public static double kP, kI, kD;
 
     TelemetryPacket packet;
     FtcDashboard dashboard;
@@ -35,7 +40,8 @@ public class SpindexerIntakeTeleOp extends OpMode {
         intake = new Intake(hardwareMap);
         spindexer = new Spindexer(hardwareMap);
         unjamSystem = new UnjammerSystem(intake, spindexer);
-        // popper = new Popper(hardwareMap);
+        popper = new Popper(hardwareMap);
+        launcher = new Launcher(hardwareMap);
 
         packet = new TelemetryPacket();
         dashboard = FtcDashboard.getInstance();
@@ -65,22 +71,25 @@ public class SpindexerIntakeTeleOp extends OpMode {
 
         // SPINDEXER LAUNCH LOGIC
         if (gamepad1.a) {
-            launchArtifactCommand = new LaunchArtifactCommand(spindexer, null);
-            launchArtifactCommand.start();
+            launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher);
+            launchArtifactCommand.startPID();
         }
 
         if (launchArtifactCommand != null && !launchArtifactCommand.isFinished()) {
-            launchArtifactCommand.update(packet);
+            launchArtifactCommand.updatePID(packet);
         }
 
         packet.put("spindexer current angle ", spindexer.getAngle());
         dashboard.sendTelemetryPacket(packet);
+
+        spindexer.updatePID(kP, kI, kD);
     }
 
     @Override
     public void stop() {
         unjamSystem.stopIntakeSpindexer();
         drive.stopDrive();
-        // popper.deactivatePopper();
+        popper.deactivatePopper();
+        launcher.stopLauncher();
     }
 }

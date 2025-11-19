@@ -15,6 +15,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain.FieldCentricDrive;
+import org.firstinspires.ftc.teamcode.Subsystems.Outtake.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.LaunchArtifactCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.Popper;
@@ -28,12 +29,13 @@ public class BlueAutonomous extends LinearOpMode {
     Spindexer spindexer = new Spindexer(hardwareMap);
     UnjammerSystem unjamSystem = new UnjammerSystem(intake, spindexer);
     Popper popper = new Popper(hardwareMap);
+    Launcher launcher = new Launcher(hardwareMap);
 
     /*
     ACTIONS
      */
     public class ShootArtifacts implements Action {
-        LaunchArtifactCommand launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper);
+        LaunchArtifactCommand launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher);
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {

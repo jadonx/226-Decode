@@ -1,65 +1,37 @@
 package org.firstinspires.ftc.teamcode.Subsystems.Outtake;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.teamcode.Constants;
 
 public class Launcher {
-    private DcMotor shooter1, shooter2;
-
-    // RPM Calculations
-    private int last = 0;
-    private final double ticksPerRev = 28;
-    private ElapsedTime rpmTimer;
-
-    // RPM PID
-    private double kP, kD;
-    private double lastError = 0;
-    private ElapsedTime pidTimer;
+    private DcMotor launcher1, launcher2;
 
     public Launcher(HardwareMap hardwareMap) {
-        shooter1 = hardwareMap.get(DcMotorEx.class, "shooter1");
-        shooter2 = hardwareMap.get(DcMotorEx.class, "shooter2");
-
-        shooter1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        shooter2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        shooter1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        shooter2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-        rpmTimer = new ElapsedTime();
-
-        pidTimer = new ElapsedTime();
+        launcher1 = hardwareMap.get(DcMotor.class, Constants.HMMotorShooter1);
+        launcher2 = hardwareMap.get(DcMotor.class, Constants.HMMotorShooter2);
     }
 
-    public void setPower(double power) {
-        shooter1.setPower(power);
-        shooter2.setPower(power);
+    public double calculateTargetVelocity(double distance) {
+        return 0.0;
     }
 
-    public double currentRPM() {
-        int current = shooter1.getCurrentPosition();
-        int deltaTicks = current - last;
-        last = current;
-
-        double revsPerSecond = (deltaTicks / ticksPerRev) / rpmTimer.seconds();
-        rpmTimer.reset();
-
-        return revsPerSecond * 60.0;
+    public double getCurrentVelocity() {
+        return 0.0;
     }
 
-    public double updatePID(int targetRPM) {
-        double error = targetRPM - currentRPM();
-
-        double derivative = (error - lastError) / pidTimer.seconds();
-        lastError = error;
-
-        return kP * error + kD * derivative;
+    public void setVelocity(double target) {
+        return;
     }
 
-    public void updatePIDValues(double kP, double kD) {
-        this.kP = kP;
-        this.kD = kD;
+    public boolean atTargetVelocity(double target) {
+        return Math.abs(getCurrentVelocity() - target) < 10;
+    }
+
+    public void stopLauncher() {
+        // CHANGE TO VELOCITY
+        launcher1.setPower(0);
+        launcher2.setPower(0);
     }
 }
