@@ -25,8 +25,6 @@ public class SpindexerIntakeTeleOp extends OpMode {
 
     LaunchArtifactCommand launchArtifactCommand;
 
-    public static double kP, kI, kD;
-
     TelemetryPacket packet;
     FtcDashboard dashboard;
 
@@ -72,14 +70,11 @@ public class SpindexerIntakeTeleOp extends OpMode {
         }
 
         if (launchArtifactCommand != null && !launchArtifactCommand.isFinished()) {
-            launchArtifactCommand.testPID(packet);  
+            launchArtifactCommand.update(packet);
         }
 
         packet.put("spindexer current angle ", spindexer.getAngle());
         dashboard.sendTelemetryPacket(packet);
-
-        // UPDATE SPINDEXER PID VALUES
-        spindexer.updatePID(kP, kI, kD);
     }
 
     @Override

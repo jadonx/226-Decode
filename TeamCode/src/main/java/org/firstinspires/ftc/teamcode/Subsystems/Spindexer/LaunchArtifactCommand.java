@@ -40,36 +40,12 @@ public class LaunchArtifactCommand {
     public void start() {
         launchAngleSequence = spindexer.getLaunchAngleSequence();
         target = launchAngleSequence[0];
-        spindexer.goToAngle(target);
+        currentState = State.MOVE_TO_FIRST_LAUNCH;
         timer = new ElapsedTime();
     }
 
-    public void testPID(TelemetryPacket packet) {
+    public void testPID(TelemetryPacket packet, int target) {
         spindexer.goToAngle(target);
-
-        /*
-        if (!reachedFirst && spindexerReachedTarget(spindexer.getAngle(), target) && target == launchAngleSequence[0]) {
-            timer.reset();
-            reachedFirst = true;
-        }
-        else if (reachedFirst && !reachedSecond && timer.seconds() > 3) {
-            target = launchAngleSequence[1];
-        }
-        else if (!reachedSecond && spindexerReachedTarget(spindexer.getAngle(), target) && target == launchAngleSequence[1]) {
-            timer.reset();
-            reachedSecond = true;
-        }
-        else if (reachedSecond && !reachedThird && timer.seconds() > 3) {
-            target = launchAngleSequence[2];
-        }
-        else if (!reachedThird && spindexerReachedTarget(spindexer.getAngle(), target) && target == launchAngleSequence[2]) {
-            timer.reset();
-            reachedThird = true;
-        }
-        else if (reachedThird && timer.seconds() > 3) {
-            isFinished = true;
-        }
-         */
 
         packet.put("timer ", timer.seconds());
         packet.put("target ", target);
@@ -77,6 +53,8 @@ public class LaunchArtifactCommand {
     }
 
     public void update(TelemetryPacket packet) {
+        spindexer.goToAngle(target);
+
         switch (currentState) {
             case MOVE_TO_FIRST_LAUNCH:
                 if(spindexerReachedTarget(spindexer.getAngle(), target)) {
@@ -88,7 +66,6 @@ public class LaunchArtifactCommand {
                 if (timer.milliseconds() - stateStartTime > waitTime) {
                     currentState = State.MOVE_TO_SECOND_LAUNCH;
                     target = launchAngleSequence[1];
-                    spindexer.goToAngle(target);
                 }
                 break;
             case MOVE_TO_SECOND_LAUNCH:
@@ -101,7 +78,6 @@ public class LaunchArtifactCommand {
                 if (timer.milliseconds() - stateStartTime > waitTime) {
                     currentState = State.MOVE_TO_THIRD_LAUNCH;
                     target = launchAngleSequence[2];
-                    spindexer.goToAngle(target);
                 }
                 break;
             case MOVE_TO_THIRD_LAUNCH:
