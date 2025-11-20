@@ -64,24 +64,25 @@ public class shooterTest extends OpMode {
         spinEncoder = hardwareMap.get(AS5600Encoder.class, HMSpindexerEncoder );
         shooterSpeed = 0;
         coverPos = 1;
-        popper.setPosition(0);
+        popper.setPosition(0.45);
         runtime.reset();
         bigSpinSpeed =0;
         intake.setPower(0);
         bigSpin.setPower(0);
         spinSpeed = 0;
         isJammed = false;
+
     }
 
     public void loop(){
         if(gamepad1.a){
-            shooter1.setPower(shooterSpeed);
-            shooter2.setPower(shooterSpeed);
+            shooter1.setVelocity(shooterSpeed);
+            shooter2.setVelocity(shooterSpeed);
         }
 
         if(gamepad1.b){
-            spinSpeed = -1;
-            spinner.setPower(spinSpeed);
+            spinSpeed = -2800;
+            spinner.setVelocity(spinSpeed);
         }
 
 
@@ -93,11 +94,11 @@ public class shooterTest extends OpMode {
         }
 
         if(gamepad1.dpad_up){
-            popper.setPosition(0.80);
+            popper.setPosition(0.485);
         }
 
         if(gamepad1.dpad_down){
-            popper.setPosition(0.1);
+            popper.setPosition(0.45);
         }
 
         if(gamepad2.dpad_down && coverPos < 1){
@@ -190,6 +191,7 @@ public class shooterTest extends OpMode {
 
         telemetry.addData("Power", shooterSpeed);
         telemetry.addData("Velocity", shooter1.getVelocity());
+        telemetry.addData("Popper Spinner Speed", spinner.getVelocity());
         telemetry.addData("cover pos", coverPos);
         telemetry.addData("turret Angle", turretEncoder.getAngleDegrees());
         telemetry.addData("spin Angle", spinEncoder.getAngleDegrees ());
