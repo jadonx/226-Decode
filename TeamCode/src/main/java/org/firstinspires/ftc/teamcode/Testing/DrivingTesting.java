@@ -41,7 +41,7 @@ public class DrivingTesting extends OpMode {
     public double lastAngle = -1;
     public boolean isJammed;
 
-    public static double unJamTime = 100;
+    public static double unJamTime = 150;
     public static double jamThreshold = 120;
     public static double angleDiff = 2;
     private ElapsedTime runtime = new ElapsedTime();
