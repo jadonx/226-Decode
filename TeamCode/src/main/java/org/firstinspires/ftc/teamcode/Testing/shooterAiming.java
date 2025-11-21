@@ -34,10 +34,10 @@ public class shooterAiming extends OpMode {
     double id = -1;
     double shooterSpeed = 1;
 
-    double camDeg = 19.47883;
+    double camDeg = 29.78;
     double camH = 12;
-    double targetH = 39;
-    public static double distance = 140;
+    double targetH = 29;
+    public static double distance = 0;
     double initialVelocity = 246.81;
     double gravity = 386.09;
 
@@ -51,15 +51,15 @@ public class shooterAiming extends OpMode {
         cover = hardwareMap.get(Servo.class, HMServobackSpin);
         //colorSensor = hardwareMap.get(NormalizedColorSensor.class, "sensor_color");
 
-        //limelight = hardwareMap.get(Limelight3A.class, "LimeLight");
-        //limelight.pipelineSwitch(1);
-        //limelight.start();
+        limelight = hardwareMap.get(Limelight3A.class, "LimeLight");
+        limelight.pipelineSwitch(1);
+        limelight.start();
         popper.setPosition(0.2);
 
     }
 
     public void loop(){
-        /*
+
         LLResult result = limelight.getLatestResult();
 
         if(result != null){
@@ -71,12 +71,14 @@ public class shooterAiming extends OpMode {
 
             ty = result.getTy();
 
+            distance =  getDistanceInches(result.getTy());
+
             List<LLResultTypes.FiducialResult> fiducialResult = result.getFiducialResults();
             for(LLResultTypes.FiducialResult fr : fiducialResult){
                 id = fr.getFiducialId();
                 telemetry.addData("id", fr.getFiducialId());
             }
-
+            /*
             NormalizedRGBA colors = colorSensor.getNormalizedColors();
 
             float[] hsv = new float[3];
@@ -85,16 +87,20 @@ public class shooterAiming extends OpMode {
             telemetry.addData("Saturation", hsv[1]);
             telemetry.addData("Light", hsv[2]);
 
+             */
+
         }
-        */
+
         telemetry.addData("Angle Needed", getNeededAngle(distance));
-        telemetry.addData("pos Needed", degreeToPos(getNeededAngle(distance)));
+        telemetry.addData("pos Needed", getNeededPos(distance));
         telemetry.addData("Shooter Speed", shooterSpeed);
 
-        if(distance > 52){
-            cover.setPosition(degreeToPos(getNeededAngle(distance)));
+        if(distance > 90){
+            cover.setPosition(0.05);
+            shooterSpeed = 2800;
         } else{
             shooterSpeed = getNeededPower(distance);
+            cover.setPosition(getNeededPos(distance));
         }
 
 
@@ -119,7 +125,7 @@ public class shooterAiming extends OpMode {
 
     }
     private double getDistanceInches(double tyDegrees) {
-        double totalAngleDeg = camDeg - tyDegrees;
+        double totalAngleDeg = camDeg + tyDegrees;
         double totalAngleRad = Math.toRadians(totalAngleDeg);
 
         return (targetH - camH) / Math.tan(totalAngleRad);
@@ -168,6 +174,10 @@ public class shooterAiming extends OpMode {
 
 
         return Math.max(0.0, Math.min(1.0, servoPos));
+    }
+
+    private double getNeededPos(double distance){
+        return (-0.0117319*distance) + 0.956034;
     }
 
 

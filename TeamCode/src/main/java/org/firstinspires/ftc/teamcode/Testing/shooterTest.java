@@ -12,10 +12,13 @@ import static org.firstinspires.ftc.teamcode.Constants.HMServospinDexer;
 import static org.firstinspires.ftc.teamcode.Constants.HMSpindexerEncoder;
 import static org.firstinspires.ftc.teamcode.Constants.HMTurretEncoder;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -35,7 +38,7 @@ public class shooterTest extends OpMode {
     public double lastAngle = -1;
     public boolean isJammed;
 
-    public static double unJamTime = 100;
+    public static double unJamTime = 150;
     public static double jamThreshold = 50;
     public static double angleDiff = 2;
 
@@ -46,6 +49,8 @@ public class shooterTest extends OpMode {
     AS5600Encoder turretEncoder, spinEncoder;
 
     CRServo bigSpin, turret1, turret2;
+
+
 
 
 
@@ -62,8 +67,10 @@ public class shooterTest extends OpMode {
         turret2 = hardwareMap.get(CRServo.class, HMServoTurretRight);
         turretEncoder = hardwareMap.get(AS5600Encoder.class,  HMTurretEncoder);
         spinEncoder = hardwareMap.get(AS5600Encoder.class, HMSpindexerEncoder );
+        shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         shooterSpeed = 0;
         coverPos = 1;
+        cover.setPosition(coverPos);
         popper.setPosition(0.45);
         runtime.reset();
         bigSpinSpeed =0;
@@ -101,12 +108,12 @@ public class shooterTest extends OpMode {
             popper.setPosition(0.45);
         }
 
-        if(gamepad2.dpad_down && coverPos < 1){
+        if(gamepad2.dpad_down && coverPos < 0.96){
             coverPos += 0.03;
             cover.setPosition(coverPos);
         }
 
-        if(gamepad2.dpad_up){
+        if(gamepad2.dpad_up && coverPos > 0){
 
             coverPos -= 0.03;
             cover.setPosition(coverPos);
@@ -198,6 +205,8 @@ public class shooterTest extends OpMode {
         telemetry.addData("isJammed?", isJammed);
         telemetry.addData("runtime", runtime.milliseconds());
         telemetry.addData("bigSPinSpeed", bigSpinSpeed);
+        telemetry.update();
+
     }
 
 
