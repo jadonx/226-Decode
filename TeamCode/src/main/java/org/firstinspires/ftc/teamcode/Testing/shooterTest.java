@@ -46,7 +46,7 @@ public class shooterTest extends OpMode {
     DcMotorEx shooter1, shooter2, spinner, intake;
 
     Servo popper, cover;
-    AS5600Encoder turretEncoder, spinEncoder;
+    AS5600Encoder spinEncoder;
 
     CRServo bigSpin, turret1, turret2;
 
@@ -65,7 +65,6 @@ public class shooterTest extends OpMode {
         bigSpin = hardwareMap.get(CRServo.class, HMServospinDexer );
         turret1 = hardwareMap.get(CRServo.class, HMServoTurretLeft );
         turret2 = hardwareMap.get(CRServo.class, HMServoTurretRight);
-        turretEncoder = hardwareMap.get(AS5600Encoder.class,  HMTurretEncoder);
         spinEncoder = hardwareMap.get(AS5600Encoder.class, HMSpindexerEncoder );
         shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         shooterSpeed = 0;
@@ -85,6 +84,7 @@ public class shooterTest extends OpMode {
         if(gamepad1.a){
             shooter1.setVelocity(shooterSpeed);
             shooter2.setVelocity(shooterSpeed);
+            spinner.setVelocity(-2800);
         }
 
         if(gamepad1.b){
@@ -138,7 +138,7 @@ public class shooterTest extends OpMode {
         }
 
         if(gamepad2.x){
-            intake.setPower(1);
+            intake.setPower(0.8);
 
         }
 
@@ -149,7 +149,7 @@ public class shooterTest extends OpMode {
 
         if(gamepad1.dpad_left){
             bigSpinSpeed = -1;
-            bigSpin.setPower(-1);
+            bigSpin.setPower(bigSpinSpeed);
         }
 
         if(gamepad1.right_bumper){
@@ -178,10 +178,10 @@ public class shooterTest extends OpMode {
                 jamCool = runtime.milliseconds();
             }
             bigSpin.setPower(-0.5);
-            intake.setPower(-1);
+            intake.setPower(0);
             if(runtime.milliseconds() - jamCool > unJamTime){
                  bigSpin.setPower(bigSpinSpeed);
-                 intake.setPower(1);
+                 intake.setPower(0.8);
                  jamCool = -1;
                 isJammed = false;
                 jamStart = -1;
@@ -200,7 +200,6 @@ public class shooterTest extends OpMode {
         telemetry.addData("Velocity", shooter1.getVelocity());
         telemetry.addData("Popper Spinner Speed", spinner.getVelocity());
         telemetry.addData("cover pos", coverPos);
-        telemetry.addData("turret Angle", turretEncoder.getAngleDegrees());
         telemetry.addData("spin Angle", spinEncoder.getAngleDegrees ());
         telemetry.addData("isJammed?", isJammed);
         telemetry.addData("runtime", runtime.milliseconds());
