@@ -1,5 +1,11 @@
 package org.firstinspires.ftc.teamcode.Testing;
 
+import static org.firstinspires.ftc.teamcode.Constants.HMMotorPopper;
+import static org.firstinspires.ftc.teamcode.Constants.HMMotorShooter1;
+import static org.firstinspires.ftc.teamcode.Constants.HMMotorShooter2;
+import static org.firstinspires.ftc.teamcode.Constants.HMServoPopper;
+import static org.firstinspires.ftc.teamcode.Constants.HMServobackSpin;
+
 import android.graphics.Color;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -19,7 +25,7 @@ import java.util.List;
 @TeleOp (name = "Shooter Aiming")
 public class shooterAiming extends OpMode {
     DcMotorEx shooter1, shooter2, spinner, spinDexer;
-    Servo cover;
+    Servo cover, popper;
     Limelight3A limelight;
     NormalizedColorSensor colorSensor;
     double anglePos, angleDegree;
@@ -28,31 +34,32 @@ public class shooterAiming extends OpMode {
     double id = -1;
     double shooterSpeed = 1;
 
-    double camDeg = 19.47883;
+    double camDeg = 29.78;
     double camH = 12;
-    double targetH = 39;
-    public static double distance = 140;
+    double targetH = 29;
+    public static double distance = 0;
     double initialVelocity = 246.81;
     double gravity = 386.09;
 
 
 
     public void init(){
-        shooter1 = hardwareMap.get(DcMotorEx.class, "shooter1");
-        shooter2 = hardwareMap.get(DcMotorEx.class, "shooter2");
-        spinner = hardwareMap.get(DcMotorEx.class, "spinner");
-
-        cover = hardwareMap.get(Servo.class, "cover");
+        shooter1 = hardwareMap.get(DcMotorEx.class, HMMotorShooter1);
+        shooter2 = hardwareMap.get(DcMotorEx.class, HMMotorShooter2);
+        spinner = hardwareMap.get(DcMotorEx.class, HMMotorPopper);
+        popper = hardwareMap.get(Servo.class, HMServoPopper);
+        cover = hardwareMap.get(Servo.class, HMServobackSpin);
         //colorSensor = hardwareMap.get(NormalizedColorSensor.class, "sensor_color");
 
-        //limelight = hardwareMap.get(Limelight3A.class, "LimeLight");
-        //limelight.pipelineSwitch(1);
-        //limelight.start();
+        limelight = hardwareMap.get(Limelight3A.class, "LimeLight");
+        limelight.pipelineSwitch(1);
+        limelight.start();
+        popper.setPosition(0.2);
 
     }
 
     public void loop(){
-        /*
+
         LLResult result = limelight.getLatestResult();
 
         if(result != null){
@@ -64,12 +71,14 @@ public class shooterAiming extends OpMode {
 
             ty = result.getTy();
 
+            distance =  getDistanceInches(result.getTy());
+
             List<LLResultTypes.FiducialResult> fiducialResult = result.getFiducialResults();
             for(LLResultTypes.FiducialResult fr : fiducialResult){
                 id = fr.getFiducialId();
                 telemetry.addData("id", fr.getFiducialId());
             }
-
+            /*
             NormalizedRGBA colors = colorSensor.getNormalizedColors();
 
             float[] hsv = new float[3];
@@ -78,15 +87,20 @@ public class shooterAiming extends OpMode {
             telemetry.addData("Saturation", hsv[1]);
             telemetry.addData("Light", hsv[2]);
 
-        }
-        */
-        telemetry.addData("Angle Needed", getNeededAngle(distance));
-        telemetry.addData("pos Needed", degreeToPos(getNeededAngle(distance)));
+             */
 
-        if(distance > 52){
-            cover.setPosition(degreeToPos(getNeededAngle(distance)));
+        }
+
+        telemetry.addData("Angle Needed", getNeededAngle(distance));
+        telemetry.addData("pos Needed", getNeededPos(distance));
+        telemetry.addData("Shooter Speed", shooterSpeed);
+
+        if(distance > 90){
+            cover.setPosition(0.05);
+            shooterSpeed = 2800;
         } else{
             shooterSpeed = getNeededPower(distance);
+            cover.setPosition(getNeededPos(distance));
         }
 
 
@@ -94,6 +108,11 @@ public class shooterAiming extends OpMode {
 
             shooter1.setPower(shooterSpeed);
             shooter2.setPower(shooterSpeed);
+            spinner.setPower(1);
+        }
+
+        if(gamepad1.x){
+            popper.setPosition(0.8);
         }
 
         if(gamepad1.b){
@@ -106,7 +125,7 @@ public class shooterAiming extends OpMode {
 
     }
     private double getDistanceInches(double tyDegrees) {
-        double totalAngleDeg = camDeg - tyDegrees;
+        double totalAngleDeg = camDeg + tyDegrees;
         double totalAngleRad = Math.toRadians(totalAngleDeg);
 
         return (targetH - camH) / Math.tan(totalAngleRad);
@@ -143,7 +162,7 @@ public class shooterAiming extends OpMode {
     }
 
     private double getNeededPower(double distance) {
-
+        //also try 0.00375
         return (0.00581395*distance)+0.697674;
     }
 
@@ -156,4 +175,10 @@ public class shooterAiming extends OpMode {
 
         return Math.max(0.0, Math.min(1.0, servoPos));
     }
+
+    private double getNeededPos(double distance){
+        return (-0.0117319*distance) + 0.956034;
+    }
+
+
 }

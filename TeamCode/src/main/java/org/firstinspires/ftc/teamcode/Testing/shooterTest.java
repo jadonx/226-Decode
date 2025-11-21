@@ -12,10 +12,13 @@ import static org.firstinspires.ftc.teamcode.Constants.HMServospinDexer;
 import static org.firstinspires.ftc.teamcode.Constants.HMSpindexerEncoder;
 import static org.firstinspires.ftc.teamcode.Constants.HMTurretEncoder;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -35,7 +38,7 @@ public class shooterTest extends OpMode {
     public double lastAngle = -1;
     public boolean isJammed;
 
-    public static double unJamTime = 100;
+    public static double unJamTime = 150;
     public static double jamThreshold = 50;
     public static double angleDiff = 2;
 
@@ -46,6 +49,8 @@ public class shooterTest extends OpMode {
     AS5600Encoder turretEncoder, spinEncoder;
 
     CRServo bigSpin, turret1, turret2;
+
+
 
 
 
@@ -62,26 +67,29 @@ public class shooterTest extends OpMode {
         turret2 = hardwareMap.get(CRServo.class, HMServoTurretRight);
         turretEncoder = hardwareMap.get(AS5600Encoder.class,  HMTurretEncoder);
         spinEncoder = hardwareMap.get(AS5600Encoder.class, HMSpindexerEncoder );
+        shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         shooterSpeed = 0;
         coverPos = 1;
-        popper.setPosition(0);
+        cover.setPosition(coverPos);
+        popper.setPosition(0.45);
         runtime.reset();
         bigSpinSpeed =0;
         intake.setPower(0);
         bigSpin.setPower(0);
         spinSpeed = 0;
         isJammed = false;
+
     }
 
     public void loop(){
         if(gamepad1.a){
-            shooter1.setPower(shooterSpeed);
-            shooter2.setPower(shooterSpeed);
+            shooter1.setVelocity(shooterSpeed);
+            shooter2.setVelocity(shooterSpeed);
         }
 
         if(gamepad1.b){
-            spinSpeed = -1;
-            spinner.setPower(spinSpeed);
+            spinSpeed = -2800;
+            spinner.setVelocity(spinSpeed);
         }
 
 
@@ -89,23 +97,23 @@ public class shooterTest extends OpMode {
 
 
         if(gamepad1.y && (spinEncoder.getAngleDegrees() > 290.05 || spinEncoder.getAngleDegrees() < 289.5)){
-            bigSpin.setPower(0.1);
+            bigSpin.setPower(0.025);
         }
 
         if(gamepad1.dpad_up){
-            popper.setPosition(0.85);
+            popper.setPosition(0.485);
         }
 
         if(gamepad1.dpad_down){
-            popper.setPosition(0.1);
+            popper.setPosition(0.45);
         }
 
-        if(gamepad2.dpad_down && coverPos < 1){
+        if(gamepad2.dpad_down && coverPos < 0.96){
             coverPos += 0.03;
             cover.setPosition(coverPos);
         }
 
-        if(gamepad2.dpad_up){
+        if(gamepad2.dpad_up && coverPos > 0){
 
             coverPos -= 0.03;
             cover.setPosition(coverPos);
@@ -188,13 +196,17 @@ public class shooterTest extends OpMode {
 
 
 
-        telemetry.addData("Speed", shooterSpeed);
+        telemetry.addData("Power", shooterSpeed);
+        telemetry.addData("Velocity", shooter1.getVelocity());
+        telemetry.addData("Popper Spinner Speed", spinner.getVelocity());
         telemetry.addData("cover pos", coverPos);
         telemetry.addData("turret Angle", turretEncoder.getAngleDegrees());
         telemetry.addData("spin Angle", spinEncoder.getAngleDegrees ());
         telemetry.addData("isJammed?", isJammed);
         telemetry.addData("runtime", runtime.milliseconds());
         telemetry.addData("bigSPinSpeed", bigSpinSpeed);
+        telemetry.update();
+
     }
 
 
