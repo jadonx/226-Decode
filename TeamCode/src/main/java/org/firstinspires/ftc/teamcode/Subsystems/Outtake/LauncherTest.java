@@ -28,9 +28,9 @@ public class LauncherTest extends OpMode {
 
     @Override
     public void loop() {
-        launcher.setPower(power);
+        // launcher.setPower(power);
 
-        packet.put("Launcher RPM ", launcher.currentRPM());
+        // packet.put("Launcher RPM ", launcher.currentRPM());
         dashboard.sendTelemetryPacket(packet);
     }
 }

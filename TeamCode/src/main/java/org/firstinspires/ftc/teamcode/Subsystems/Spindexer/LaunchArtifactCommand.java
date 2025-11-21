@@ -19,12 +19,15 @@ public class LaunchArtifactCommand {
         MOVE_TO_FIRST_LAUNCH,
         LAUNCH_FIRST,
         WAIT_AFTER_FIRST_LAUNCH,
+        PULL_OUT_POPPER_FIRST,
         MOVE_TO_SECOND_LAUNCH,
         LAUNCH_SECOND,
         WAIT_AFTER_SECOND_LAUNCH,
+        PULL_OUT_POPPER_SECOND,
         MOVE_TO_THIRD_LAUNCH,
         LAUNCH_THIRD,
         WAIT_AFTER_THIRD_LAUNCH,
+        PULL_OUT_POPPER_THIRD,
         FINISHED
     }
     private State currentState = State.MOVE_TO_FIRST_LAUNCH;
@@ -110,11 +113,13 @@ public class LaunchArtifactCommand {
         spindexer.goToAngle(target);
 
         switch (currentState) {
+            // WAIT UNTIL SPINDEXER IS AT POSITION
             case MOVE_TO_FIRST_LAUNCH:
                 if(spindexerReachedTarget(spindexer.getAngle(), target)) {
                     currentState = State.LAUNCH_FIRST;
                 }
                 break;
+            // IF LAUNCHER AT TARGET VELOCITY, PUSH IN POPPER
             case LAUNCH_FIRST:
                 if (launcher.atTargetVelocity(targetVelocity)) {
                     popper.pushInPopper();
@@ -122,32 +127,64 @@ public class LaunchArtifactCommand {
                     stateStartTime = timer.milliseconds();
                 }
                 break;
+            // WAIT AFTER PUSHING IN POPPER FOR LAUNCH, PULL OUT POPPER
             case WAIT_AFTER_FIRST_LAUNCH:
                 if (timer.milliseconds() - stateStartTime > waitTime) {
                     popper.pushOutPopper();
-                    currentState = State.MOVE_TO_SECOND_LAUNCH;
-                }
-            case MOVE_TO_SECOND_LAUNCH:
-                if(spindexerReachedTarget(spindexer.getAngle(), target)) {
-                    currentState = State.LAUNCH_SECOND;
+                    currentState = State.PULL_OUT_POPPER_FIRST;
                     stateStartTime = timer.milliseconds();
                 }
                 break;
+            // WAIT FOR POPPER TO PULL OUT
+            case PULL_OUT_POPPER_FIRST:
+                if (timer.milliseconds() - stateStartTime > waitTime) {
+                    currentState = State.MOVE_TO_SECOND_LAUNCH;
+                    target = launchAngleSequence[1];
+                }
+                break;
+            case MOVE_TO_SECOND_LAUNCH:
+                if(spindexerReachedTarget(spindexer.getAngle(), target)) {
+                    currentState = State.LAUNCH_SECOND;
+                }
+                break;
             case LAUNCH_SECOND:
+                if (launcher.atTargetVelocity(targetVelocity)) {
+                    popper.pushInPopper();
+                    currentState = State.WAIT_AFTER_SECOND_LAUNCH;
+                    stateStartTime = timer.milliseconds();
+                }
+                break;
+            case WAIT_AFTER_SECOND_LAUNCH:
+                if (timer.milliseconds() - stateStartTime > waitTime) {
+                    popper.pushOutPopper();
+                    currentState = State.PULL_OUT_POPPER_SECOND;
+                    stateStartTime = timer.milliseconds();
+                }
+                break;
+            case PULL_OUT_POPPER_SECOND:
                 if (timer.milliseconds() - stateStartTime > waitTime) {
                     currentState = State.MOVE_TO_THIRD_LAUNCH;
                     target = launchAngleSequence[2];
                 }
                 break;
             case MOVE_TO_THIRD_LAUNCH:
-                if (spindexerReachedTarget(spindexer.getAngle(), target)) {
+                if(spindexerReachedTarget(spindexer.getAngle(), target)) {
                     currentState = State.LAUNCH_THIRD;
-                    stateStartTime = timer.milliseconds();
                 }
                 break;
             case LAUNCH_THIRD:
+                if (launcher.atTargetVelocity(targetVelocity)) {
+                    popper.pushInPopper();
+                    currentState = State.WAIT_AFTER_THIRD_LAUNCH;
+                    stateStartTime = timer.milliseconds();
+                }
+                break;
+            case WAIT_AFTER_THIRD_LAUNCH:
                 if (timer.milliseconds() - stateStartTime > waitTime) {
+                    popper.pushOutPopper();
+                    popper.stopPopper();
                     currentState = State.FINISHED;
+                    stateStartTime = timer.milliseconds();
                 }
                 break;
             case FINISHED:

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Subsystems.Spindexer.SpindexerTesting;
+package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -15,8 +15,8 @@ import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.Spindexer;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.UnjammerSystem;
 
 @Config
-@TeleOp(name="SpindexerIntakeTeleOp")
-public class SpindexerIntakeTeleOp extends OpMode {
+@TeleOp(name="ScrimmageTeleOp")
+public class ScrimmageTeleOp extends OpMode {
     FieldCentricDrive drive;
 
     Intake intake;
@@ -72,17 +72,19 @@ public class SpindexerIntakeTeleOp extends OpMode {
         // SPINDEXER LAUNCH LOGIC
         if (gamepad1.a) {
             launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher);
-            launchArtifactCommand.startPID();
+            // launchArtifactCommand.startPID();
+            launchArtifactCommand.start();
         }
 
         if (launchArtifactCommand != null && !launchArtifactCommand.isFinished()) {
-            launchArtifactCommand.updatePID(packet);
+            // launchArtifactCommand.updatePID(packet);
+            launchArtifactCommand.update(packet);
         }
 
         packet.put("spindexer current angle ", spindexer.getAngle());
         dashboard.sendTelemetryPacket(packet);
 
-        spindexer.updatePID(kP, kI, kD);
+        // spindexer.updatePID(kP, kI, kD);
     }
 
     @Override
