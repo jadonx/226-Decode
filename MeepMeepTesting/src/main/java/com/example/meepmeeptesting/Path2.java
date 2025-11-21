@@ -9,7 +9,7 @@ import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
 
 
-public class MeepMeepTesting {
+public class Path2 {
     public static void main(String[] args) {
 
         MeepMeep meepMeep = new MeepMeep(800);
@@ -41,17 +41,31 @@ public class MeepMeepTesting {
 
         TrajectoryActionBuilder collectSample10 = collectSample1.endTrajectory().fresh()
                 .setReversed(false)
+                //.splineToLinearHeading(new Pose2d(-11, -47, Math.toRadians(270)), Math.toRadians(0.00))
                 .lineToY(-35.5)
                 ;
         TrajectoryActionBuilder collectSample11 = collectSample10.endTrajectory().fresh()
                 .setReversed(false)
+                //.splineToLinearHeading(new Pose2d(-11, -47, Math.toRadians(270)), Math.toRadians(0.00))
                 .lineToY(-40.5)
                 ;
         TrajectoryActionBuilder collectSample12 = collectSample11.endTrajectory().fresh()
                 .setReversed(false)
+                //.splineToLinearHeading(new Pose2d(-11, -47, Math.toRadians(270)), Math.toRadians(0.00))
                 .lineToY(-45.5)
                 ;
-        TrajectoryActionBuilder shootZone2 = collectSample12.endTrajectory().fresh()
+        TrajectoryActionBuilder pushLever = collectSample12.endTrajectory().fresh()
+                .splineToLinearHeading(new Pose2d(.3, -48, Math.toRadians(270)), Math.toRadians(0.00))
+                ;
+        TrajectoryActionBuilder pushLever2 =  pushLever.endTrajectory().fresh()
+                .setReversed(false)
+                //.splineToLinearHeading(new Pose2d(-11, -47, Math.toRadians(270)), Math.toRadians(0.00))
+                .lineToY(-52)
+                .waitSeconds(3)
+                ;
+
+
+        TrajectoryActionBuilder shootZone2 = pushLever2.endTrajectory().fresh()
                 .setReversed(false)
                 .splineToLinearHeading(new Pose2d(0, 0, Math.toRadians(270)), Math.toRadians(0.00))
                 .waitSeconds(2)
@@ -59,18 +73,21 @@ public class MeepMeepTesting {
         TrajectoryActionBuilder collectSample2 = shootZone2.endTrajectory().fresh()
                 .setReversed(false)
                 .splineToLinearHeading(new Pose2d(11.5, -28, Math.toRadians(270)), Math.toRadians(0.00));
-                ;
+        ;
 
         TrajectoryActionBuilder collectSample20 = collectSample2.endTrajectory().fresh()
                 .setReversed(false)
+                //.splineToLinearHeading(new Pose2d(-11, -47, Math.toRadians(270)), Math.toRadians(0.00))
                 .lineToY(-35.5)
                 ;
         TrajectoryActionBuilder collectSample21 = collectSample20.endTrajectory().fresh()
                 .setReversed(false)
+                //.splineToLinearHeading(new Pose2d(-11, -47, Math.toRadians(270)), Math.toRadians(0.00))
                 .lineToY(-40.5)
                 ;
         TrajectoryActionBuilder collectSample22 = collectSample21.endTrajectory().fresh()
                 .setReversed(false)
+                //.splineToLinearHeading(new Pose2d(-11, -47, Math.toRadians(270)), Math.toRadians(0.00))
                 .lineToY(-45.5)
                 ;
         TrajectoryActionBuilder shootZone3 = collectSample22.endTrajectory().fresh()
@@ -84,14 +101,17 @@ public class MeepMeepTesting {
         ;
         TrajectoryActionBuilder collectSample30 = collectSample3.endTrajectory().fresh()
                 .setReversed(false)
+                //.splineToLinearHeading(new Pose2d(-11, -47, Math.toRadians(270)), Math.toRadians(0.00))
                 .lineToY(-35.5)
                 ;
         TrajectoryActionBuilder collectSample31 = collectSample30.endTrajectory().fresh()
                 .setReversed(false)
+                //.splineToLinearHeading(new Pose2d(-11, -47, Math.toRadians(270)), Math.toRadians(0.00))
                 .lineToY(-40.5)
                 ;
         TrajectoryActionBuilder collectSample32 = collectSample31.endTrajectory().fresh()
                 .setReversed(false)
+                //.splineToLinearHeading(new Pose2d(-11, -47, Math.toRadians(270)), Math.toRadians(0.00))
                 .lineToY(-45.5)
                 ;
 
@@ -111,6 +131,8 @@ public class MeepMeepTesting {
                         collectSample10.build(),
                         collectSample11.build(),
                         collectSample12.build(),
+                        pushLever.build(),
+                        pushLever2.build(),
                         shootZone2.build(),
                         collectSample2.build(),
                         collectSample20.build(),
@@ -124,7 +146,7 @@ public class MeepMeepTesting {
 
                         shootZone4.build()
 
-                        )
+                )
         );
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_DECODE_JUICE_DARK)
@@ -135,3 +157,55 @@ public class MeepMeepTesting {
 
     }
 }
+
+
+
+
+
+
+
+
+
+
+/*
+public class MeepMeepTesting {
+    public static void main(String[] args) {
+        MeepMeep meepMeep = new MeepMeep(800);
+
+        Pose2d initialPose = new Pose2d(-50, -50, Math.toRadians(229));
+
+        RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
+                // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
+                .setConstraints(120, 120, Math.toRadians(180), Math.toRadians(180), 15)
+                .build();
+
+        myBot.runAction(myBot.getDrive().actionBuilder(initialPose)
+                .strafeTo(new Vector2d(-12, -10))
+                .waitSeconds(0.2)
+                .strafeToLinearHeading(new Vector2d(-12, -20), Math.toRadians(270))
+                .waitSeconds(0.2)
+                .strafeToLinearHeading(new Vector2d(-12, -50), Math.toRadians(270))
+                .waitSeconds(0.2)
+                .strafeToLinearHeading(new Vector2d(-12, -10), Math.toRadians(229))
+                .waitSeconds(.2)
+                .strafeToLinearHeading(new Vector2d(12, -20), Math.toRadians(270))
+                .waitSeconds(.2)
+                .strafeToLinearHeading(new Vector2d(12, -50), Math.toRadians(270))
+                .waitSeconds(.2)
+                .strafeToLinearHeading(new Vector2d(-12, -10), Math.toRadians(229))
+                .waitSeconds(.2)
+                .strafeToLinearHeading(new Vector2d(35.5, -20), Math.toRadians(270))
+                .waitSeconds(.2)
+                .strafeToLinearHeading(new Vector2d(35.5, -50), Math.toRadians(270))
+                .waitSeconds(.2)
+                .strafeToLinearHeading(new Vector2d(-12, -10), Math.toRadians(229))
+                .build());
+
+        meepMeep.setBackground(MeepMeep.Background.FIELD_DECODE_JUICE_DARK)
+                .setDarkMode(true)
+                .setBackgroundAlpha(0.95f)
+                .addEntity(myBot)
+                .start();
+    }
+}
+*/
