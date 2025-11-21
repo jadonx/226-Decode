@@ -99,6 +99,8 @@ public class shooterAiming extends OpMode {
             cover.setPosition(0.05);
             if(distance > 100){
                 shooterSpeed = 2800;
+            } else{
+                shooterSpeed = getNeededPower(distance);
             }
         }else if(distance == 0){
             cover.setPosition(1);
@@ -175,7 +177,14 @@ public class shooterAiming extends OpMode {
 
     private double getNeededPower(double distance) {
         //also try 0.00375
-        return (0.0353161*(Math.pow(distance,2)))+(0.991859*distance)+1388.8866;
+        if(distance < 80){
+            return (0.0353161*(Math.pow(distance,2)))+(0.991859*distance)+1388.8866;
+        } else if(distance > 130){
+            return 2800;
+        } else{
+            return (-0.47286*Math.pow(distance,2))+(109.73693*distance)-3946.15385;
+        }
+
     }
 
 
