@@ -79,6 +79,11 @@ public class ScrimmageTeleOp extends OpMode {
             launchArtifactCommand.start();
         }
 
+        if (gamepad1.b) {
+            launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher);
+            launchArtifactCommand.startFar();
+        }
+
         if (launchArtifactCommand != null && !launchArtifactCommand.isFinished()) {
             // launchArtifactCommand.updatePID(packet);
             launchArtifactCommand.update(packet);
