@@ -65,6 +65,8 @@ public class ScrimmageTeleOp extends OpMode {
         if (gamepad1.right_trigger > 0.1) {
             unjamSystem.periodic(gamepad1.right_trigger);
             launchArtifactCommand = null;
+            launcher.stopLauncher();
+            popper.deactivatePopper();
         }
         else {
             unjamSystem.stopIntakeSpindexer();
