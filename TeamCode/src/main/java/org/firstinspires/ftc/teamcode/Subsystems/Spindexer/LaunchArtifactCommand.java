@@ -220,6 +220,11 @@ public class LaunchArtifactCommand {
         return currentState == State.FINISHED;
     }
 
+    public void stop() {
+        popper.deactivatePopper();
+        launcher.stopLauncher();
+    }
+
     public boolean spindexerReachedTarget(double currentAngle, double targetAngle) {
         return Math.abs(currentAngle - targetAngle) < 5;
     }
