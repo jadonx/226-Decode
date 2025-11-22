@@ -190,7 +190,6 @@ public class LaunchArtifactCommand {
                     popper.pushOutPopper();
                     popper.stopPopper();
                     currentState = State.FINISHED;
-                    stateStartTime = timer.milliseconds();
                 }
                 break;
             case FINISHED:

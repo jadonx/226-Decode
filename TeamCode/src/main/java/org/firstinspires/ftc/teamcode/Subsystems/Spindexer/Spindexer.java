@@ -16,6 +16,7 @@ public class Spindexer {
     private AS5600Encoder spindexerEncoder;
 
     // PID VARIABLES
+    // 0.015, 0, -0.001
     private double kP = 0.015, kI = 0, kD = -0.001;
     private double lastError = 0;
     private ElapsedTime pidTimer;
