@@ -29,9 +29,12 @@ public class ScrimmageTeleOp extends OpMode {
 
     LaunchArtifactCommand launchArtifactCommand;
 
+<<<<<<< HEAD
     boolean isIntaking = false;
     double turretTargetAngle = 0;
 
+=======
+>>>>>>> 8015b444dc50a5fcd4e2e32b4c78039381315301
     // 0.015, 0, -0.001
     public static double kP, kI, kD;
 
@@ -71,11 +74,12 @@ public class ScrimmageTeleOp extends OpMode {
         // INTAKE/SPINDEXER LOGIC
         if (gamepad1.right_trigger > 0.1) {
             unjamSystem.periodic(gamepad1.right_trigger);
-            isIntaking = true;
+            launchArtifactCommand = null;
+            launcher.stopLauncher();
+            popper.deactivatePopper();
         }
         else {
             unjamSystem.stopIntakeSpindexer();
-            isIntaking = false;
         }
 
         // SPINDEXER LAUNCH LOGIC
@@ -85,11 +89,17 @@ public class ScrimmageTeleOp extends OpMode {
             launchArtifactCommand.start();
         }
 
-        if (launchArtifactCommand != null && !launchArtifactCommand.isFinished() && !isIntaking) {
+        if (gamepad1.b) {
+            launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher);
+            launchArtifactCommand.startFar();
+        }
+
+        if (launchArtifactCommand != null && !launchArtifactCommand.isFinished()) {
             // launchArtifactCommand.updatePID(packet);
             launchArtifactCommand.update(packet);
         }
 
+<<<<<<< HEAD
         if (gamepad1.b) {
             launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher);
             launchArtifactCommand.startFar();
@@ -106,6 +116,14 @@ public class ScrimmageTeleOp extends OpMode {
 
 
 
+=======
+        if (launchArtifactCommand != null && launchArtifactCommand.isFinished()) {
+            launchArtifactCommand = null;
+            launcher.stopLauncher();
+            popper.deactivatePopper();
+        }
+
+>>>>>>> 8015b444dc50a5fcd4e2e32b4c78039381315301
         packet.put("spindexer current angle ", spindexer.getAngle());
         dashboard.sendTelemetryPacket(packet);
 
