@@ -1,12 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 public class Constants {
-    //Drivetrain Hardware Map Names
-
-
-
-    public static String HMMotorSpinner = "spinner";
-
     public static String HMimu = "imu";
     public static String HMSpindexerEncoder = "spinDexerEncoder";
     public static String HMTurretEncoder = "turretEncoder";

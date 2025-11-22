@@ -13,7 +13,6 @@ import com.qualcomm.robotcore.hardware.IMU;
 public class TurretSubsystem {
     private CRServo turretLeft, turretRight;
     private OpMode opMode;
-    private IMU imu;
     private PIDController pid;
     public static double kP = 0.02;
     public static double kI = 0.0;

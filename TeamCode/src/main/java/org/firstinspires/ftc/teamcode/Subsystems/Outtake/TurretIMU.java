@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.Subsystems.Outtake;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -9,85 +11,121 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.Core.Controller.PIDFController;
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
-import org.firstinspires.ftc.teamcode.Subsystems.Encoder.AS5600Encoder;
 
+@Config
 @TeleOp (name = "Turret IMU")
 public class TurretIMU extends OpMode {
     private CRServo turretLeft;
     private CRServo turretRight;
     private IMU imu;
-    private AS5600Encoder turretEncoder;
+    private IMU turretEncoder;
+
     private MecanumDrive drive;
     private Pose2d botPose;
-    private PIDFController pid;
+    private PIDController pid;
     private Pose2d blueGoalPose;
 
-    public static final double TURRET_KP = 0.01;
-    public static final double TURRET_KI = 0.0;
-    public static final double TURRET_KD = 0.0;
-    public static final double TURRET_KF = 0.0;
-    public static final double TURRET_MIN = 0.6;
+    public static double kP = 0.02;
+    public static double kI = 0.0;
+    public static double kD = 0.0008;
+
+    public static double x_position = 0;
+    public static double y_position = 0;
+
+    public static double targetAngle = 0;
+    double power;
+    double error;
+    double turretAngle;
+    double dx;
+    double dy;
+
+    boolean toggle = false;
 
     @Override
     public void init() {
         turretLeft = hardwareMap.get(CRServo.class, Constants.HMServoTurretLeft);
         turretRight = hardwareMap.get(CRServo.class, Constants.HMServoTurretRight);
-        turretEncoder = hardwareMap.get(AS5600Encoder.class, Constants.HMTurretEncoder);
-
 
         botPose = new Pose2d(0, 0, 0);
-        pid = new PIDFController(TURRET_KP, TURRET_KI, TURRET_KD, TURRET_KF);
-        blueGoalPose = new Pose2d(-150, 130, 0);
+        pid = new PIDController(kP, kI, kD);
+        pid.setTolerance(0.5);
+
+
+
+        blueGoalPose = new Pose2d(x_position, y_position, 0);
         drive = new MecanumDrive(hardwareMap, botPose);
 
         imu = hardwareMap.get(IMU.class, Constants.HMimu);
+        turretEncoder = hardwareMap.get(IMU.class, Constants.HMTurretEncoder);
 
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
                 RevHubOrientationOnRobot.UsbFacingDirection.UP));
 
+        IMU.Parameters turretParameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+                RevHubOrientationOnRobot.UsbFacingDirection.UP));
+
         imu.initialize(parameters);
+        turretEncoder.initialize(turretParameters);
+        imu.resetYaw();
+        turretEncoder.resetYaw();
     }
-
-
-    public void AimTo(Pose2d GOAL, Pose2d BOT) {
-        double desiredAngle = AngleUnit.normalizeDegrees(Math.toDegrees(Math.atan2(GOAL.position.y - BOT.position.y, GOAL.position.x - BOT.position.x)));
-        double botHeading = AngleUnit.normalizeDegrees(imu.getRobotYawPitchRollAngles().getYaw());
-        double turretAngle = AngleUnit.normalizeDegrees(turretEncoder.getAngleDegrees());
-
-        double targetTurretAngle = AngleUnit.normalizeDegrees(desiredAngle - botHeading);
-        double error = AngleUnit.normalizeDegrees(targetTurretAngle - turretAngle);
-
-        pid.setSetpoint(error);
-        double power = pid.calculate(0);
-
-        if (Math.abs(power) < TURRET_MIN && Math.abs(error) > 1) {
-            power = Math.signum(power) * TURRET_MIN;
-        }
-
-        power = Math.max(-1, Math.min(1, power));
-
-        setPower(power);
-
-        telemetry.addData("Desired Angle", desiredAngle);
-        telemetry.addData("Bot Heading", botHeading);
-        telemetry.addData("Turret Angle", turretAngle);
-        telemetry.addData("Target Turret Angle", targetTurretAngle);
-        telemetry.addData("Turret Power", power);
-        telemetry.update();
-    }
-
 
     @Override
     public void loop() {
         drive.updatePoseEstimate();
-        AimTo(blueGoalPose, drive.localizer.getPose());
+        targetAngle = getRobotToGoalAngle(blueGoalPose, drive.localizer.getPose(), imu.getRobotYawPitchRollAngles().getYaw());
+
+        if (gamepad1.a && !toggle) {
+            toggle = true;
+        } else if (gamepad1.a && toggle) {
+            toggle = false;
+        }
+
+        if (!toggle) {
+            telemetry.addData("desired angle", targetAngle);
+            telemetry.addData("Bot Pose X", drive.localizer.getPose());
+            telemetry.addData("dx", dx);
+            telemetry.addData("dy", dy);
+        } else {
+            AimToAngle(targetAngle);
+            telemetry.addData("Turret Angle", turretAngle);
+            telemetry.addData("Error", error);
+            telemetry.addData("Turret Power", power);
+            telemetry.addData("desired angle", targetAngle);
+            telemetry.addData("dx", dx);
+            telemetry.addData("dy", dy);
+        }
+
+        telemetry.update();
     }
 
     public void setPower(double power) {
-        turretLeft.setPower(power);
-        turretRight.setPower(power);
+        turretLeft.setPower(-power);
+        turretRight.setPower(-power);
     }
+
+    public void AimToAngle(double ta) {
+        pid.setPID(kP, kI, kD);
+        double turretAngle = turretEncoder.getRobotYawPitchRollAngles().getYaw();
+        error = ta - turretAngle;
+        power = pid.calculate(error, 0);
+        if (pid.atSetPoint()) {
+            setPower(0);
+            return;
+        }
+        setPower(power);
+    }
+
+    public double getRobotToGoalAngle(Pose2d goal, Pose2d bot, double robotHeadingDeg) {
+        dy = goal.position.x - bot.position.x;
+        dx = goal.position.y - bot.position.y;
+
+        double angleToGoalRad = Math.atan2(dy, dx);
+        double angleToGoalDeg = Math.toDegrees(angleToGoalRad) - 90;
+        return angleToGoalDeg - robotHeadingDeg;
+    }
+
 }
