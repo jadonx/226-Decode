@@ -23,8 +23,8 @@ import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.Spindexer;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.UnjammerSystem;
 
 @Config
-@Autonomous(name = "BlueSideCloseAuto", group = "Autonomous")
-public class BlueSideCloseAuto extends LinearOpMode {
+@Autonomous(name = "RedSideCloseAuto", group = "Autonomous")
+public class RedSideCloseAuto extends LinearOpMode {
     Intake intake;
     Spindexer spindexer;
     UnjammerSystem unjamSystem;
@@ -82,13 +82,13 @@ public class BlueSideCloseAuto extends LinearOpMode {
         TRAJECTORIES
          */
 
-        Pose2d initialPose = new Pose2d(-48, -48, Math.toRadians(225));
+        Pose2d initialPose = new Pose2d(-48, 48, Math.toRadians(135));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
         // Trajectory Variables
         TrajectoryActionBuilder moveToShootArtifacts = drive.actionBuilder(initialPose)
-                .setTangent(Math.toRadians(45))
-                .lineToY(-20);
+                .setTangent(Math.toRadians(-45))
+                .lineToY(20);
 
         waitForStart();
 
