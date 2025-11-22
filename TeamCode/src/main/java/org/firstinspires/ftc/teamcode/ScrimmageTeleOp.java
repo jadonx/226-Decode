@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Subsystems.Spindexer.SpindexerTesting;
+package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain.FieldCentricDrive;
+import org.firstinspires.ftc.teamcode.Subsystems.Outtake.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.LaunchArtifactCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.Popper;
@@ -14,17 +15,21 @@ import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.Spindexer;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.UnjammerSystem;
 
 @Config
-@TeleOp(name="SpindexerIntakeTeleOp")
-public class SpindexerIntakeTeleOp extends OpMode {
+@TeleOp(name="ScrimmageTeleOp")
+public class ScrimmageTeleOp extends OpMode {
     FieldCentricDrive drive;
 
     Intake intake;
     Spindexer spindexer;
     UnjammerSystem unjamSystem;
     Popper popper;
+    Launcher launcher;
 
     LaunchArtifactCommand launchArtifactCommand;
 
+    boolean isIntaking = false;
+
+    // 0.015, 0, -0.001
     public static double kP, kI, kD;
 
     TelemetryPacket packet;
@@ -38,6 +43,7 @@ public class SpindexerIntakeTeleOp extends OpMode {
         spindexer = new Spindexer(hardwareMap);
         unjamSystem = new UnjammerSystem(intake, spindexer);
         popper = new Popper(hardwareMap);
+        launcher = new Launcher(hardwareMap);
 
         packet = new TelemetryPacket();
         dashboard = FtcDashboard.getInstance();
@@ -60,26 +66,29 @@ public class SpindexerIntakeTeleOp extends OpMode {
         // INTAKE/SPINDEXER LOGIC
         if (gamepad1.right_trigger > 0.1) {
             unjamSystem.periodic(gamepad1.right_trigger);
+            isIntaking = true;
         }
         else {
             unjamSystem.stopIntakeSpindexer();
+            isIntaking = false;
         }
 
         // SPINDEXER LAUNCH LOGIC
         if (gamepad1.a) {
-            launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper);
+            launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher);
+            // launchArtifactCommand.startPID();
             launchArtifactCommand.start();
         }
 
-        if (launchArtifactCommand != null && !launchArtifactCommand.isFinished()) {
+        if (launchArtifactCommand != null && !launchArtifactCommand.isFinished() && !isIntaking) {
+            // launchArtifactCommand.updatePID(packet);
             launchArtifactCommand.update(packet);
         }
 
         packet.put("spindexer current angle ", spindexer.getAngle());
         dashboard.sendTelemetryPacket(packet);
 
-        // UPDATE SPINDEXER PID VALUES
-        spindexer.updatePID(kP, kI, kD);
+        // spindexer.updatePID(kP, kI, kD);
     }
 
     @Override
@@ -87,5 +96,6 @@ public class SpindexerIntakeTeleOp extends OpMode {
         unjamSystem.stopIntakeSpindexer();
         drive.stopDrive();
         popper.deactivatePopper();
+        launcher.stopLauncher();
     }
 }

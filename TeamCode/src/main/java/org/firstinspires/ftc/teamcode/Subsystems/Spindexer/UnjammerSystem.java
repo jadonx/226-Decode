@@ -31,18 +31,22 @@ public class UnjammerSystem {
     }
 
     public void periodic(float intakePower) {
+
         if (!isJammed) {
             runIntakeSpindexer(intakePower);
         }
 
+        runIntakeSpindexer(intakePower);
+
+
         // Checks whether intake is intaking and is not jammed
         if (intake.isIntaking() && !isJammed) {
             // Checks if spindexer is stuck
-            if (Math.abs(spindexer.getAngle() - lastAngle) < 3) {
+            if (Math.abs(spindexer.getAngle() - lastAngle) < 2) {
                 if (jamStartTime == -1) {
                     jamStartTime = timer.milliseconds();
                 }
-                else if (timer.milliseconds() - jamStartTime > 100) {
+                else if (timer.milliseconds() - jamStartTime > 150) {
                     isJammed = true;
                 }
             }
@@ -58,7 +62,7 @@ public class UnjammerSystem {
             if (unjamStartTime == -1) {
                 unjamStartTime = timer.milliseconds();
             }
-            if (timer.milliseconds() - unjamStartTime > 250) {
+            if (timer.milliseconds() - unjamStartTime > 120) {
                 isJammed = false;
                 jamStartTime = -1;
                 unjamStartTime = -1;

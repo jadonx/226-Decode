@@ -16,11 +16,11 @@ public class Spindexer {
     private AS5600Encoder spindexerEncoder;
 
     // PID VARIABLES
-    private double kP = 0.01, kI = 0, kD = 0;
+    private double kP = 0.015, kI = 0, kD = -0.001;
     private double lastError = 0;
     private ElapsedTime pidTimer;
 
-    private int[] launchHolderAngles = {40, 190, 290};
+    private int[] launchHolderAngles = {50, 192, 280};
 
     // COLOR SENSOR VARIABLES
     private NormalizedColorSensor colorSensor;
@@ -60,7 +60,7 @@ public class Spindexer {
 
         double derivative = (error - lastError) / pidTimer.seconds();
 
-        double output = (kP * error) + (kD * derivative);
+        double output = (kP * error) + (-kD * derivative);
 
         spindexerServo.setPower(output);
 

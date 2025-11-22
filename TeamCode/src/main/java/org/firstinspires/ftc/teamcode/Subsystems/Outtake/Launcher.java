@@ -1,65 +1,152 @@
 package org.firstinspires.ftc.teamcode.Subsystems.Outtake;
 
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.teamcode.Constants;
+
+import java.util.List;
 
 public class Launcher {
-    private DcMotor shooter1, shooter2;
+    // LAUNCHER
+    private DcMotorEx launcher1, launcher2;
+    private double shooterSpeed = 1;
 
-    // RPM Calculations
-    private int last = 0;
-    private final double ticksPerRev = 28;
-    private ElapsedTime rpmTimer;
+    // COVER
+    private Servo cover;
+    private double anglePos, angleDegree;
 
-    // RPM PID
-    private double kP, kD;
-    private double lastError = 0;
-    private ElapsedTime pidTimer;
+    // LIMELIGHT
+    private Limelight3A limelight;
+    // private double tx = 0;
+    // private double ty = 0;
+    // private double id = -1;
+    private double distance = 0;
+
+    private final double CAM_DEG = 29.78;
+    private final double CAM_H = 12;
+    private final double TARGET_H = 29;
+    // private final double INITIAL_VELOCITY = 246.81;
+    // private final double GRAVITY = 386.09;
 
     public Launcher(HardwareMap hardwareMap) {
-        shooter1 = hardwareMap.get(DcMotorEx.class, "shooter1");
-        shooter2 = hardwareMap.get(DcMotorEx.class, "shooter2");
+        launcher1 = hardwareMap.get(DcMotorEx.class, Constants.HMMotorShooter1);
+        launcher2 = hardwareMap.get(DcMotorEx.class, Constants.HMMotorShooter2);
 
-        shooter1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        shooter2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        launcher1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        launcher2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        shooter1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        shooter2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        cover = hardwareMap.get(Servo.class, Constants.HMServobackSpin);
 
-        rpmTimer = new ElapsedTime();
-
-        pidTimer = new ElapsedTime();
+        limelight = hardwareMap.get(Limelight3A.class, Constants.HMLimelight);
+        limelight.pipelineSwitch(1);
+        limelight.start();
     }
 
-    public void setPower(double power) {
-        shooter1.setPower(power);
-        shooter2.setPower(power);
+    // Returns [target velocity, target angle]
+    public double[] getVelocityAndAngle() {
+        double targetVelocity;
+        double coverPos;
+
+        calculateLimelightDistance();
+
+        if (distance > 76){
+            coverPos = 0.05;
+            // cover.setPosition(0.05);
+
+            if (distance > 100){
+                targetVelocity = 2800;
+                // shooterSpeed = 2800;
+            }
+            else {
+                targetVelocity = calculateTargetVelocity();
+                // shooterSpeed = calculateTargetVelocity();
+            }
+        }
+        else if (distance < 29.70772 && distance > 29.7077){
+            coverPos = 1;
+            // cover.setPosition(1);
+            targetVelocity = 1400;
+            // shooterSpeed = 1400;
+        }
+        else {
+            coverPos = calculateCoverAngle();
+            // cover.setPosition(calculateCoverAngle());
+            targetVelocity = calculateTargetVelocity();
+            // shooterSpeed = calculateTargetVelocity();
+        }
+
+        return new double[] {targetVelocity, coverPos};
     }
 
-    public double currentRPM() {
-        int current = shooter1.getCurrentPosition();
-        int deltaTicks = current - last;
-        last = current;
-
-        double revsPerSecond = (deltaTicks / ticksPerRev) / rpmTimer.seconds();
-        rpmTimer.reset();
-
-        return revsPerSecond * 60.0;
+    public void setVelocity(double targetVelocity) {
+        launcher1.setVelocity(targetVelocity);
+        launcher2.setVelocity(targetVelocity);
     }
 
-    public double updatePID(int targetRPM) {
-        double error = targetRPM - currentRPM();
-
-        double derivative = (error - lastError) / pidTimer.seconds();
-        lastError = error;
-
-        return kP * error + kD * derivative;
+    public void setCoverAngle(double targetAngle) {
+        cover.setPosition(targetAngle);
     }
 
-    public void updatePIDValues(double kP, double kD) {
-        this.kP = kP;
-        this.kD = kD;
+    public double getCurrentVelocity() {
+        return launcher1.getVelocity();
+    }
+
+    public boolean atTargetVelocity(double targetVelocity) {
+        return Math.abs(getCurrentVelocity() - targetVelocity) < 10;
+    }
+
+    public void stopLauncher() {
+        // CHANGE TO VELOCITY
+        launcher1.setVelocity(0);
+        launcher2.setVelocity(0);
+    }
+
+    // CALCULATE DISTANCE USING LIMELIGHT
+    private void calculateLimelightDistance() {
+        LLResult result = limelight.getLatestResult();
+
+        if(result != null){
+            // tx = result.getTx();
+            // ty = result.getTy();
+
+            distance = getDistanceInches(result.getTy());
+
+            /*
+            List<LLResultTypes.FiducialResult> fiducialResult = result.getFiducialResults();
+            for(LLResultTypes.FiducialResult fr : fiducialResult){
+                id = fr.getFiducialId();
+            }
+             */
+        }
+    }
+
+    // CALCULATE TARGET VELOCITY
+    private double calculateTargetVelocity() {
+        if (distance < 80){
+            return (0.0353161*(Math.pow(distance,2)))+(0.991859*distance)+1388.8866;
+        } else if(distance > 130){
+            return 2800;
+        } else{
+            return (-0.47286*Math.pow(distance,2))+(109.73693*distance)-3946.15385;
+        }
+    }
+
+    // CALCULATE TARGET ANGLE
+    private double calculateCoverAngle(){
+        return (-0.0117319 * distance) + 0.956034;
+    }
+
+    // CALCULATE DISTANCE FROM BOT TO APRIL TAG
+    private double getDistanceInches(double tyDegrees) {
+        double totalAngleDeg = CAM_DEG + tyDegrees;
+        double totalAngleRad = Math.toRadians(totalAngleDeg);
+
+        return (TARGET_H - CAM_H) / Math.tan(totalAngleRad);
     }
 }
