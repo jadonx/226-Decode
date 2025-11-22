@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Operation.Autonomous;
+package org.firstinspires.ftc.teamcode;
 
 import androidx.annotation.NonNull;
 
@@ -14,7 +14,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
-import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain.FieldCentricDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Outtake.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.LaunchArtifactCommand;
@@ -23,8 +22,8 @@ import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.Spindexer;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.UnjammerSystem;
 
 @Config
-@Autonomous(name = "Blue Autonomous", group = "Autonomous")
-public class BlueAutonomous extends LinearOpMode {
+@Autonomous(name = "BlueSideCloseAuto", group = "Autonomous")
+public class BlueSideCloseAuto extends LinearOpMode {
     Intake intake = new Intake(hardwareMap);;
     Spindexer spindexer = new Spindexer(hardwareMap);
     UnjammerSystem unjamSystem = new UnjammerSystem(intake, spindexer);
@@ -54,50 +53,29 @@ public class BlueAutonomous extends LinearOpMode {
         TRAJECTORIES
          */
 
-        Pose2d initialPose = new Pose2d(-50, -50, Math.toRadians(229));
+        Pose2d initialPose = new Pose2d(-48, -48, Math.toRadians(54));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
-        TrajectoryActionBuilder shooting1 = drive.actionBuilder(initialPose)
-                .strafeTo(new Vector2d(-12, -10));
+        // Trajectory Variables
+        TrajectoryActionBuilder shiftForward = drive.actionBuilder(initialPose)
+                .setTangent(Math.toRadians(90))
+                .lineToYLinearHeading(-44, Math.toRadians(90));
 
-        TrajectoryActionBuilder intake1 = shooting1.endTrajectory().fresh()
-                .strafeToLinearHeading(new Vector2d(-12, -20), Math.toRadians(270))
-                .waitSeconds(0.2)
-                .strafeToLinearHeading(new Vector2d(-12, -50), Math.toRadians(270));
-
-        TrajectoryActionBuilder shooting2 = intake1.endTrajectory().fresh()
-                .strafeToLinearHeading(new Vector2d(-12, -10), Math.toRadians(229));
-
-        TrajectoryActionBuilder intake2 = shooting2.endTrajectory().fresh()
-                .strafeToLinearHeading(new Vector2d(12, -20), Math.toRadians(270))
-                .waitSeconds(.2)
-                .strafeToLinearHeading(new Vector2d(12, -50), Math.toRadians(270));
-
-        TrajectoryActionBuilder shooting3 = intake2.endTrajectory().fresh()
-                .strafeToLinearHeading(new Vector2d(35.5, -20), Math.toRadians(270));
-
-        TrajectoryActionBuilder intake3 = shooting3.endTrajectory().fresh()
-                .strafeToLinearHeading(new Vector2d(35.5, -20), Math.toRadians(270))
-                .waitSeconds(.2)
-                .strafeToLinearHeading(new Vector2d(35.5, -50), Math.toRadians(270));
-
-        TrajectoryActionBuilder shooting4 = intake3.endTrajectory().fresh()
-                .strafeToLinearHeading(new Vector2d(-12, -10), Math.toRadians(229));
+        TrajectoryActionBuilder shootZone = shiftForward.endTrajectory().fresh()
+                .setReversed(false)
+                .splineToLinearHeading(new Pose2d(-20, -20, Math.toRadians(270)), Math.toRadians(0.00))
+                .waitSeconds(2);
 
         waitForStart();
 
         if (isStopRequested()) return;
+
         Actions.runBlocking(
                 new SequentialAction(
-                        shooting1.build(),
-                        intake1.build(),
-                        shooting2.build(),
-                        intake2.build(),
-                        shooting3.build(),
-                        intake3.build(),
-                        shooting4.build()
+                        shiftForward.build(),
+                        shootZone.build(),
+                        shootArtifacts()
                 )
-
         );
     }
 }

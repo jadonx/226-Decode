@@ -80,9 +80,15 @@ public class ScrimmageTeleOp extends OpMode {
             launchArtifactCommand.start();
         }
 
-        if (launchArtifactCommand != null && !launchArtifactCommand.isFinished() && !isIntaking) {
+        if (launchArtifactCommand != null && !launchArtifactCommand.isFinished()) {
             // launchArtifactCommand.updatePID(packet);
             launchArtifactCommand.update(packet);
+        }
+
+        if (launchArtifactCommand != null && launchArtifactCommand.isFinished()) {
+            launchArtifactCommand = null;
+            launcher.stopLauncher();
+            popper.deactivatePopper();
         }
 
         packet.put("spindexer current angle ", spindexer.getAngle());
