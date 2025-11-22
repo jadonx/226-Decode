@@ -12,6 +12,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.LaunchArtifactCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.Popper;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.Spindexer;
+import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.Turret;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.UnjammerSystem;
 
 @Config
@@ -24,16 +25,19 @@ public class ScrimmageTeleOp extends OpMode {
     UnjammerSystem unjamSystem;
     Popper popper;
     Launcher launcher;
+    Turret turret;
 
     LaunchArtifactCommand launchArtifactCommand;
 
     boolean isIntaking = false;
+    double turretTargetAngle = 0;
 
     // 0.015, 0, -0.001
     public static double kP, kI, kD;
 
     TelemetryPacket packet;
     FtcDashboard dashboard;
+
 
     @Override
     public void init() {
@@ -44,6 +48,7 @@ public class ScrimmageTeleOp extends OpMode {
         unjamSystem = new UnjammerSystem(intake, spindexer);
         popper = new Popper(hardwareMap);
         launcher = new Launcher(hardwareMap);
+        turret = new Turret(hardwareMap);
 
         packet = new TelemetryPacket();
         dashboard = FtcDashboard.getInstance();
@@ -85,6 +90,22 @@ public class ScrimmageTeleOp extends OpMode {
             launchArtifactCommand.update(packet);
         }
 
+        if (gamepad1.b) {
+            launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher);
+            launchArtifactCommand.startFar();
+        }
+
+        // TURRET LOGIC
+        if (gamepad1.dpad_up) {
+            turret.alignTurret();
+        }
+
+        if (gamepad1.y) {
+            turret.AimToAngle(turretTargetAngle);
+        }
+
+
+
         packet.put("spindexer current angle ", spindexer.getAngle());
         dashboard.sendTelemetryPacket(packet);
 
@@ -97,5 +118,6 @@ public class ScrimmageTeleOp extends OpMode {
         drive.stopDrive();
         popper.deactivatePopper();
         launcher.stopLauncher();
+        turret.stopTurert();
     }
 }

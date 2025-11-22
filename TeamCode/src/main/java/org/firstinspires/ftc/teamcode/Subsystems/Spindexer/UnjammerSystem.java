@@ -7,8 +7,8 @@ public class UnjammerSystem {
     private final Spindexer spindexer;
 
     private boolean isJammed;
-    private double jamStartTime;
-    private double unjamStartTime;
+    private double jamStartTime = -1;
+    private double unjamStartTime = -1;
     private double lastAngle;
 
     private ElapsedTime timer;

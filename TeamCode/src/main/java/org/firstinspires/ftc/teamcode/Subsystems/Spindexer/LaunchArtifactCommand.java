@@ -113,6 +113,20 @@ public class LaunchArtifactCommand {
         launcher.setCoverAngle(targetAngle);
     }
 
+    public void startFar() {
+        launchAngleSequence = spindexer.getLaunchAngleSequence();
+        target = launchAngleSequence[0];
+        currentState = State.MOVE_TO_FIRST_LAUNCH;
+        timer = new ElapsedTime();
+
+        popper.spinPopper();
+
+        targetVelocity = 2300; targetAngle = 0.05;
+
+        launcher.setVelocity(targetVelocity);
+        launcher.setCoverAngle(targetAngle);
+    }
+
     public void update(TelemetryPacket packet) {
         spindexer.goToAngle(target);
         launcher.setVelocity(targetVelocity);
@@ -190,7 +204,6 @@ public class LaunchArtifactCommand {
                     popper.pushOutPopper();
                     popper.stopPopper();
                     currentState = State.FINISHED;
-                    stateStartTime = timer.milliseconds();
                 }
                 break;
             case FINISHED:
