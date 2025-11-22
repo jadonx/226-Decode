@@ -20,7 +20,7 @@ public class Spindexer {
     private double lastError = 0;
     private ElapsedTime pidTimer;
 
-    private int[] launchHolderAngles = {0, 96, 225};
+    private int[] launchHolderAngles = {50, 192, 280};
 
     // COLOR SENSOR VARIABLES
     private NormalizedColorSensor colorSensor;

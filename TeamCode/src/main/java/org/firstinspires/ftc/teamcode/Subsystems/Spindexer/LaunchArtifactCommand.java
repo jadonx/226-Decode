@@ -27,7 +27,6 @@ public class LaunchArtifactCommand {
         MOVE_TO_THIRD_LAUNCH,
         LAUNCH_THIRD,
         WAIT_AFTER_THIRD_LAUNCH,
-        PULL_OUT_POPPER_THIRD,
         FINISHED
     }
     private State currentState = State.MOVE_TO_FIRST_LAUNCH;
@@ -37,6 +36,7 @@ public class LaunchArtifactCommand {
     private ElapsedTime timer;
 
     private double targetVelocity;
+    private double targetAngle;
 
     public LaunchArtifactCommand(Spindexer spindexer, Popper popper, Launcher launcher) {
         this.spindexer = spindexer;
@@ -104,13 +104,19 @@ public class LaunchArtifactCommand {
         currentState = State.MOVE_TO_FIRST_LAUNCH;
         timer = new ElapsedTime();
 
-        targetVelocity = launcher.calculateTargetVelocity(0.0);
-        launcher.setVelocity(targetVelocity);
         popper.spinPopper();
+
+        double[] targetVelocityAngle = launcher.getVelocityAndAngle();
+        targetVelocity = targetVelocityAngle[0]; targetAngle = targetVelocityAngle[1];
+
+        launcher.setVelocity(targetVelocity);
+        launcher.setCoverAngle(targetAngle);
     }
 
     public void update(TelemetryPacket packet) {
         spindexer.goToAngle(target);
+        launcher.setVelocity(targetVelocity);
+        launcher.setCoverAngle(targetAngle);
 
         switch (currentState) {
             // WAIT UNTIL SPINDEXER IS AT POSITION
@@ -188,6 +194,8 @@ public class LaunchArtifactCommand {
                 }
                 break;
             case FINISHED:
+                popper.deactivatePopper();
+                launcher.stopLauncher();
                 break;
         }
 
