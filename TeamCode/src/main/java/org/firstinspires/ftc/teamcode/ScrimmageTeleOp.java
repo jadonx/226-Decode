@@ -27,8 +27,6 @@ public class ScrimmageTeleOp extends OpMode {
 
     LaunchArtifactCommand launchArtifactCommand;
 
-    boolean isIntaking = false;
-
     // 0.015, 0, -0.001
     public static double kP, kI, kD;
 
@@ -66,11 +64,10 @@ public class ScrimmageTeleOp extends OpMode {
         // INTAKE/SPINDEXER LOGIC
         if (gamepad1.right_trigger > 0.1) {
             unjamSystem.periodic(gamepad1.right_trigger);
-            isIntaking = true;
+            launchArtifactCommand = null;
         }
         else {
             unjamSystem.stopIntakeSpindexer();
-            isIntaking = false;
         }
 
         // SPINDEXER LAUNCH LOGIC

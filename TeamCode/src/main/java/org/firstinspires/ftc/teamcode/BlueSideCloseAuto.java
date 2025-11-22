@@ -12,6 +12,7 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Outtake.Launcher;
@@ -24,47 +25,66 @@ import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.UnjammerSystem;
 @Config
 @Autonomous(name = "BlueSideCloseAuto", group = "Autonomous")
 public class BlueSideCloseAuto extends LinearOpMode {
-    Intake intake = new Intake(hardwareMap);;
-    Spindexer spindexer = new Spindexer(hardwareMap);
-    UnjammerSystem unjamSystem = new UnjammerSystem(intake, spindexer);
-    Popper popper = new Popper(hardwareMap);
-    Launcher launcher = new Launcher(hardwareMap);
 
     /*
     ACTIONS
      */
-    public class ShootArtifacts implements Action {
-        LaunchArtifactCommand launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher);
+    /*
+    public class Commands {
+        Intake intake;
+        Spindexer spindexer;
+        UnjammerSystem unjamSystem;
+        Popper popper;
+        Launcher launcher;
 
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            launchArtifactCommand.update(telemetryPacket);
+        LaunchArtifactCommand launchArtifactCommand;
 
-            return launchArtifactCommand.isFinished();
+        public Commands(HardwareMap hardwareMap) {
+            intake = new Intake(hardwareMap);
+            spindexer = new Spindexer(hardwareMap);
+            unjamSystem = new UnjammerSystem(intake, spindexer);
+            popper = new Popper(hardwareMap);
+            launcher = new Launcher(hardwareMap);
+        }
+
+        public void startLaunchArtifactCommand() {
+            launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper,launcher);
+            launchArtifactCommand.start();
+        }
+
+        public class ShootArtifacts implements Action {
+            startLaunchArtifactCommand();
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                launchArtifactCommand.update(telemetryPacket);
+
+                return launchArtifactCommand.isFinished();
+            }
+        }
+        public Action shootArtifacts() {
+            return new ShootArtifacts();
         }
     }
-    public Action shootArtifacts() {
-        return new ShootArtifacts();
-    }
+     */
 
     @Override
     public void runOpMode() throws InterruptedException {
         /*
+        SUBSYSTEMS AND COMMANDS
+         */
+
+
+        /*
         TRAJECTORIES
          */
 
-        Pose2d initialPose = new Pose2d(-48, -48, Math.toRadians(54));
+        Pose2d initialPose = new Pose2d(-48, -48, Math.toRadians(225));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
         // Trajectory Variables
-        TrajectoryActionBuilder shiftForward = drive.actionBuilder(initialPose)
-                .setTangent(Math.toRadians(90))
-                .lineToYLinearHeading(-44, Math.toRadians(90));
-
-        TrajectoryActionBuilder shootZone = shiftForward.endTrajectory().fresh()
-                .setReversed(false)
-                .splineToLinearHeading(new Pose2d(-20, -20, Math.toRadians(270)), Math.toRadians(0.00))
-                .waitSeconds(2);
+        TrajectoryActionBuilder moveToShootArtifacts = drive.actionBuilder(initialPose)
+                .lineToY(-20);
 
         waitForStart();
 
@@ -72,9 +92,8 @@ public class BlueSideCloseAuto extends LinearOpMode {
 
         Actions.runBlocking(
                 new SequentialAction(
-                        shiftForward.build(),
-                        shootZone.build(),
-                        shootArtifacts()
+                        moveToShootArtifacts.build()
+                        // shootArtifacts()
                 )
         );
     }
