@@ -7,13 +7,13 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain.FieldCentricDrive;
-import org.firstinspires.ftc.teamcode.Subsystems.Outtake.Launcher;
-import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.Intake;
-import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.LaunchArtifactCommand;
-import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.Popper;
-import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.Spindexer;
-import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.Turret;
-import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.UnjammerSystem;
+import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
+import org.firstinspires.ftc.teamcode.Subsystems.Intake;
+import org.firstinspires.ftc.teamcode.Subsystems.LaunchArtifactCommand;
+import org.firstinspires.ftc.teamcode.Subsystems.Popper;
+import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
+import org.firstinspires.ftc.teamcode.Subsystems.Turret;
+import org.firstinspires.ftc.teamcode.Subsystems.UnjammerSystem;
 
 @Config
 @TeleOp(name="ScrimmageTeleOp")
@@ -30,7 +30,6 @@ public class ScrimmageTeleOp extends OpMode {
     LaunchArtifactCommand launchArtifactCommand;
 
     boolean isIntaking = false;
-    double turretTargetAngle = 0;
 
     public static double kP, kI, kD;
 
@@ -67,7 +66,6 @@ public class ScrimmageTeleOp extends OpMode {
             drive.resetIMU();
         }
 
-        // INTAKE/SPINDEXER LOGIC
         if (gamepad1.right_trigger > 0.1) {
             unjamSystem.periodic(gamepad1.right_trigger);
             launchArtifactCommand = null;
@@ -101,13 +99,8 @@ public class ScrimmageTeleOp extends OpMode {
         }
 
         // TURRET LOGIC
-        if (gamepad1.dpad_up) {
-            turret.alignTurret();
-        }
-
-        if (gamepad1.y) {
-            turret.AimToAngle(turretTargetAngle);
-        }
+        // Tracking when see the limelight, if not go to 0
+        turret.alignTurret();
 
         if (launchArtifactCommand != null && launchArtifactCommand.isFinished()) {
             launchArtifactCommand = null;
@@ -117,7 +110,6 @@ public class ScrimmageTeleOp extends OpMode {
 
         packet.put("spindexer current angle ", spindexer.getAngle());
         dashboard.sendTelemetryPacket(packet);
-
     }
 
     @Override

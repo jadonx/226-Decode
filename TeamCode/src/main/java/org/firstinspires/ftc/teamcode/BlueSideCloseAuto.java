@@ -8,19 +8,17 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
-import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
-import org.firstinspires.ftc.teamcode.Subsystems.Outtake.Launcher;
-import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.Intake;
-import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.LaunchArtifactCommand;
-import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.Popper;
-import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.Spindexer;
-import org.firstinspires.ftc.teamcode.Subsystems.Spindexer.UnjammerSystem;
+import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
+import org.firstinspires.ftc.teamcode.Subsystems.Intake;
+import org.firstinspires.ftc.teamcode.Subsystems.LaunchArtifactCommand;
+import org.firstinspires.ftc.teamcode.Subsystems.Popper;
+import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
+import org.firstinspires.ftc.teamcode.Subsystems.UnjammerSystem;
 
 @Config
 @Autonomous(name = "BlueSideCloseAuto", group = "Autonomous")

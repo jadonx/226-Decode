@@ -1,5 +1,6 @@
-package org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
+package org.firstinspires.ftc.teamcode.Subsystems;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -8,9 +9,9 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Constants;
 
+@Config
 public class Turret {
     private CRServo turretLeft, turretRight;
     private PIDController pid;
@@ -21,9 +22,9 @@ public class Turret {
     private static double kI = 0.0;
     private static double kD = 0.0008;
 
+    double turretTargetAngle = 0;
 
     private Limelight3A limelight;
-
 
     public Turret(HardwareMap hardwareMap) {
         turretRight = hardwareMap.get(CRServo.class, Constants.HMServoTurretRight);
@@ -44,28 +45,23 @@ public class Turret {
     public void alignTurret() {
         LLResult result = limelight.getLatestResult();
 
+        // If target is found, use limelight tracking to align turret, if not, aim to 0 angle
         if (result.isValid()) {
             double tX = result.getTx();
             trackingWithLL(tX);
         } else {
-            setPower(0);
+            AimToAngle(turretTargetAngle);
         }
     }
 
     public void trackingWithLL(double tX) {
         pid.setPID(kP, kI, kD);
-
-        double correction = pid.calculate(tX, 0);
-
+        double correction = pid.calculate(-tX, 0);
         if (pid.atSetPoint()) {
             setPower(0);
             return;
         }
-        setPower(-correction);
-    }
-    private void setPower(double power) {
-        turretLeft.setPower(-power);
-        turretRight.setPower(-power);
+        setPower(correction);
     }
 
     public void AimToAngle(double ta) {
@@ -78,6 +74,11 @@ public class Turret {
             return;
         }
         setPower(power);
+    }
+
+    private void setPower(double power) {
+        turretLeft.setPower(-power);
+        turretRight.setPower(-power);
     }
 
     public void stopTurert() {

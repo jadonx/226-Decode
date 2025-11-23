@@ -1,7 +1,6 @@
-package org.firstinspires.ftc.teamcode.Subsystems.Outtake;
+package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -9,8 +8,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.Constants;
-
-import java.util.List;
 
 public class Launcher {
     // LAUNCHER
@@ -23,16 +20,11 @@ public class Launcher {
 
     // LIMELIGHT
     private Limelight3A limelight;
-    // private double tx = 0;
-    // private double ty = 0;
-    // private double id = -1;
     private double distance = 0;
 
     private final double CAM_DEG = 29.78;
     private final double CAM_H = 12;
     private final double TARGET_H = 29;
-    // private final double INITIAL_VELOCITY = 246.81;
-    // private final double GRAVITY = 386.09;
 
     public Launcher(HardwareMap hardwareMap) {
         launcher1 = hardwareMap.get(DcMotorEx.class, Constants.HMMotorShooter1);
@@ -112,17 +104,7 @@ public class Launcher {
         LLResult result = limelight.getLatestResult();
 
         if(result != null){
-            // tx = result.getTx();
-            // ty = result.getTy();
-
             distance = getDistanceInches(result.getTy());
-
-            /*
-            List<LLResultTypes.FiducialResult> fiducialResult = result.getFiducialResults();
-            for(LLResultTypes.FiducialResult fr : fiducialResult){
-                id = fr.getFiducialId();
-            }
-             */
         }
     }
 
