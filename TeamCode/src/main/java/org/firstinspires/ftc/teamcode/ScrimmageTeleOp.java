@@ -29,13 +29,9 @@ public class ScrimmageTeleOp extends OpMode {
 
     LaunchArtifactCommand launchArtifactCommand;
 
-<<<<<<< HEAD
     boolean isIntaking = false;
     double turretTargetAngle = 0;
 
-=======
->>>>>>> 8015b444dc50a5fcd4e2e32b4c78039381315301
-    // 0.015, 0, -0.001
     public static double kP, kI, kD;
 
     TelemetryPacket packet;
@@ -99,7 +95,6 @@ public class ScrimmageTeleOp extends OpMode {
             launchArtifactCommand.update(packet);
         }
 
-<<<<<<< HEAD
         if (gamepad1.b) {
             launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher);
             launchArtifactCommand.startFar();
@@ -114,20 +109,15 @@ public class ScrimmageTeleOp extends OpMode {
             turret.AimToAngle(turretTargetAngle);
         }
 
-
-
-=======
         if (launchArtifactCommand != null && launchArtifactCommand.isFinished()) {
             launchArtifactCommand = null;
             launcher.stopLauncher();
             popper.deactivatePopper();
         }
 
->>>>>>> 8015b444dc50a5fcd4e2e32b4c78039381315301
         packet.put("spindexer current angle ", spindexer.getAngle());
         dashboard.sendTelemetryPacket(packet);
 
-        // spindexer.updatePID(kP, kI, kD);
     }
 
     @Override

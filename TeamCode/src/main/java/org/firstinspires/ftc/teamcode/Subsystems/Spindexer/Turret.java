@@ -52,7 +52,6 @@ public class Turret {
         }
     }
 
-
     public void trackingWithLL(double tX) {
         pid.setPID(kP, kI, kD);
 
