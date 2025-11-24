@@ -14,7 +14,7 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 public class motorTest extends OpMode {
     //DcMotorEx motor1, motor2;
     NormalizedColorSensor colorSensor;
-    float[] hsvValues = new float[3];
+
 
 
     public void init(){

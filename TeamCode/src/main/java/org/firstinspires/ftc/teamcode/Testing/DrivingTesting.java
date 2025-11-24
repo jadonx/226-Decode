@@ -24,14 +24,14 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Subsystems.Encoder.AS5600Encoder;
-import org.firstinspires.ftc.teamcode.Subsystems.Outtake.TurretSubsystem;
+
 
 @TeleOp(name="Drive Testing")
 public class DrivingTesting extends OpMode {
     DcMotor frontLeft, frontRight, backLeft, backRight,intake;
     CRServo bigSpin;
     IMU imu;
-    private TurretSubsystem turret;
+
     private FtcDashboard dashboard;
     private Limelight3A limelight;
     private double tX;
