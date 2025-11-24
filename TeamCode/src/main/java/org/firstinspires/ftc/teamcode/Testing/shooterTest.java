@@ -10,7 +10,7 @@ import static org.firstinspires.ftc.teamcode.Constants.HMServoTurretRight;
 import static org.firstinspires.ftc.teamcode.Constants.HMServobackSpin;
 import static org.firstinspires.ftc.teamcode.Constants.HMServospinDexer;
 import static org.firstinspires.ftc.teamcode.Constants.HMSpindexerEncoder;
-import static org.firstinspires.ftc.teamcode.Constants.HMTurretEncoder;
+
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -39,7 +39,7 @@ public class shooterTest extends OpMode {
     public boolean isJammed;
 
     public static double unJamTime = 150;
-    public static double jamThreshold = 50;
+    public static double jamThreshold = 120;
     public static double angleDiff = 2;
 
     private ElapsedTime runtime = new ElapsedTime();
