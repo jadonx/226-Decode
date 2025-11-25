@@ -26,7 +26,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Subsystems.Encoder.AS5600Encoder;
 
 @Config
-@TeleOp(name = "Shooter test")
+@TeleOp(name = "Shooter_Tester" , group = "Tester")
 public class shooterTest extends OpMode {
     public static double shooterSpeed;
     public static double spinSpeed;

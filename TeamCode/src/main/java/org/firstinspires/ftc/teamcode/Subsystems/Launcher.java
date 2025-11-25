@@ -44,33 +44,23 @@ public class Launcher {
     public double[] getVelocityAndAngle() {
         double targetVelocity;
         double coverPos;
-
         calculateLimelightDistance();
-
         if (distance > 76){
             coverPos = 0.05;
-            // cover.setPosition(0.05);
-
             if (distance > 100){
                 targetVelocity = 2800;
-                // shooterSpeed = 2800;
             }
             else {
                 targetVelocity = calculateTargetVelocity();
-                // shooterSpeed = calculateTargetVelocity();
             }
         }
         else if (distance < 29.70772 && distance > 29.7077){
             coverPos = 1;
-            // cover.setPosition(1);
             targetVelocity = 1400;
-            // shooterSpeed = 1400;
         }
         else {
             coverPos = calculateCoverAngle();
-            // cover.setPosition(calculateCoverAngle());
             targetVelocity = calculateTargetVelocity();
-            // shooterSpeed = calculateTargetVelocity();
         }
 
         return new double[] {targetVelocity, coverPos};

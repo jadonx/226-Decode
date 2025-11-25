@@ -9,8 +9,7 @@ import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 
 @Config
-@TeleOp(name = "Motor testing")
-
+@TeleOp(name = "Motor_Tester", group = "Tester")
 public class motorTest extends OpMode {
     //DcMotorEx motor1, motor2;
     NormalizedColorSensor colorSensor;

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Autonomous;
 
 import androidx.annotation.NonNull;
 
@@ -21,8 +21,8 @@ import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 import org.firstinspires.ftc.teamcode.Subsystems.UnjammerSystem;
 
 @Config
-@Autonomous(name = "RedSideCloseAuto", group = "Autonomous")
-public class RedSideCloseAuto extends LinearOpMode {
+@Autonomous(name = "BlueSideCloseAuto", group = "Autonomous")
+public class BlueSideCloseAuto extends LinearOpMode {
     Intake intake;
     Spindexer spindexer;
     UnjammerSystem unjamSystem;
@@ -80,13 +80,13 @@ public class RedSideCloseAuto extends LinearOpMode {
         TRAJECTORIES
          */
 
-        Pose2d initialPose = new Pose2d(-48, 48, Math.toRadians(135));
+        Pose2d initialPose = new Pose2d(-48, -48, Math.toRadians(225));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
         // Trajectory Variables
         TrajectoryActionBuilder moveToShootArtifacts = drive.actionBuilder(initialPose)
-                .setTangent(Math.toRadians(-45))
-                .lineToY(20);
+                .setTangent(Math.toRadians(45))
+                .lineToY(-20);
 
         waitForStart();
 
