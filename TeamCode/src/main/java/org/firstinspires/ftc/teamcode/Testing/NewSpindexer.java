@@ -28,7 +28,7 @@ public class NewSpindexer extends OpMode {
     public double pos1A = 50; //For launch
     public double pos2A = 192;
     public double pos3A = 280;
-
+    //a
     public double pos1B = 230; //For Intake
     public double pos2B = 12;
     public double pos3B = 100;
