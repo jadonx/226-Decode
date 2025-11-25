@@ -13,14 +13,13 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.Subsystems.Outtake.TurretSubsystem;
 
 @TeleOp(name="FieldCentricDrive")
 public class FieldCentricLL extends OpMode {
     DcMotor frontLeft, frontRight, backLeft, backRight,intake;
     CRServo bigSpin;
     IMU imu;
-    private TurretSubsystem turret;
+
     private FtcDashboard dashboard;
     private Limelight3A limelight;
     private double tX;
@@ -48,8 +47,6 @@ public class FieldCentricLL extends OpMode {
 
         imu.initialize(parameters);
 
-        turret = new TurretSubsystem(this);
-        turret.init();
 
         limelight = hardwareMap.get(Limelight3A.class, Constants.HMLimelight);
         limelight.pipelineSwitch(1);
@@ -98,14 +95,14 @@ public class FieldCentricLL extends OpMode {
         backRight.setPower(backRightPower);
 
         if (trackingEnabled) {
-            turret.trackTarget(tX);
+
             telemetry.addLine("Mode: Tracking Apriltag");
             telemetry.addData("Bot Rotation: ", botHeading);
             telemetry.addData("Tracking Enabled", trackingEnabled);
 
         } else {
             double manualPower = gamepad2.right_stick_x * 0.5; // reduce sensitivity
-            turret.manualPower(manualPower);
+
             telemetry.addLine("Mode: Manual Control");
             telemetry.addData("Bot Rotation: ", botHeading);
             telemetry.addData("Tracking Enabled", trackingEnabled);
