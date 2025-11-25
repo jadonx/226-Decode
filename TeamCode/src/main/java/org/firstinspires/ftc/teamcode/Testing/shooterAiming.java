@@ -54,7 +54,7 @@ public class shooterAiming extends OpMode {
         limelight = hardwareMap.get(Limelight3A.class, "LimeLight");
         limelight.pipelineSwitch(1);
         limelight.start();
-        popper.setPosition(0.2);
+        popper.setPosition(0.45);
 
     }
 
@@ -91,13 +91,20 @@ public class shooterAiming extends OpMode {
 
         }
 
-        telemetry.addData("Angle Needed", getNeededAngle(distance));
+
         telemetry.addData("pos Needed", getNeededPos(distance));
         telemetry.addData("Shooter Speed", shooterSpeed);
 
-        if(distance > 90){
+        if(distance > 76){
             cover.setPosition(0.05);
-            shooterSpeed = 2800;
+            if(distance > 100){
+                shooterSpeed = 2800;
+            } else{
+                shooterSpeed = getNeededPower(distance);
+            }
+        }else if(distance < 29.70772 && distance > 29.7077){
+            cover.setPosition(1);
+            shooterSpeed = 1400;
         } else{
             shooterSpeed = getNeededPower(distance);
             cover.setPosition(getNeededPos(distance));
@@ -106,13 +113,16 @@ public class shooterAiming extends OpMode {
 
         if(gamepad1.a){
 
-            shooter1.setPower(shooterSpeed);
-            shooter2.setPower(shooterSpeed);
-            spinner.setPower(1);
+            shooter1.setVelocity(shooterSpeed);
+            shooter2.setVelocity(shooterSpeed);
+            spinner.setPower(-1);
         }
 
-        if(gamepad1.x){
-            popper.setPosition(0.8);
+        if(gamepad1.dpad_up){
+            popper.setPosition(0.458);
+        }
+        if(gamepad1.dpad_down){
+            popper.setPosition(0.45);
         }
 
         if(gamepad1.b){
@@ -143,6 +153,8 @@ public class shooterAiming extends OpMode {
     }
 
      */
+
+    /*
     private double getNeededAngle(double distance) {
         double v = initialVelocity;
         double g = gravity;
@@ -160,10 +172,19 @@ public class shooterAiming extends OpMode {
 
         return thetaDeg;
     }
+    */
+
 
     private double getNeededPower(double distance) {
         //also try 0.00375
-        return (0.00581395*distance)+0.697674;
+        if(distance < 80){
+            return (0.0353161*(Math.pow(distance,2)))+(0.991859*distance)+1388.8866;
+        } else if(distance > 130){
+            return 2800;
+        } else{
+            return (-0.47286*Math.pow(distance,2))+(109.73693*distance)-3946.15385;
+        }
+
     }
 
 
