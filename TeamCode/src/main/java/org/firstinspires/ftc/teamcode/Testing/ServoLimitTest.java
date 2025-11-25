@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.Constants;
 
 @Config
-@TeleOp(name="ServoLimitTest")
+@TeleOp(name="ServoLimit_Tester", group="Tester")
 public class ServoLimitTest extends OpMode {
     Servo popperServo;
 

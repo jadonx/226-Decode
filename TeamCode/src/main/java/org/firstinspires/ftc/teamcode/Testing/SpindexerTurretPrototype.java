@@ -17,7 +17,7 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @Config
-@TeleOp(name="Spindexer Turret Prototype")
+@TeleOp(name="Spindexer_Tester", group = "Tester")
 public class SpindexerTurretPrototype extends OpMode {
     public static double shooterSpeed;
     public static double spinSpeed;
@@ -56,9 +56,6 @@ public class SpindexerTurretPrototype extends OpMode {
         spinner.setDirection(DcMotorSimple.Direction.REVERSE);
 
         intake = hardwareMap.get(DcMotorEx.class, "intake");
-
-        // leftServo = hardwareMap.get(CRServo.class, "leftCRServo");
-        // rightServo = hardwareMap.get(CRServo.class, "rightCRServo");
 
         spindexerServo = hardwareMap.get(CRServo.class, "leftCRServo");
 

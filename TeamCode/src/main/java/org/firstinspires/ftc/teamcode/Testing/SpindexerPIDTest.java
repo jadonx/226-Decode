@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 
 @Config
-@TeleOp(name="SpindexerPIDTest")
+@TeleOp(name="SpindexerPID_Tester", group="Tester")
 public class SpindexerPIDTest extends OpMode {
     Spindexer spindexer;
 

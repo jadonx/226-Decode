@@ -12,24 +12,30 @@ public class ScrimBlueSideCloseAutoMeepMeep {
         MeepMeep meepMeep = new MeepMeep(800);
 
         // new starting pose
-        Pose2d startPose = new Pose2d(65, -11, Math.toRadians(180));
+        Pose2d initialPose = new Pose2d(-48, 48, Math.toRadians(135));
 
         RoadRunnerBotEntity bot = new DefaultBotBuilder(meepMeep)
                 .setConstraints(90, 90, Math.toRadians(180), Math.toRadians(180), 15)
                 .build();
 
         // so the bot spawns here
-        bot.setPose(startPose);
+        bot.setPose(initialPose);
 
         // Trajectory Variables
-        TrajectoryActionBuilder moveToShootArtifacts = bot.getDrive().actionBuilder(startPose)
-                .setTangent(Math.toRadians(180))
-                .lineToXLinearHeading(45, Math.toRadians(210));
+        TrajectoryActionBuilder moveToShootArtifacts = bot.getDrive().actionBuilder(initialPose)
+                .setTangent(Math.toRadians(-45))
+                .lineToYLinearHeading(11, Math.toRadians(90));
+
+        TrajectoryActionBuilder moveToIntakeFirstLineArtifact = moveToShootArtifacts.endTrajectory().fresh()
+                .setTangent(Math.toRadians(90))
+                .lineToYConstantHeading(45)
+                ;
 
         // run in order
         bot.runAction(
                 new SequentialAction(
-                        moveToShootArtifacts.build()
+                        moveToShootArtifacts.build(),
+                        moveToIntakeFirstLineArtifact.build()
                 )
         );
 

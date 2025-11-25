@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @Config
-@TeleOp(name = "popper tester")
+@TeleOp(name = "Popper_Tester", group = "Tester")
 public class popperTester extends OpMode {
     public static double servoPos = 0.5;
     Servo popper;

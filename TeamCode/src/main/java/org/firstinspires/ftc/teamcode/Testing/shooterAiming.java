@@ -22,7 +22,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import java.util.List;
 
 @Config
-@TeleOp (name = "Shooter Aiming")
+@TeleOp (name = "Shooter_Aiming_Tester", group = "Tester")
 public class shooterAiming extends OpMode {
     DcMotorEx shooter1, shooter2, spinner, spinDexer;
     Servo cover, popper;

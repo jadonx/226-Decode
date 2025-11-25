@@ -1,24 +1,32 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.TeleOps;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain.FieldCentricDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.LaunchArtifactCommand;
+import org.firstinspires.ftc.teamcode.Subsystems.LimeLight;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 import org.firstinspires.ftc.teamcode.Subsystems.UnjammerSystem;
 
 @Config
-@TeleOp(name="ScrimmageTeleOp")
+@TeleOp(name="ScrimmageTeleOp", group="!TeleOp")
 public class ScrimmageTeleOp extends OpMode {
     FieldCentricDrive drive;
+    MecanumDrive drive_roadrunner;
+    Pose2d initialPose = new Pose2d(0, 0, 0);
+    Pose2d BLUE_GOALPose = new Pose2d(-50, 50, 0);
+
+    LimeLight limelight;
 
     Intake intake;
     Spindexer spindexer;
@@ -26,10 +34,10 @@ public class ScrimmageTeleOp extends OpMode {
     Popper popper;
     Launcher launcher;
     Turret turret;
-
     LaunchArtifactCommand launchArtifactCommand;
 
     boolean isIntaking = false;
+    boolean isUsingLL = false;
 
     public static double kP, kI, kD;
 
@@ -40,6 +48,11 @@ public class ScrimmageTeleOp extends OpMode {
     @Override
     public void init() {
         drive = new FieldCentricDrive(hardwareMap);
+
+        //Roadrunner Initialization
+        drive_roadrunner = new MecanumDrive(hardwareMap, initialPose);
+
+        limelight = new LimeLight(hardwareMap);
 
         intake = new Intake(hardwareMap);
         spindexer = new Spindexer(hardwareMap);
@@ -60,7 +73,13 @@ public class ScrimmageTeleOp extends OpMode {
         double rx = gamepad1.right_stick_x;
 
         drive.drive(y, x, rx);
-        packet.put("imu ", drive.getYaw());
+        packet.put("IMU: ", drive.getYaw());
+
+        //Limelight Logic
+        limelight.getResult();
+        packet.put("Limelight tX: ", limelight.getTX());
+        packet.put("Limelight tY: ", limelight.getTY());
+        packet.put("LimeLight distance: ", limelight.getDistance());
 
         if (gamepad1.x) {
             drive.resetIMU();
@@ -98,17 +117,31 @@ public class ScrimmageTeleOp extends OpMode {
             launchArtifactCommand.startFar();
         }
 
-        // TURRET LOGIC
-        // Tracking when see the limelight, if not go to 0
-        turret.alignTurret();
-
         if (launchArtifactCommand != null && launchArtifactCommand.isFinished()) {
             launchArtifactCommand = null;
             launcher.stopLauncher();
             popper.deactivatePopper();
         }
 
-        packet.put("spindexer current angle ", spindexer.getAngle());
+        if(gamepad1.dpad_up && !isUsingLL) {
+            isUsingLL = true;
+            packet.put("Using Limelight for turret targeting", "");
+        } else if (gamepad1.dpad_down && isUsingLL) {
+            isUsingLL = false;
+            packet.put("Using Angle Calculation for turret targeting", "");
+        }
+
+        //Turret Logic
+        if (isUsingLL) {
+            turret.trackAprilTag(limelight.getTX());
+        } else {
+//            turret.trackTargetAngle(turret.angleBotToGoal(BLUE_GOALPose.position.y - drive_roadrunner.localizer.getPose().position.y, BLUE_GOALPose.position.x - drive_roadrunner.localizer.getPose().position.x));
+        }
+
+        packet.put("Spindexer current angle: ", spindexer.getAngle());
+        //Theoretical Angle Calculation
+        drive_roadrunner.updatePoseEstimate();
+        packet.put("Angle from bot to goal: ", turret.angleBotToGoal(BLUE_GOALPose.position.y - drive_roadrunner.localizer.getPose().position.y, BLUE_GOALPose.position.x - drive_roadrunner.localizer.getPose().position.x));
         dashboard.sendTelemetryPacket(packet);
     }
 
@@ -118,6 +151,5 @@ public class ScrimmageTeleOp extends OpMode {
         drive.stopDrive();
         popper.deactivatePopper();
         launcher.stopLauncher();
-        turret.stopTurert();
     }
 }

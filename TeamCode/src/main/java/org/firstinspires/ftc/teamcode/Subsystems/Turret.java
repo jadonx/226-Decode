@@ -15,74 +15,67 @@ import org.firstinspires.ftc.teamcode.Constants;
 public class Turret {
     private CRServo turretLeft, turretRight;
     private PIDController pid;
-
     private IMU turretEncoder;
 
-    private static double kP = 0.02;
-    private static double kI = 0.0;
-    private static double kD = 0.0008;
-
-    double turretTargetAngle = 0;
-
-    private Limelight3A limelight;
+    public static double kP_Turret = 0.02;
+    public static double kI_Turret = 0.0;
+    public static double kD_Turret = 0.0008;
+    public static double targetAngle_Turret = 0;
+    public static double tolerance_Turret = 0.5;
 
     public Turret(HardwareMap hardwareMap) {
         turretRight = hardwareMap.get(CRServo.class, Constants.HMServoTurretRight);
         turretLeft = hardwareMap.get(CRServo.class, Constants.HMServoTurretLeft);
 
-        limelight = hardwareMap.get(Limelight3A.class, Constants.HMLimelight);
-        limelight.pipelineSwitch(1);
-        limelight.start();
-
-        pid = new PIDController(kP, kI, kD);
-        pid.setTolerance(0.5);
+        turretEncoder = hardwareMap.get(IMU.class, Constants.HMTurretEncoder);
 
         IMU.Parameters turretParameters = new IMU.Parameters(new RevHubOrientationOnRobot( RevHubOrientationOnRobot.LogoFacingDirection.RIGHT, RevHubOrientationOnRobot.UsbFacingDirection.UP));
         turretEncoder.initialize(turretParameters);
         turretEncoder.resetYaw();
+
+        pid = new PIDController(kP_Turret, kI_Turret, kD_Turret);
+        pid.setTolerance(tolerance_Turret);
     }
 
-    public void alignTurret() {
-        LLResult result = limelight.getLatestResult();
+    public void trackAprilTag(double targetX) {
+        pid.setPID(kP_Turret, kI_Turret, kD_Turret);
 
-        // If target is found, use limelight tracking to align turret, if not, aim to 0 angle
-        if (result.isValid()) {
-            double tX = result.getTx();
-            trackingWithLL(tX);
-        } else {
-            AimToAngle(turretTargetAngle);
-        }
-    }
+        double correction = pid.calculate(targetX, 0);
 
-    public void trackingWithLL(double tX) {
-        pid.setPID(kP, kI, kD);
-        double correction = pid.calculate(-tX, 0);
+        correction = Math.max(Math.min(correction, 0.8), -0.8);
+
         if (pid.atSetPoint()) {
             setPower(0);
             return;
         }
+
         setPower(correction);
     }
 
-    public void AimToAngle(double ta) {
-        pid.setPID(kP, kI, kD);
-        double turretAngle = turretEncoder.getRobotYawPitchRollAngles().getYaw();
-        double error = ta - turretAngle;
-        double power = pid.calculate(error, 0);
+    public void trackTargetAngle(double targetA){
+        pid.setPID(kP_Turret, kI_Turret, kD_Turret);
+
+        double currentAngle = turretEncoder.getRobotYawPitchRollAngles().getYaw();
+
+        double correction = pid.calculate(currentAngle, targetA);
+
+        correction = Math.max(Math.min(correction, 0.8), -0.8);
+
         if (pid.atSetPoint()) {
             setPower(0);
             return;
         }
-        setPower(power);
+
+        setPower(correction);
     }
 
     private void setPower(double power) {
-        turretLeft.setPower(-power);
-        turretRight.setPower(-power);
+        turretLeft.setPower(power);
+        turretRight.setPower(power);
     }
 
-    public void stopTurert() {
-        setPower(0);
+    public double angleBotToGoal(double y, double x) {
+        if (x == 0.0 && y == 0.0) return 0;
+        return Math.toDegrees(Math.atan2(y, x)) - 90.0;
     }
-
 }
