@@ -1,7 +1,11 @@
-package org.firstinspires.ftc.teamcode.Subsystems;
+package org.firstinspires.ftc.teamcode.Subsystems.Commands;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
+import org.firstinspires.ftc.teamcode.Subsystems.Popper;
+import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 
 public class LaunchArtifactCommand {
     private final Spindexer spindexer;
@@ -28,7 +32,7 @@ public class LaunchArtifactCommand {
     private State currentState = State.MOVE_TO_FIRST_LAUNCH;
 
     private double stateStartTime = 0;
-    private final double waitTime = 1000;
+    private final double waitTime = 500;
     private ElapsedTime timer;
 
     private double targetVelocity;
@@ -38,60 +42,6 @@ public class LaunchArtifactCommand {
         this.spindexer = spindexer;
         this.popper = popper;
         this.launcher = launcher;
-    }
-
-    public void startPID() {
-        launchAngleSequence = spindexer.getLaunchAngleSequence();
-        target = launchAngleSequence[0];
-        currentState = State.MOVE_TO_FIRST_LAUNCH;
-        timer = new ElapsedTime();
-    }
-
-    public void updatePID(TelemetryPacket packet) {
-        spindexer.goToAngle(target);
-
-        switch (currentState) {
-            case MOVE_TO_FIRST_LAUNCH:
-                if(spindexerReachedTarget(spindexer.getAngle(), target)) {
-                    currentState = State.LAUNCH_FIRST;
-                    stateStartTime = timer.milliseconds();
-                }
-                break;
-            case LAUNCH_FIRST:
-                if (timer.milliseconds() - stateStartTime > waitTime) {
-                    currentState = State.MOVE_TO_SECOND_LAUNCH;
-                    target = launchAngleSequence[1];
-                }
-                break;
-            case MOVE_TO_SECOND_LAUNCH:
-                if(spindexerReachedTarget(spindexer.getAngle(), target)) {
-                    currentState = State.LAUNCH_SECOND;
-                    stateStartTime = timer.milliseconds();
-                }
-                break;
-            case LAUNCH_SECOND:
-                if (timer.milliseconds() - stateStartTime > waitTime) {
-                    currentState = State.MOVE_TO_THIRD_LAUNCH;
-                    target = launchAngleSequence[2];
-                }
-                break;
-            case MOVE_TO_THIRD_LAUNCH:
-                if (spindexerReachedTarget(spindexer.getAngle(), target)) {
-                    currentState = State.LAUNCH_THIRD;
-                    stateStartTime = timer.milliseconds();
-                }
-                break;
-            case LAUNCH_THIRD:
-                if (timer.milliseconds() - stateStartTime > waitTime) {
-                    currentState = State.FINISHED;
-                }
-                break;
-            case FINISHED:
-                break;
-        }
-
-        packet.put("state ", currentState);
-        packet.put("target ", target);
     }
 
     public void start() {

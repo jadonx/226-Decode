@@ -19,10 +19,7 @@ public class FieldCentricLL extends OpMode {
     DcMotor frontLeft, frontRight, backLeft, backRight,intake;
     CRServo bigSpin;
     IMU imu;
-<<<<<<< HEAD
 
-=======
->>>>>>> a3332f0ac239e9f073bd158a3884141a3c046f47
     private FtcDashboard dashboard;
     private Limelight3A limelight;
     private double tX;
@@ -98,20 +95,12 @@ public class FieldCentricLL extends OpMode {
         backRight.setPower(backRightPower);
 
         if (trackingEnabled) {
-<<<<<<< HEAD
-
-=======
->>>>>>> a3332f0ac239e9f073bd158a3884141a3c046f47
             telemetry.addLine("Mode: Tracking Apriltag");
             telemetry.addData("Bot Rotation: ", botHeading);
             telemetry.addData("Tracking Enabled", trackingEnabled);
 
         } else {
             double manualPower = gamepad2.right_stick_x * 0.5; // reduce sensitivity
-<<<<<<< HEAD
-
-=======
->>>>>>> a3332f0ac239e9f073bd158a3884141a3c046f47
             telemetry.addLine("Mode: Manual Control");
             telemetry.addData("Bot Rotation: ", botHeading);
             telemetry.addData("Tracking Enabled", trackingEnabled);
