@@ -8,6 +8,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -50,7 +51,7 @@ public class RedSideCloseAuto extends LinearOpMode {
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (!initialized) {
                 if (!isTurretReadyToShoot) {
-                    turret.trackTargetAngle(taShooting); // Aim turret to shooting angle
+                    turret.trackTargetAngle(taShooting, 0); // Aim turret to shooting angle
                     isTurretReadyToShoot = true;
                 }
                 launcherArtifactCommand.start();
@@ -89,13 +90,42 @@ public class RedSideCloseAuto extends LinearOpMode {
         TRAJECTORIES
          */
 
-        Pose2d initialPose = new Pose2d(-48, 48, Math.toRadians(135));
-        MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
+        Pose2d startPose = new Pose2d(-48, 48, Math.toRadians(128));
+
+        MecanumDrive drive = new MecanumDrive(hardwareMap, startPose);
 
         // Trajectory Variables
-        TrajectoryActionBuilder moveToShootArtifacts = drive.actionBuilder(initialPose)
-                .setTangent(Math.toRadians(-45))
-                .lineToY(20);
+        TrajectoryActionBuilder firstLaunch = drive.actionBuilder(startPose)
+                .strafeToLinearHeading(new Vector2d(-11.5,11.5), Math.toRadians(90))
+                .waitSeconds(3);
+
+        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh()
+                .strafeToConstantHeading(new Vector2d(-11.5, 30))
+                .lineToY(44.5)
+                ;
+
+
+        TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh()
+                .strafeToConstantHeading(new Vector2d(-11.5,11.5))
+                .waitSeconds(3);
+
+        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh()
+                .strafeToConstantHeading(new Vector2d(11.5, 30))
+                .strafeToConstantHeading(new Vector2d(11.5,44.5));
+
+
+        TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh()
+                .strafeToConstantHeading(new Vector2d(-11.5,11.5))
+                .waitSeconds(3);
+
+        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh()
+                .strafeToConstantHeading(new Vector2d(36, 30))
+                .strafeToConstantHeading(new Vector2d(36,44.5))
+                .waitSeconds(0.3);
+
+        TrajectoryActionBuilder fourthLaunch = thirdPickup.endTrajectory().fresh()
+                .strafeToConstantHeading(new Vector2d(-11.5,11.5))
+                .waitSeconds(3);
 
         waitForStart();
 
@@ -103,8 +133,13 @@ public class RedSideCloseAuto extends LinearOpMode {
 
         Actions.runBlocking(
                 new SequentialAction(
-                        moveToShootArtifacts.build(),
-                        shootArtifacts(launchArtifactCommand)
+                        firstLaunch.build(),
+                        firstPickup.build(),
+                        secondLaunch.build(),
+                        secondPickup.build(),
+                        thirdLaunch.build(),
+                        thirdPickup.build(),
+                        fourthLaunch.build()
                 )
         );
     }
