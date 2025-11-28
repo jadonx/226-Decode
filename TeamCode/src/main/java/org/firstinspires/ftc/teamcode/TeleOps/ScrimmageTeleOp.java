@@ -39,8 +39,6 @@ public class ScrimmageTeleOp extends OpMode {
     boolean isIntaking = false;
     boolean isUsingLL = false;
 
-    public static double kP, kI, kD;
-
     TelemetryPacket packet;
     FtcDashboard dashboard;
 
@@ -59,8 +57,6 @@ public class ScrimmageTeleOp extends OpMode {
         popper = new Popper(hardwareMap);
         launcher = new Launcher(hardwareMap);
         turret = new Turret(hardwareMap);
-
-        kP = 0.015; kI = 0; kD = -0.001;
 
         packet = new TelemetryPacket();
         dashboard = FtcDashboard.getInstance();
@@ -119,8 +115,6 @@ public class ScrimmageTeleOp extends OpMode {
             launcher.stopLauncher();
             popper.deactivatePopper();
         }
-
-        spindexer.updatePID(kP, kI, kD);
 
         if(gamepad1.dpad_up && !isUsingLL) {
             isUsingLL = true;

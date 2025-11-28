@@ -32,7 +32,7 @@ public class LaunchArtifactCommand {
     private State currentState = State.MOVE_TO_FIRST_LAUNCH;
 
     private double stateStartTime = 0;
-    private final double waitTime = 500;
+    private final double waitTime = 350;
     private ElapsedTime timer;
 
     private double targetVelocity;
