@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain.FieldCentricDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
-import org.firstinspires.ftc.teamcode.Subsystems.LaunchArtifactCommand;
+import org.firstinspires.ftc.teamcode.Subsystems.Commands.LaunchArtifactCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.LimeLight;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
@@ -30,6 +30,8 @@ public class ScrimmageTeleOp extends OpMode {
 
     Intake intake;
     Spindexer spindexer;
+    public static double kP, kD;
+
     UnjammerSystem unjamSystem;
     Popper popper;
     Launcher launcher;
@@ -39,11 +41,8 @@ public class ScrimmageTeleOp extends OpMode {
     boolean isIntaking = false;
     boolean isUsingLL = false;
 
-    public static double kP, kI, kD;
-
     TelemetryPacket packet;
     FtcDashboard dashboard;
-
 
     @Override
     public void init() {
@@ -63,6 +62,8 @@ public class ScrimmageTeleOp extends OpMode {
 
         packet = new TelemetryPacket();
         dashboard = FtcDashboard.getInstance();
+
+        kP = 0.015; kD = -0.001;
     }
 
     @Override
@@ -98,23 +99,17 @@ public class ScrimmageTeleOp extends OpMode {
         // SPINDEXER LAUNCH LOGIC
         if (gamepad1.a) {
             launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher);
-            // launchArtifactCommand.startPID();
             launchArtifactCommand.start();
         }
 
+        // FAR LAUNCHING
         if (gamepad1.b) {
             launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher);
             launchArtifactCommand.startFar();
         }
 
         if (launchArtifactCommand != null && !launchArtifactCommand.isFinished()) {
-            // launchArtifactCommand.updatePID(packet);
             launchArtifactCommand.update(packet);
-        }
-
-        if (gamepad1.b) {
-            launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher);
-            launchArtifactCommand.startFar();
         }
 
         if (launchArtifactCommand != null && launchArtifactCommand.isFinished()) {
@@ -135,10 +130,13 @@ public class ScrimmageTeleOp extends OpMode {
         if (isUsingLL) {
             turret.trackAprilTag(limelight.getTX());
         } else {
-//            turret.trackTargetAngle(turret.angleBotToGoal(BLUE_GOALPose.position.y - drive_roadrunner.localizer.getPose().position.y, BLUE_GOALPose.position.x - drive_roadrunner.localizer.getPose().position.x));
+            // turret.trackTargetAngle(turret.angleBotToGoal(BLUE_GOALPose.position.y - drive_roadrunner.localizer.getPose().position.y, BLUE_GOALPose.position.x - drive_roadrunner.localizer.getPose().position.x));
         }
 
         packet.put("Spindexer current angle: ", spindexer.getAngle());
+
+        spindexer.updatePID(kP, 0, kD);
+
         //Theoretical Angle Calculation
         drive_roadrunner.updatePoseEstimate();
         packet.put("Angle from bot to goal: ", turret.angleBotToGoal(BLUE_GOALPose.position.y - drive_roadrunner.localizer.getPose().position.y, BLUE_GOALPose.position.x - drive_roadrunner.localizer.getPose().position.x));

@@ -19,7 +19,7 @@ public class Popper {
     }
 
     public void pushInPopper() {
-        popperServo.setPosition(0.485);
+        popperServo.setPosition(0.47);
     }
 
     public void pushOutPopper() {

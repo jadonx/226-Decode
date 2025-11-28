@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
-import org.firstinspires.ftc.teamcode.Subsystems.LaunchArtifactCommand;
+import org.firstinspires.ftc.teamcode.Subsystems.Commands.LaunchArtifactCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;

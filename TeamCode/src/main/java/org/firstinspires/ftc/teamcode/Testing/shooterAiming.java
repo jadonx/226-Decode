@@ -177,14 +177,15 @@ public class shooterAiming extends OpMode {
 
     private double getNeededPower(double distance) {
         //also try 0.00375
-        if(distance < 80){
-            return (0.0353161*(Math.pow(distance,2)))+(0.991859*distance)+1388.8866;
-        } else if(distance > 130){
+        if (distance < 20) {
+            return 1420;
+        } else if (distance < 80) {
+            return (0.0353161 * (Math.pow(distance, 2))) + (0.991859 * distance) + 1388.8866;
+        } else if (distance > 120) {
             return 2800;
-        } else{
-            return (-0.47286*Math.pow(distance,2))+(109.73693*distance)-3946.15385;
+        } else {
+            return (-0.47286 * Math.pow(distance, 2)) + (109.73693 * distance) - 3946.15385;
         }
-
     }
 
 
