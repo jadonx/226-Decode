@@ -30,6 +30,8 @@ public class ScrimmageTeleOp extends OpMode {
 
     Intake intake;
     Spindexer spindexer;
+    public static double kP, kD;
+
     UnjammerSystem unjamSystem;
     Popper popper;
     Launcher launcher;
@@ -60,6 +62,8 @@ public class ScrimmageTeleOp extends OpMode {
 
         packet = new TelemetryPacket();
         dashboard = FtcDashboard.getInstance();
+
+        kP = 0.015; kD = -0.001;
     }
 
     @Override
@@ -130,6 +134,8 @@ public class ScrimmageTeleOp extends OpMode {
         }
 
         packet.put("Spindexer current angle: ", spindexer.getAngle());
+
+        spindexer.updatePID(kP, 0, kD);
 
         //Theoretical Angle Calculation
         drive_roadrunner.updatePoseEstimate();
