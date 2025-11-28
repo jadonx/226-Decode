@@ -95,7 +95,6 @@ public class ScrimmageTeleOp extends OpMode {
         // SPINDEXER LAUNCH LOGIC
         if (gamepad1.a) {
             launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher);
-            // launchArtifactCommand.startPID();
             launchArtifactCommand.start();
         }
 
@@ -106,7 +105,6 @@ public class ScrimmageTeleOp extends OpMode {
         }
 
         if (launchArtifactCommand != null && !launchArtifactCommand.isFinished()) {
-            // launchArtifactCommand.updatePID(packet);
             launchArtifactCommand.update(packet);
         }
 
@@ -132,6 +130,7 @@ public class ScrimmageTeleOp extends OpMode {
         }
 
         packet.put("Spindexer current angle: ", spindexer.getAngle());
+
         //Theoretical Angle Calculation
         drive_roadrunner.updatePoseEstimate();
         packet.put("Angle from bot to goal: ", turret.angleBotToGoal(BLUE_GOALPose.position.y - drive_roadrunner.localizer.getPose().position.y, BLUE_GOALPose.position.x - drive_roadrunner.localizer.getPose().position.x));

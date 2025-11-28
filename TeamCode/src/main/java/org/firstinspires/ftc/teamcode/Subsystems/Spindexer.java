@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Subsystems.Encoder.AS5600Encoder;
@@ -66,7 +67,13 @@ public class Spindexer {
 
         double output = (kP * error) + (-kD * derivative);
 
-        spindexerServo.setPower(output);
+        output *= 0.5; // Ranging to match actuator output
+        output  = Range.clip(output, -1.0, 1.0);
+
+        // Feedforward to overcome static friction
+        double ff = Math.signum(error) * 0.1;
+
+        spindexerServo.setPower(output + ff);
 
         lastError = error;
         pidTimer.reset();
