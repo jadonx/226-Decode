@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.Testing;
 
-import static org.firstinspires.ftc.teamcode.Constants.HMColorSensor;
+import static org.firstinspires.ftc.teamcode.Constants.HMColorSensorBack;
 import static org.firstinspires.ftc.teamcode.Constants.HMMotorIntake;
 import static org.firstinspires.ftc.teamcode.Constants.HMServospinDexer;
 import static org.firstinspires.ftc.teamcode.Constants.HMSpindexerEncoder;
@@ -41,10 +41,8 @@ public class NewSpindexer extends OpMode {
     ElapsedTime pidTimer;
     private double kP = 0.015, kI = 0, kD = -0.001;
 
-
-
     public void init(){
-        colorSensor1 = hardwareMap.get(NormalizedColorSensor.class, HMColorSensor);
+        colorSensor1 = hardwareMap.get(NormalizedColorSensor.class, HMColorSensorBack);
         spinner = hardwareMap.get(CRServo.class, HMServospinDexer);
         intake = hardwareMap.get(DcMotorEx.class, HMMotorIntake);
         spinEncoder = hardwareMap.get(AS5600Encoder.class, HMSpindexerEncoder );
@@ -55,7 +53,6 @@ public class NewSpindexer extends OpMode {
         NormalizedRGBA colors = colorSensor1.getNormalizedColors();
         float[] hsv = new float[3];
         Color.colorToHSV(colors.toColor(), hsv);
-
 
         if(gamepad1.a){
             intake.setPower(0.75);

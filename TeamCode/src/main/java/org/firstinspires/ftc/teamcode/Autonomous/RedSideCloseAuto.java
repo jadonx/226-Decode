@@ -30,7 +30,6 @@ public class RedSideCloseAuto extends LinearOpMode {
     UnjammerSystem unjamSystem;
     Popper popper;
     Launcher launcher;
-    Turret turret;
 
     LaunchArtifactCommand launchArtifactCommand;
 
@@ -40,8 +39,6 @@ public class RedSideCloseAuto extends LinearOpMode {
     public class ShootArtifacts implements Action {
         private final LaunchArtifactCommand launcherArtifactCommand;
         private boolean initialized = false;
-        private boolean isTurretReadyToShoot = false;
-        private double taShooting = 45; // Angle to aim turret for shooting
 
         public ShootArtifacts(LaunchArtifactCommand launchArtifactCommand) {
             this.launcherArtifactCommand = launchArtifactCommand;
@@ -50,10 +47,6 @@ public class RedSideCloseAuto extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (!initialized) {
-                if (!isTurretReadyToShoot) {
-                    turret.trackTargetAngle(taShooting, 0); // Aim turret to shooting angle
-                    isTurretReadyToShoot = true;
-                }
                 launcherArtifactCommand.start();
                 initialized = true;
             }
@@ -103,7 +96,6 @@ public class RedSideCloseAuto extends LinearOpMode {
                 .strafeToConstantHeading(new Vector2d(-11.5, 30))
                 .lineToY(44.5)
                 ;
-
 
         TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh()
                 .strafeToConstantHeading(new Vector2d(-11.5,11.5))

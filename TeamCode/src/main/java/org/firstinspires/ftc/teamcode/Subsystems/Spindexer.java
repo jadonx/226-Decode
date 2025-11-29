@@ -24,11 +24,9 @@ public class Spindexer {
     private int[] launchHolderAngles = {50, 192, 280};
 
     // COLOR SENSOR VARIABLES
-    /*
     private NormalizedColorSensor colorSensor;
     float[] hsv = new float[3];
     private ElapsedTime colorSensorTimer;
-     */
 
     public Spindexer(HardwareMap hardwareMap) {
         spindexerServo = hardwareMap.get(CRServo.class, Constants.HMServospinDexer);
@@ -36,10 +34,8 @@ public class Spindexer {
 
         pidTimer = new ElapsedTime();
 
-        /*
-        colorSensor = hardwareMap.get(NormalizedColorSensor.class, Constants.HMColorSensor);
+        colorSensor = hardwareMap.get(NormalizedColorSensor.class, Constants.HMColorSensorFront);
         colorSensorTimer = new ElapsedTime();
-         */
     }
 
     /*
@@ -47,6 +43,10 @@ public class Spindexer {
      */
     public void runSpindexer() {
         spindexerServo.setPower(1);
+    }
+
+    public void runSpindexer(double power) {
+        spindexerServo.setPower(power);
     }
 
     public void unjamSpindexer() {
@@ -124,7 +124,6 @@ public class Spindexer {
     /*
     COLOR SENSOR CODE
      */
-    /*
     public double getHue() {
         NormalizedRGBA colors = colorSensor.getNormalizedColors();
 
@@ -138,5 +137,4 @@ public class Spindexer {
 
         return hsv[0];
     }
-     */
 }

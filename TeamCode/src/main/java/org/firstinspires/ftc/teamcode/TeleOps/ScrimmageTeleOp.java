@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
+import org.firstinspires.ftc.teamcode.Subsystems.Commands.SpindexerColorSensorIntakeCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain.FieldCentricDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
@@ -21,6 +22,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.UnjammerSystem;
 @Config
 @TeleOp(name="ScrimmageTeleOp", group="!TeleOp")
 public class ScrimmageTeleOp extends OpMode {
+    // SUBSYSTEMS
     FieldCentricDrive drive;
     MecanumDrive drive_roadrunner;
     Pose2d initialPose = new Pose2d(0, 0, 0);
@@ -36,7 +38,10 @@ public class ScrimmageTeleOp extends OpMode {
     Popper popper;
     Launcher launcher;
     Turret turret;
+
+    // COMMANDS
     LaunchArtifactCommand launchArtifactCommand;
+    SpindexerColorSensorIntakeCommand spindexerColorSensorIntakeCommand;
 
     boolean isIntaking = false;
     boolean isUsingLL = false;
@@ -59,6 +64,10 @@ public class ScrimmageTeleOp extends OpMode {
         popper = new Popper(hardwareMap);
         launcher = new Launcher(hardwareMap);
         turret = new Turret(hardwareMap);
+
+        // COMMANDS
+        spindexerColorSensorIntakeCommand = new SpindexerColorSensorIntakeCommand(spindexer);
+        spindexerColorSensorIntakeCommand.start();
 
         packet = new TelemetryPacket();
         dashboard = FtcDashboard.getInstance();
@@ -118,6 +127,14 @@ public class ScrimmageTeleOp extends OpMode {
             popper.deactivatePopper();
         }
 
+        // UPDATING SPINDEXER PID FOR TESTING
+        packet.put("Spindexer current angle: ", spindexer.getAngle());
+
+        spindexer.updatePID(kP, 0, kD);
+
+        // SPINDEXER COLOR SENSOR
+        spindexerColorSensorIntakeCommand.update(telemetry);
+
         if(gamepad1.dpad_up && !isUsingLL) {
             isUsingLL = true;
             packet.put("Using Limelight for turret targeting", "");
@@ -133,14 +150,13 @@ public class ScrimmageTeleOp extends OpMode {
             // turret.trackTargetAngle(turret.angleBotToGoal(BLUE_GOALPose.position.y - drive_roadrunner.localizer.getPose().position.y, BLUE_GOALPose.position.x - drive_roadrunner.localizer.getPose().position.x));
         }
 
-        packet.put("Spindexer current angle: ", spindexer.getAngle());
-
-        spindexer.updatePID(kP, 0, kD);
-
         //Theoretical Angle Calculation
         drive_roadrunner.updatePoseEstimate();
         packet.put("Angle from bot to goal: ", turret.angleBotToGoal(BLUE_GOALPose.position.y - drive_roadrunner.localizer.getPose().position.y, BLUE_GOALPose.position.x - drive_roadrunner.localizer.getPose().position.x));
+
+        // FTC Dashboard/Telemetry Update
         dashboard.sendTelemetryPacket(packet);
+        telemetry.update();
     }
 
     @Override
