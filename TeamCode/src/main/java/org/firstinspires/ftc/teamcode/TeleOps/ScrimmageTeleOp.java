@@ -95,6 +95,8 @@ public class ScrimmageTeleOp extends OpMode {
             drive.resetIMU();
         }
 
+        /*
+        OLD INTAKE LOGIC
         if (gamepad1.right_trigger > 0.1) {
             unjamSystem.periodic(gamepad1.right_trigger);
             launchArtifactCommand = null;
@@ -104,8 +106,28 @@ public class ScrimmageTeleOp extends OpMode {
         else {
             unjamSystem.stopIntakeSpindexer();
         }
+         */
 
-        // SPINDEXER LAUNCH LOGIC
+        /*
+        NEW INTAKE LOGIC
+         */
+        if (gamepad1.right_trigger > 0.1) {
+            // Canceling launch command sequence
+            launchArtifactCommand = null;
+            launcher.stopLauncher();
+            popper.deactivatePopper();
+
+            // Intake logic
+            intake.runIntake(gamepad1.right_trigger);
+            spindexerColorSensorIntakeCommand.update(telemetry);
+        }
+        else {
+            intake.stopIntake();
+        }
+
+        /*
+        SPINDEXER LAUNCH LOGIC
+         */
         if (gamepad1.a && launchArtifactCommand == null) {
             launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher);
             launchArtifactCommand.start();
@@ -125,15 +147,14 @@ public class ScrimmageTeleOp extends OpMode {
             launchArtifactCommand = null;
             launcher.stopLauncher();
             popper.deactivatePopper();
+
+            // Reset holder statuses
+            spindexerColorSensorIntakeCommand.resetHolderStatuses();
         }
 
         // UPDATING SPINDEXER PID FOR TESTING
         packet.put("Spindexer current angle: ", spindexer.getAngle());
-
         spindexer.updatePID(kP, 0, kD);
-
-        // SPINDEXER COLOR SENSOR
-        spindexerColorSensorIntakeCommand.update(telemetry);
 
         if(gamepad1.dpad_up && !isUsingLL) {
             isUsingLL = true;

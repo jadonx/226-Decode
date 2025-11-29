@@ -45,11 +45,12 @@ public class SpindexerColorSensorIntakeCommand {
         else if (currentAngle > intakePositions[1][1] && currentAngle < intakePositions[1][2]) {
             holderStatuses[1] = getHolderStatus(currentHue);
         }
-        else if (currentAngle > intakePositions[2][1] && currentAngle < intakePositions[2][2]) {
+        else if (currentAngle > intakePositions[2][1] || currentAngle < intakePositions[2][2]) {
             holderStatuses[2] = getHolderStatus(currentHue);
         }
 
         // GOING TO EMPTY HOLDERS
+        /*
         if (holderStatuses[0] == HolderStatus.NONE) {
             spindexer.goToAngle(intakePositions[0][0]);
         }
@@ -59,11 +60,18 @@ public class SpindexerColorSensorIntakeCommand {
         else if (holderStatuses[2] == HolderStatus.NONE) {
             spindexer.goToAngle(intakePositions[2][0]);
         }
+         */
 
         telemetry.addData("hue ", currentHue);
         telemetry.addData("holder 0 ", holderStatuses[0]);
         telemetry.addData("holder 1 ", holderStatuses[1]);
         telemetry.addData("holder 2 ", holderStatuses[2]);
+    }
+
+    public void resetHolderStatuses() {
+        holderStatuses[0] = HolderStatus.NONE;
+        holderStatuses[1] = HolderStatus.NONE;
+        holderStatuses[2] = HolderStatus.NONE;
     }
 
     private HolderStatus getHolderStatus(double hue) {

@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -82,7 +83,6 @@ public class RedSideCloseAuto extends LinearOpMode {
         /*
         TRAJECTORIES
          */
-
         Pose2d startPose = new Pose2d(-48, 48, Math.toRadians(128));
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, startPose);
@@ -94,8 +94,7 @@ public class RedSideCloseAuto extends LinearOpMode {
 
         TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh()
                 .strafeToConstantHeading(new Vector2d(-11.5, 30))
-                .lineToY(44.5)
-                ;
+                .lineToY(44.5);
 
         TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh()
                 .strafeToConstantHeading(new Vector2d(-11.5,11.5))
@@ -104,7 +103,6 @@ public class RedSideCloseAuto extends LinearOpMode {
         TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh()
                 .strafeToConstantHeading(new Vector2d(11.5, 30))
                 .strafeToConstantHeading(new Vector2d(11.5,44.5));
-
 
         TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh()
                 .strafeToConstantHeading(new Vector2d(-11.5,11.5))
