@@ -72,7 +72,7 @@ public class ScrimmageTeleOp extends OpMode {
         packet = new TelemetryPacket();
         dashboard = FtcDashboard.getInstance();
 
-        kP = 0.015; kD = -0.001;
+        kP = 0.01; kD = -0.0005;
     }
 
     @Override
@@ -106,7 +106,7 @@ public class ScrimmageTeleOp extends OpMode {
         }
 
         // SPINDEXER LAUNCH LOGIC
-        if (gamepad1.a) {
+        if (gamepad1.a && launchArtifactCommand == null) {
             launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher);
             launchArtifactCommand.start();
         }

@@ -17,11 +17,11 @@ public class Spindexer {
 
     // PID VARIABLES
     // 0.015, 0, -0.001
-    private double kP = 0.015, kI = 0, kD = -0.001;
+    private double kP = 0.01, kI = 0, kD = -0.0005;
     private double lastError = 0;
     private ElapsedTime pidTimer;
 
-    private int[] launchHolderAngles = {50, 192, 280};
+    private int[] launchHolderAngles = {49, 180, 283};
 
     // COLOR SENSOR VARIABLES
     private NormalizedColorSensor colorSensor;
@@ -85,9 +85,12 @@ public class Spindexer {
         double error = targetAngle - currentAngle;
 
         // Normalize error to the range (-180, 180]
-        error = (error + 180) % 360;
-        if (error < 0) error += 360;
-        return error - 180;
+
+        error = error % 360;
+        if (error >= 180) error -= 360;
+        if (error < -180) error += 360;
+
+        return error;
     }
 
     public double getAngle() {
