@@ -18,6 +18,8 @@ public class Spindexer {
     // PID VARIABLES
     // 0.015, 0, -0.001
     private double kP = 0.01, kI = 0, kD = -0.0005;
+    private double alpha = 0.2;
+    private double filteredDerivative = 0;
     private double lastError = 0;
     private ElapsedTime pidTimer;
 
@@ -65,16 +67,23 @@ public class Spindexer {
 
         double derivative = (error - lastError) / pidTimer.seconds();
 
-        double output = (kP * error) + (-kD * derivative);
+        // Derivative filtering to reduce oscillations
+        filteredDerivative = alpha * derivative + (1-alpha) * filteredDerivative;
 
+        double output = (kP * error) + (-kD * filteredDerivative);
+
+        // double output = (kP * error) + (-kD * derivative);
+
+        /* FEEDFORWARD + RANGING/CLIPPING
         // output *= 0.5; // Ranging to match actuator output
         // output  = Range.clip(output, -1.0, 1.0);
-
 
         // Feedforward to overcome static friction
         // double ff = Math.signum(error) * 0.1;
 
         // spindexerServo.setPower(output + ff);
+         */
+
         spindexerServo.setPower(output);
 
         lastError = error;
