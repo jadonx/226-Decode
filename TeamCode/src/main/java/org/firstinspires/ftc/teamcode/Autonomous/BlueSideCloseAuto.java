@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
+import org.firstinspires.ftc.teamcode.Subsystems.Commands.SpindexerColorIntakeCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Commands.LaunchArtifactCommand;
@@ -30,6 +31,7 @@ public class BlueSideCloseAuto extends LinearOpMode {
     Launcher launcher;
 
     LaunchArtifactCommand launchArtifactCommand;
+    SpindexerColorIntakeCommand spindexerColorIntakeCommand;
 
     /*
     ACTIONS
@@ -63,6 +65,34 @@ public class BlueSideCloseAuto extends LinearOpMode {
         return new ShootArtifacts(launchArtifactCommand);
     }
 
+    public class IntakeArtifacts implements Action {
+        private final SpindexerColorIntakeCommand spindexerColorIntakeCommand;
+        private final Intake intake;
+
+        private boolean initialized = false;
+
+        public IntakeArtifacts(SpindexerColorIntakeCommand spindexerColorIntakeCommand, Intake intake) {
+            this.spindexerColorIntakeCommand = spindexerColorIntakeCommand;
+            this.intake = intake;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (!initialized) {
+                spindexerColorIntakeCommand.start();
+                initialized = true;
+            }
+
+            intake.runIntake(1);
+            spindexerColorIntakeCommand.update(telemetry);
+
+            return true;
+        }
+    }
+    public Action intakeArtifacts(SpindexerColorIntakeCommand spindexerColorIntakeCommand, Intake intake) {
+        return new IntakeArtifacts(spindexerColorIntakeCommand, intake);
+    }
+
     @Override
     public void runOpMode() throws InterruptedException {
         /*
@@ -75,6 +105,7 @@ public class BlueSideCloseAuto extends LinearOpMode {
         launcher = new Launcher(hardwareMap);
 
         launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher);
+        spindexerColorIntakeCommand = new SpindexerColorIntakeCommand(spindexer);
 
         /*
         TRAJECTORIES

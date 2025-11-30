@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
-import org.firstinspires.ftc.teamcode.Subsystems.Commands.SpindexerColorSensorIntakeCommand;
+import org.firstinspires.ftc.teamcode.Subsystems.Commands.SpindexerColorIntakeCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain.FieldCentricDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
@@ -41,7 +41,7 @@ public class ScrimmageTeleOp extends OpMode {
 
     // COMMANDS
     LaunchArtifactCommand launchArtifactCommand;
-    SpindexerColorSensorIntakeCommand spindexerColorSensorIntakeCommand;
+    SpindexerColorIntakeCommand spindexerColorSensorIntakeCommand;
 
     boolean isIntaking = false;
     boolean isUsingLL = false;
@@ -66,7 +66,7 @@ public class ScrimmageTeleOp extends OpMode {
         turret = new Turret(hardwareMap);
 
         // COMMANDS
-        spindexerColorSensorIntakeCommand = new SpindexerColorSensorIntakeCommand(spindexer);
+        spindexerColorSensorIntakeCommand = new SpindexerColorIntakeCommand(spindexer);
         spindexerColorSensorIntakeCommand.start();
 
         packet = new TelemetryPacket();
@@ -119,10 +119,17 @@ public class ScrimmageTeleOp extends OpMode {
 
             // Intake logic
             intake.runIntake(gamepad1.right_trigger);
-            spindexerColorSensorIntakeCommand.update(telemetry);
         }
         else {
             intake.stopIntake();
+        }
+
+        /*
+        AUTONOMOUS SPINDEXER INTAKE LOGIC
+         */
+        // If launch sequence not engaged, set spindexer to intake mode
+        if (launchArtifactCommand == null) {
+            spindexerColorSensorIntakeCommand.update(telemetry);
         }
 
         /*

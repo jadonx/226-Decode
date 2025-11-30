@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 
-public class SpindexerColorSensorIntakeCommand {
+public class SpindexerColorIntakeCommand {
     private final Spindexer spindexer;
 
     private ElapsedTime colorSensorTimer;
@@ -22,7 +22,7 @@ public class SpindexerColorSensorIntakeCommand {
     private HolderStatus[] holderStatuses = {HolderStatus.NONE, HolderStatus.NONE, HolderStatus.NONE};
     private double[][] intakePositions = {{230, 225, 233}, {105, 93, 115}, {5, 354, 13}};
 
-    public SpindexerColorSensorIntakeCommand(Spindexer spindexer) {
+    public SpindexerColorIntakeCommand(Spindexer spindexer) {
         this.spindexer = spindexer;
     }
 
@@ -75,10 +75,10 @@ public class SpindexerColorSensorIntakeCommand {
     }
 
     private HolderStatus getHolderStatus(double hue) {
-        if (hue > 150 && hue < 170) {
+        if (hue > 130 && hue < 200) {
             return HolderStatus.GREEN;
         }
-        else if (hue > 230 && hue < 260) {
+        else if (hue > 210 && hue < 270) {
             return HolderStatus.PURPLE;
         }
         else {
