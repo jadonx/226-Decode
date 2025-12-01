@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
+import org.firstinspires.ftc.teamcode.Subsystems.Commands.SpindexerColorIntakeCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain.FieldCentricDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
@@ -27,9 +28,7 @@ public class ScrimmageTeleOp extends OpMode {
     public static double xValueBot = 0;
     public static double yValueBot = 0;
 
-
     public double pinPointDistance;
-
 
     FieldCentricDrive drive;
     MecanumDrive drive_roadrunner;
@@ -40,19 +39,16 @@ public class ScrimmageTeleOp extends OpMode {
 
     Intake intake;
     Spindexer spindexer;
-    UnjammerSystem unjamSystem;
     Popper popper;
     Launcher launcher;
     Turret turret;
+
+    // COMMANDS
     LaunchArtifactCommand launchArtifactCommand;
-
-    boolean isIntaking = false;
-
-    public static double kP, kI, kD;
+    SpindexerColorIntakeCommand spindexerColorSensorIntakeCommand;
 
     TelemetryPacket packet;
     FtcDashboard dashboard;
-
 
     @Override
     public void init() {
@@ -65,7 +61,6 @@ public class ScrimmageTeleOp extends OpMode {
 
         intake = new Intake(hardwareMap);
         spindexer = new Spindexer(hardwareMap);
-        unjamSystem = new UnjammerSystem(intake, spindexer);
         popper = new Popper(hardwareMap);
         launcher = new Launcher(hardwareMap);
         turret = new Turret(hardwareMap);
@@ -97,19 +92,26 @@ public class ScrimmageTeleOp extends OpMode {
         }
 
         if (gamepad1.right_trigger > 0.1) {
-            unjamSystem.periodic(gamepad1.right_trigger);
+            // Canceling launch command sequence
             launchArtifactCommand = null;
             launcher.stopLauncher();
             popper.deactivatePopper();
+
+            // Intake logic
+            intake.runIntake(gamepad1.right_trigger);
         }
         else {
-            unjamSystem.stopIntakeSpindexer();
+            intake.stopIntake();
+        }
+
+        // If launch sequence not engaged, set spindexer to intake mode
+        if (launchArtifactCommand == null) {
+            spindexerColorSensorIntakeCommand.update(telemetry);
         }
 
         // SPINDEXER LAUNCH LOGIC
         if (gamepad1.a) {
             launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher, drive_roadrunner);
-            // launchArtifactCommand.startPID();
             launchArtifactCommand.start();
         }
 
@@ -131,6 +133,9 @@ public class ScrimmageTeleOp extends OpMode {
             launchArtifactCommand = null;
             launcher.stopLauncher();
             popper.deactivatePopper();
+
+            // Reset holder statuses
+            spindexerColorSensorIntakeCommand.resetHolderStatuses();
         }
 
         // TURRET LOGIC
@@ -156,9 +161,6 @@ public class ScrimmageTeleOp extends OpMode {
                 turret.trackTargetAngle(ta);
             }
         }
-
-
-
 
         // Calculate Theoretical Angle to Goal
 
@@ -190,7 +192,8 @@ public class ScrimmageTeleOp extends OpMode {
 
     @Override
     public void stop() {
-        unjamSystem.stopIntakeSpindexer();
+        intake.stopIntake();
+        spindexer.stopSpindexer();
         drive.stopDrive();
         popper.deactivatePopper();
         launcher.stopLauncher();
