@@ -73,7 +73,7 @@ public class ScrimmageTeleOp extends OpMode {
         dashboard = FtcDashboard.getInstance();
 
         // 0.0005
-        kP = 0.009; kD = 0; kS = 0.12;
+        kP = 0.005; kD = 0; kS = 0.12;
 
         loopTime = new ElapsedTime();
     }
@@ -184,9 +184,6 @@ public class ScrimmageTeleOp extends OpMode {
         //Theoretical Angle Calculation
         drive_roadrunner.updatePoseEstimate();
         packet.put("Angle from bot to goal: ", turret.angleBotToGoal(BLUE_GOALPose.position.y - drive_roadrunner.localizer.getPose().position.y, BLUE_GOALPose.position.x - drive_roadrunner.localizer.getPose().position.x));
-
-        telemetry.addData("LOOP TIME ", loopTime.seconds());
-        loopTime.reset();
 
         // FTC Dashboard/Telemetry Update
         dashboard.sendTelemetryPacket(packet);

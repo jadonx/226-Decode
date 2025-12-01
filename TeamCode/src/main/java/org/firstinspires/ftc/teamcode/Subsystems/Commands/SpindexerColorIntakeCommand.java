@@ -71,7 +71,7 @@ public class SpindexerColorIntakeCommand {
             telemetry.addData("GOING TO HOLDER 2", null);
         }
         else {
-            targetAngle = 200;
+            targetAngle = 49;
         }
 
         spindexer.goToAngleSlow(targetAngle);

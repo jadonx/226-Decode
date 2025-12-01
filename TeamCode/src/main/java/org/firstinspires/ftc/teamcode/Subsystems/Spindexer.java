@@ -80,8 +80,8 @@ public class Spindexer {
 
         double output = (kP * error) + (-kD * filteredDerivative) + ff;
 
-        if (Math.abs(error) < 12) {
-            output *= 0.5;
+        if (Math.abs(error) < 15) {
+            output *= 0.4;
         }
 
         if (Math.abs(error) < 2) {
@@ -110,8 +110,8 @@ public class Spindexer {
 
         double output = (kP * error) + (-kD * filteredDerivative) + ff;
 
-        if (Math.abs(error) < 12) {
-            output *= 0.5;
+        if (Math.abs(error) < 15) {
+            output *= 0.4;
         }
 
         if (Math.abs(error) < 2) {
