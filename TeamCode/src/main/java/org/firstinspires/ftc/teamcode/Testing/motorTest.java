@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.Testing;
 
+
+import static org.firstinspires.ftc.teamcode.Constants.HMFrontColorSensor;
+
 import android.graphics.Color;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -19,7 +22,7 @@ public class motorTest extends OpMode {
     public void init(){
         //motor1 = hardwareMap.get(DcMotorEx.class, "motor1");
         //motor2 = hardwareMap.get(DcMotorEx.class, "motor2");
-        colorSensor = hardwareMap.get(NormalizedColorSensor.class, "sensor_color");
+        colorSensor = hardwareMap.get(NormalizedColorSensor.class, HMFrontColorSensor);
 
 
     }

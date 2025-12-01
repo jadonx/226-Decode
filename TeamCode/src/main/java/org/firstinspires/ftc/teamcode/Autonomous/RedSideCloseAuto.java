@@ -51,7 +51,7 @@ public class RedSideCloseAuto extends LinearOpMode {
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (!initialized) {
                 if (!isTurretReadyToShoot) {
-                    turret.trackTargetAngle(taShooting, 0); // Aim turret to shooting angle
+                    turret.trackTargetAngle(taShooting); // Aim turret to shooting angle
                     isTurretReadyToShoot = true;
                 }
                 launcherArtifactCommand.start();

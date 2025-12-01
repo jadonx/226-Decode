@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Subsystems.Encoder.AS5600Encoder;
@@ -24,11 +23,9 @@ public class Spindexer {
     private int[] launchHolderAngles = {50, 192, 280};
 
     // COLOR SENSOR VARIABLES
-    /*
     private NormalizedColorSensor colorSensor;
     float[] hsv = new float[3];
     private ElapsedTime colorSensorTimer;
-     */
 
     public Spindexer(HardwareMap hardwareMap) {
         spindexerServo = hardwareMap.get(CRServo.class, Constants.HMServospinDexer);
@@ -36,10 +33,8 @@ public class Spindexer {
 
         pidTimer = new ElapsedTime();
 
-        /*
-        colorSensor = hardwareMap.get(NormalizedColorSensor.class, Constants.HMColorSensor);
+        colorSensor = hardwareMap.get(NormalizedColorSensor.class, Constants.HMFrontColorSensor);
         colorSensorTimer = new ElapsedTime();
-         */
     }
 
     /*
@@ -67,14 +62,6 @@ public class Spindexer {
 
         double output = (kP * error) + (-kD * derivative);
 
-        // output *= 0.5; // Ranging to match actuator output
-        // output  = Range.clip(output, -1.0, 1.0);
-
-
-        // Feedforward to overcome static friction
-        // double ff = Math.signum(error) * 0.1;
-
-        // spindexerServo.setPower(output + ff);
         spindexerServo.setPower(output);
 
         lastError = error;
@@ -124,7 +111,6 @@ public class Spindexer {
     /*
     COLOR SENSOR CODE
      */
-    /*
     public double getHue() {
         NormalizedRGBA colors = colorSensor.getNormalizedColors();
 
@@ -138,5 +124,8 @@ public class Spindexer {
 
         return hsv[0];
     }
+
+    /*
+
      */
 }
