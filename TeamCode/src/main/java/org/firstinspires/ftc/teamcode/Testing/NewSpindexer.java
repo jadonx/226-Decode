@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Testing;
 
-import static org.firstinspires.ftc.teamcode.Constants.HMColorSensor;
+
+import static org.firstinspires.ftc.teamcode.Constants.HMFrontColorSensor;
 import static org.firstinspires.ftc.teamcode.Constants.HMMotorIntake;
 import static org.firstinspires.ftc.teamcode.Constants.HMServospinDexer;
 import static org.firstinspires.ftc.teamcode.Constants.HMSpindexerEncoder;
@@ -25,17 +26,17 @@ public class NewSpindexer extends OpMode {
     NormalizedColorSensor colorSensor1;
     AS5600Encoder spinEncoder;
 
-    public double pos1A = 50; //For launch
-    public double pos2A = 192;
-    public double pos3A = 280;
+    public double pos1A = 49; //For launch
+    public double pos2A = 183;
+    public double pos3A = 284;
     //a
-    public double pos1B = 230; //For Intake
-    public double pos2B = 12;
-    public double pos3B = 100;
+    public double pos1B = 229; //For Intake
+    public double pos2B = 3.69;
+    public double pos3B = 106;
 
-    boolean hold1 = false;
-    boolean hold2 = false;
-    boolean hold3 = false;
+    ball hold1 = ball.empty;
+    ball hold2 = ball.empty;
+    ball hold3 = ball.empty;
 
     private double lastError = 0;
     ElapsedTime pidTimer;
@@ -44,7 +45,7 @@ public class NewSpindexer extends OpMode {
 
 
     public void init(){
-        colorSensor1 = hardwareMap.get(NormalizedColorSensor.class, HMColorSensor);
+        colorSensor1 = hardwareMap.get(NormalizedColorSensor.class, HMFrontColorSensor);
         spinner = hardwareMap.get(CRServo.class, HMServospinDexer);
         intake = hardwareMap.get(DcMotorEx.class, HMMotorIntake);
         spinEncoder = hardwareMap.get(AS5600Encoder.class, HMSpindexerEncoder );
@@ -61,40 +62,54 @@ public class NewSpindexer extends OpMode {
             intake.setPower(0.75);
         }
 
-        if(hold1 && hold2 && hold3){
+        if(gamepad1.b){
+            hold1 = ball.empty;
+            hold2 = ball.empty;
+            hold3 = ball.empty;
+        }
+
+        if(hold1 != ball.empty && hold2!= ball.empty && hold3!= ball.empty){
             gamepad1.rumble(1000);
         }
 
-        if(spinEncoder.getAngleDegrees() < pos1B+1 && spinEncoder.getAngleDegrees() > pos1B-1){
-            if(hsv[0] > 100){
-                hold1 = true;
+        if(spinEncoder.getAngleDegrees() < pos1B+3 && spinEncoder.getAngleDegrees() > pos1B-3){
+            if(colors.green*255 > 5.5 && hsv[1] > 0.61){
+                hold1 = ball.green;
+            } else if(colors.blue*255 > 6){
+                hold1= ball.purple;
             } else{
-                hold1= false;
+                hold1 = ball.empty;
             }
         }
 
-        if(spinEncoder.getAngleDegrees() < pos2B+1 && spinEncoder.getAngleDegrees() > pos2B-1){
-            if(hsv[0] > 100){
-                hold2 = true;
+        if(spinEncoder.getAngleDegrees() < pos2B+3 && spinEncoder.getAngleDegrees() > pos2B-3){
+            if(colors.green*255 > 5 && hsv[1] > 0.61){
+                hold2 = ball.green;
+            } else if(colors.blue*255 > 6){
+                hold2= ball.purple;
             } else{
-                hold2= false;
+                hold2 = ball.empty;
             }
         }
 
-        if(spinEncoder.getAngleDegrees() < pos3B+1 && spinEncoder.getAngleDegrees() > pos3B-1){
-            if(hsv[0] > 100){
-                hold3 = true;
+        if(spinEncoder.getAngleDegrees() < pos3B+3 && spinEncoder.getAngleDegrees() > pos3B-3){
+            if(colors.green*255 > 5 && hsv[1] > 0.61){
+                hold3 = ball.green;
+            } else if(colors.blue*255 > 6){
+                hold3= ball.purple;
             } else{
-                hold3= false;
+                hold3 = ball.empty;
             }
         }
 
-        if(!hold1){
+        if(hold1 == ball.empty){
             goToAngle(pos1B);
-        } else if(!hold2){
+        } else if(hold2 == ball.empty){
             goToAngle(pos2B);
-        } else if(!hold3){
+        } else if(hold3 == ball.empty){
             goToAngle(pos3B);
+        } else{
+            goToAngle(pos1A);
         }
 
 
@@ -102,7 +117,8 @@ public class NewSpindexer extends OpMode {
         telemetry.addData("hold1", hold1);
         telemetry.addData("hold2", hold2);
         telemetry.addData("hold3", hold3);
-        telemetry.addData("hue", hsv[0]);
+        telemetry.addData("Green", colors.green*255);
+        telemetry.addData("Blue", colors.blue*255);
         telemetry.addData("Encoder Pos", spinEncoder.getAngleDegrees());
     }
 
@@ -126,6 +142,12 @@ public class NewSpindexer extends OpMode {
         error = (error + 180) % 360;
         if (error < 0) error += 360;
         return error - 180;
+    }
+
+    public enum ball{
+        empty,
+        purple,
+        green
     }
 }
 

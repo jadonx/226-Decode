@@ -46,7 +46,7 @@ public class SpindexerSample {
         spindexerServo = hardwareMap.get(CRServo.class, Constants.HMServospinDexer);
         spindexerEncoder = hardwareMap.get(AS5600Encoder.class, Constants.HMSpindexerEncoder);
 
-        colorSensor = hardwareMap.get(NormalizedColorSensor.class, Constants.HMColorSensor);
+        colorSensor = hardwareMap.get(NormalizedColorSensor.class, Constants.HMFrontColorSensor);
         colorSensorTimer = new ElapsedTime();
 
         kP = 0.005;

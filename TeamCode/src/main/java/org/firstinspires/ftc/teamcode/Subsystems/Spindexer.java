@@ -33,7 +33,7 @@ public class Spindexer {
 
         pidTimer = new ElapsedTime();
 
-        colorSensor = hardwareMap.get(NormalizedColorSensor.class, Constants.HMColorSensor);
+        colorSensor = hardwareMap.get(NormalizedColorSensor.class, Constants.HMFrontColorSensor);
         colorSensorTimer = new ElapsedTime();
     }
 
