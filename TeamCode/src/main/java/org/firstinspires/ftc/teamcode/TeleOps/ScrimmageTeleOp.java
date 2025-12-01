@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Commands.SpindexerColorIntakeCommand;
@@ -32,7 +33,7 @@ public class ScrimmageTeleOp extends OpMode {
 
     Intake intake;
     Spindexer spindexer;
-    public static double kP, kD;
+    public static double kP, kD, kS;
     Popper popper;
     Launcher launcher;
     Turret turret;
@@ -46,6 +47,8 @@ public class ScrimmageTeleOp extends OpMode {
 
     TelemetryPacket packet;
     FtcDashboard dashboard;
+
+    ElapsedTime loopTime;
 
     @Override
     public void init() {
@@ -69,7 +72,10 @@ public class ScrimmageTeleOp extends OpMode {
         packet = new TelemetryPacket();
         dashboard = FtcDashboard.getInstance();
 
-        kP = 0.009; kD = -0.0005;
+        // 0.0005
+        kP = 0.009; kD = 0; kS = 0.12;
+
+        loopTime = new ElapsedTime();
     }
 
     @Override
@@ -158,7 +164,7 @@ public class ScrimmageTeleOp extends OpMode {
 
         // UPDATING SPINDEXER PID FOR TESTING
         packet.put("Spindexer current angle: ", spindexer.getAngle());
-        spindexer.updatePID(kP, 0, kD);
+        spindexer.updatePID(kP, kD, kS);
 
         if(gamepad1.dpad_up && !isUsingLL) {
             isUsingLL = true;
@@ -178,6 +184,9 @@ public class ScrimmageTeleOp extends OpMode {
         //Theoretical Angle Calculation
         drive_roadrunner.updatePoseEstimate();
         packet.put("Angle from bot to goal: ", turret.angleBotToGoal(BLUE_GOALPose.position.y - drive_roadrunner.localizer.getPose().position.y, BLUE_GOALPose.position.x - drive_roadrunner.localizer.getPose().position.x));
+
+        telemetry.addData("LOOP TIME ", loopTime.seconds());
+        loopTime.reset();
 
         // FTC Dashboard/Telemetry Update
         dashboard.sendTelemetryPacket(packet);

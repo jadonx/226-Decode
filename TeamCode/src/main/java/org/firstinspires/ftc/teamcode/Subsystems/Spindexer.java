@@ -19,8 +19,8 @@ public class Spindexer {
     private AS5600Encoder spindexerEncoder;
 
     // PID VARIABLES
-    // 0.015, 0, -0.001
-    private double kP = 0.009, kI = 0, kD = -0.0005;
+    // 0.015, 0, -0.0005
+    private double kP = 0.005, kD = 0, kS = 0.12;
     private double alpha = 0.1;
     private double filteredDerivative = 0;
     private double lastError = 0;
@@ -75,16 +75,21 @@ public class Spindexer {
         // Derivative filtering to reduce oscillations
         filteredDerivative = alpha * derivative + (1-alpha) * filteredDerivative;
 
-        double output = (kP * error) + (-kD * filteredDerivative);
+        // Feedforward to overcome static friction
+        double ff = kS * Math.signum(error);
 
-        // double output = (kP * error) + (-kD * derivative);
+        double output = (kP * error) + (-kD * filteredDerivative) + ff;
+
+        if (Math.abs(error) < 12) {
+            output *= 0.5;
+        }
+
+        if (Math.abs(error) < 2) {
+            output = 0;
+        }
 
         // FEEDFORWARD + RANGING/CLIPPING
-        // output *= 0.5; // Ranging to match actuator output
-        // output  = Range.clip(output, -1.0, 1.0);
-
-        // Feedforward to overcome static friction
-        // double ff = Math.signum(error) * 0.05;
+        output  = Range.clip(output, -0.55, 0.55);
 
         spindexerServo.setPower(output);
 
@@ -100,16 +105,21 @@ public class Spindexer {
         // Derivative filtering to reduce oscillations
         filteredDerivative = alpha * derivative + (1-alpha) * filteredDerivative;
 
-        double output = (kP * error) + (-kD * filteredDerivative);
+        // Feedforward to overcome static friction
+        double ff = kS * Math.signum(error);
 
-        // double output = (kP * error) + (-kD * derivative);
+        double output = (kP * error) + (-kD * filteredDerivative) + ff;
+
+        if (Math.abs(error) < 12) {
+            output *= 0.5;
+        }
+
+        if (Math.abs(error) < 2) {
+            output = 0;
+        }
 
         // FEEDFORWARD + RANGING/CLIPPING
-        // output *= 0.5; // Ranging to match actuator output
-        // output  = Range.clip(output, -1.0, 1.0);
-
-        // Feedforward to overcome static friction
-        // double ff = Math.signum(error) * 0.05;
+        output  = Range.clip(output, -0.55, 0.55);
 
         spindexerServo.setPower(output * 0.75);
 
@@ -131,10 +141,10 @@ public class Spindexer {
         return spindexerEncoder.getAngleDegrees();
     }
 
-    public void updatePID(double kP, double kI, double kD) {
+    public void updatePID(double kP, double kD, double kS) {
         this.kP = kP;
-        this.kI = kI;
         this.kD = kD;
+        this.kS = kS;
     }
 
     // Returns the sequence of shooting angles starting from the closest (for shooting)
