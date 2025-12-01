@@ -22,12 +22,18 @@ public class LimeLight {
         limelight.start();
     }
 
+
+
     public void getResult() {
         result = limelight.getLatestResult();
     }
 
     public void getMotifPattern() {
 
+    }
+
+    public boolean isResulted() {
+        return result != null;
     }
 
     public double getTX() {

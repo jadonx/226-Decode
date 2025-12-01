@@ -6,7 +6,6 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -31,6 +30,7 @@ public class RedSideCloseAuto extends LinearOpMode {
     UnjammerSystem unjamSystem;
     Popper popper;
     Launcher launcher;
+    Turret turret;
 
     LaunchArtifactCommand launchArtifactCommand;
 
@@ -40,6 +40,8 @@ public class RedSideCloseAuto extends LinearOpMode {
     public class ShootArtifacts implements Action {
         private final LaunchArtifactCommand launcherArtifactCommand;
         private boolean initialized = false;
+        private boolean isTurretReadyToShoot = false;
+        private double taShooting = 45; // Angle to aim turret for shooting
 
         public ShootArtifacts(LaunchArtifactCommand launchArtifactCommand) {
             this.launcherArtifactCommand = launchArtifactCommand;
@@ -48,6 +50,10 @@ public class RedSideCloseAuto extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (!initialized) {
+                if (!isTurretReadyToShoot) {
+                    turret.trackTargetAngle(taShooting); // Aim turret to shooting angle
+                    isTurretReadyToShoot = true;
+                }
                 launcherArtifactCommand.start();
                 initialized = true;
             }
@@ -78,14 +84,17 @@ public class RedSideCloseAuto extends LinearOpMode {
         popper = new Popper(hardwareMap);
         launcher = new Launcher(hardwareMap);
 
-        launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher);
+
 
         /*
         TRAJECTORIES
          */
+
         Pose2d startPose = new Pose2d(-48, 48, Math.toRadians(128));
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, startPose);
+
+        launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher, drive);
 
         // Trajectory Variables
         TrajectoryActionBuilder firstLaunch = drive.actionBuilder(startPose)
@@ -94,7 +103,9 @@ public class RedSideCloseAuto extends LinearOpMode {
 
         TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh()
                 .strafeToConstantHeading(new Vector2d(-11.5, 30))
-                .lineToY(44.5);
+                .lineToY(44.5)
+                ;
+
 
         TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh()
                 .strafeToConstantHeading(new Vector2d(-11.5,11.5))
@@ -103,6 +114,7 @@ public class RedSideCloseAuto extends LinearOpMode {
         TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh()
                 .strafeToConstantHeading(new Vector2d(11.5, 30))
                 .strafeToConstantHeading(new Vector2d(11.5,44.5));
+
 
         TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh()
                 .strafeToConstantHeading(new Vector2d(-11.5,11.5))

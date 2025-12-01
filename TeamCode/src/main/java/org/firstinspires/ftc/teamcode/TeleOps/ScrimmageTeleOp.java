@@ -6,7 +6,6 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Commands.SpindexerColorIntakeCommand;
@@ -23,17 +22,23 @@ import org.firstinspires.ftc.teamcode.Subsystems.UnjammerSystem;
 @Config
 @TeleOp(name="ScrimmageTeleOp", group="!TeleOp")
 public class ScrimmageTeleOp extends OpMode {
-    // SUBSYSTEMS
+
+    public static double xValueGoal = -60;
+    public static double yValueGoal = 60;
+    public static double xValueBot = 0;
+    public static double yValueBot = 0;
+
+    public double pinPointDistance;
+
     FieldCentricDrive drive;
     MecanumDrive drive_roadrunner;
-    Pose2d initialPose = new Pose2d(0, 0, 0);
-    Pose2d BLUE_GOALPose = new Pose2d(-50, 50, 0);
+    Pose2d initialPose = new Pose2d(xValueBot, yValueBot, Math.toRadians(180));
+    Pose2d BLUE_GOALPose = new Pose2d(xValueGoal, yValueGoal, 0);
 
     LimeLight limelight;
 
     Intake intake;
     Spindexer spindexer;
-    public static double kP, kD, kS;
     Popper popper;
     Launcher launcher;
     Turret turret;
@@ -42,13 +47,8 @@ public class ScrimmageTeleOp extends OpMode {
     LaunchArtifactCommand launchArtifactCommand;
     SpindexerColorIntakeCommand spindexerColorSensorIntakeCommand;
 
-    boolean isIntaking = false;
-    boolean isUsingLL = false;
-
     TelemetryPacket packet;
     FtcDashboard dashboard;
-
-    ElapsedTime loopTime;
 
     @Override
     public void init() {
@@ -65,17 +65,10 @@ public class ScrimmageTeleOp extends OpMode {
         launcher = new Launcher(hardwareMap);
         turret = new Turret(hardwareMap);
 
-        // COMMANDS
-        spindexerColorSensorIntakeCommand = new SpindexerColorIntakeCommand(spindexer);
-        spindexerColorSensorIntakeCommand.start();
-
         packet = new TelemetryPacket();
         dashboard = FtcDashboard.getInstance();
 
-        // 0.0005
-        kP = 0.005; kD = 0; kS = 0.12;
-
-        loopTime = new ElapsedTime();
+        drive.resetIMU();
     }
 
     @Override
@@ -90,30 +83,14 @@ public class ScrimmageTeleOp extends OpMode {
 
         //Limelight Logic
         limelight.getResult();
-        packet.put("Limelight tX: ", limelight.getTX());
-        packet.put("Limelight tY: ", limelight.getTY());
-        packet.put("LimeLight distance: ", limelight.getDistance());
+//        packet.put("Limelight tX: ", limelight.getTX());
+//        packet.put("Limelight tY: ", limelight.getTY());
+//        packet.put("LimeLight distance: ", limelight.getDistance());
 
         if (gamepad1.x) {
             drive.resetIMU();
         }
 
-        /*
-        OLD INTAKE LOGIC
-        if (gamepad1.right_trigger > 0.1) {
-            unjamSystem.periodic(gamepad1.right_trigger);
-            launchArtifactCommand = null;
-            launcher.stopLauncher();
-            popper.deactivatePopper();
-        }
-        else {
-            unjamSystem.stopIntakeSpindexer();
-        }
-         */
-
-        /*
-        NEW INTAKE LOGIC
-         */
         if (gamepad1.right_trigger > 0.1) {
             // Canceling launch command sequence
             launchArtifactCommand = null;
@@ -127,30 +104,29 @@ public class ScrimmageTeleOp extends OpMode {
             intake.stopIntake();
         }
 
-        /*
-        AUTONOMOUS SPINDEXER INTAKE LOGIC
-         */
         // If launch sequence not engaged, set spindexer to intake mode
         if (launchArtifactCommand == null) {
             spindexerColorSensorIntakeCommand.update(telemetry);
         }
 
-        /*
-        SPINDEXER LAUNCH LOGIC
-         */
-        if (gamepad1.a && launchArtifactCommand == null) {
-            launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher);
+        // SPINDEXER LAUNCH LOGIC
+        if (gamepad1.a) {
+            launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher, drive_roadrunner);
             launchArtifactCommand.start();
         }
 
-        // FAR LAUNCHING
         if (gamepad1.b) {
-            launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher);
+            launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher, drive_roadrunner);
             launchArtifactCommand.startFar();
         }
 
         if (launchArtifactCommand != null && !launchArtifactCommand.isFinished()) {
             launchArtifactCommand.update(packet);
+        }
+
+        if (gamepad1.b) {
+            launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher, drive_roadrunner);
+            launchArtifactCommand.startFar();
         }
 
         if (launchArtifactCommand != null && launchArtifactCommand.isFinished()) {
@@ -162,32 +138,56 @@ public class ScrimmageTeleOp extends OpMode {
             spindexerColorSensorIntakeCommand.resetHolderStatuses();
         }
 
-        // UPDATING SPINDEXER PID FOR TESTING
-        packet.put("Spindexer current angle: ", spindexer.getAngle());
-        spindexer.updatePID(kP, kD, kS);
+        // TURRET LOGIC
 
-        if(gamepad1.dpad_up && !isUsingLL) {
-            isUsingLL = true;
-            packet.put("Using Limelight for turret targeting", "");
-        } else if (gamepad1.dpad_down && isUsingLL) {
-            isUsingLL = false;
-            packet.put("Using Angle Calculation for turret targeting", "");
+        double ta = turret.angleBotToGoal(
+                BLUE_GOALPose.position.y - drive_roadrunner.localizer.getPose().position.y,
+                BLUE_GOALPose.position.x - drive_roadrunner.localizer.getPose().position.x,
+                Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log()));
+
+
+        turret.setRobotHeading(Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log()));
+
+        if (gamepad1.dpad_down) {
+            turret.zeroTurretRelativeToRobot();
         }
 
-        //Turret Logic
-        if (isUsingLL) {
+        if (limelight.getTX() != 0) {
             turret.trackAprilTag(limelight.getTX());
+            packet.put("Turret Mode: ", "LimeLight");
         } else {
-            // turret.trackTargetAngle(turret.angleBotToGoal(BLUE_GOALPose.position.y - drive_roadrunner.localizer.getPose().position.y, BLUE_GOALPose.position.x - drive_roadrunner.localizer.getPose().position.x));
+            packet.put("Turret Mode: ", "PinPoint");
+            if (turret.getTurretZeroOffsetField() != -10000) {
+                turret.trackTargetAngle(ta);
+            }
         }
+
+        // Calculate Theoretical Angle to Goal
 
         //Theoretical Angle Calculation
         drive_roadrunner.updatePoseEstimate();
-        packet.put("Angle from bot to goal: ", turret.angleBotToGoal(BLUE_GOALPose.position.y - drive_roadrunner.localizer.getPose().position.y, BLUE_GOALPose.position.x - drive_roadrunner.localizer.getPose().position.x));
+        packet.put("Is resulted: ", limelight.isResulted());
+        packet.put("LimeLight Tx: ", limelight.getTX());
+        packet.put("1 Turret Angle: ", turret.getTurretAngle());
+        packet.put("2 Desired Angle: ", ta);
 
-        // FTC Dashboard/Telemetry Update
-        dashboard.sendTelemetryPacket(packet);
+//        packet.put("Bot Position X: ", drive_roadrunner.localizer.getPose().position.x);
+//        packet.put("Bot Position Y: ", drive_roadrunner.localizer.getPose().position.y);
+        packet.put("3 Bot Position Heading log: ", Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log()));
+        packet.put("4 Offset: ", turret.getTurretZeroOffsetField());
+        packet.put("5 Robot Angle at init", turret.getRobotHeadingDeg());
+
+        telemetry.addData("1 Turret Angle: ", turret.getTurretAngle());
+        telemetry.addData("2 Desired Angle: ", ta);
+        telemetry.addData("3 Bot Position Heading log: ", Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log()));
+        telemetry.addData("4 Offset: ", turret.getTurretZeroOffsetField());
+        telemetry.addData("5 Robot Angle at init", turret.getRobotHeadingDeg());
+        telemetry.addData("Limelight Distance", limelight.getDistance());
+        telemetry.addData("Pinpoint Distance", launcher.getPinPointDistance());
+
         telemetry.update();
+
+        dashboard.sendTelemetryPacket(packet);
     }
 
     @Override
@@ -197,5 +197,6 @@ public class ScrimmageTeleOp extends OpMode {
         drive.stopDrive();
         popper.deactivatePopper();
         launcher.stopLauncher();
+        turret.stopTurret();
     }
 }

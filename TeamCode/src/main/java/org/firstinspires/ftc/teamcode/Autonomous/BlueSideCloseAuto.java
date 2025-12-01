@@ -104,15 +104,16 @@ public class BlueSideCloseAuto extends LinearOpMode {
         popper = new Popper(hardwareMap);
         launcher = new Launcher(hardwareMap);
 
-        launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher);
-        spindexerColorIntakeCommand = new SpindexerColorIntakeCommand(spindexer);
-
         /*
         TRAJECTORIES
          */
 
         Pose2d initialPose = new Pose2d(-48, -48, Math.toRadians(225));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
+
+        // Commands
+        launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher, drive);
+        spindexerColorIntakeCommand = new SpindexerColorIntakeCommand(spindexer);
 
         // Trajectory Variables
         TrajectoryActionBuilder moveToShootArtifacts = drive.actionBuilder(initialPose)
