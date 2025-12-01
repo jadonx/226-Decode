@@ -33,8 +33,6 @@ public class ScrimmageTeleOp extends OpMode {
     Intake intake;
     Spindexer spindexer;
     public static double kP, kD;
-
-    UnjammerSystem unjamSystem;
     Popper popper;
     Launcher launcher;
     Turret turret;
@@ -60,7 +58,6 @@ public class ScrimmageTeleOp extends OpMode {
 
         intake = new Intake(hardwareMap);
         spindexer = new Spindexer(hardwareMap);
-        unjamSystem = new UnjammerSystem(intake, spindexer);
         popper = new Popper(hardwareMap);
         launcher = new Launcher(hardwareMap);
         turret = new Turret(hardwareMap);
@@ -72,7 +69,7 @@ public class ScrimmageTeleOp extends OpMode {
         packet = new TelemetryPacket();
         dashboard = FtcDashboard.getInstance();
 
-        kP = 0.01; kD = -0.0005;
+        kP = 0.009; kD = -0.0005;
     }
 
     @Override
@@ -189,7 +186,8 @@ public class ScrimmageTeleOp extends OpMode {
 
     @Override
     public void stop() {
-        unjamSystem.stopIntakeSpindexer();
+        intake.stopIntake();
+        spindexer.stopSpindexer();
         drive.stopDrive();
         popper.deactivatePopper();
         launcher.stopLauncher();

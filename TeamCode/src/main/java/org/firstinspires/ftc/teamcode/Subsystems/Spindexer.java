@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import android.graphics.Color;
+
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
@@ -17,16 +20,17 @@ public class Spindexer {
 
     // PID VARIABLES
     // 0.015, 0, -0.001
-    private double kP = 0.01, kI = 0, kD = -0.0005;
-    private double alpha = 0.2;
+    private double kP = 0.009, kI = 0, kD = -0.0005;
+    private double alpha = 0.1;
     private double filteredDerivative = 0;
     private double lastError = 0;
     private ElapsedTime pidTimer;
 
-    private int[] launchHolderAngles = {49, 180, 283};
+    private int[] launchHolderAngles = {49, 181, 283};
 
     // COLOR SENSOR VARIABLES
     private NormalizedColorSensor colorSensor;
+    private RevColorSensorV3 colorSensorV3;
     float[] hsv = new float[3];
     private ElapsedTime colorSensorTimer;
 
@@ -37,6 +41,7 @@ public class Spindexer {
         pidTimer = new ElapsedTime();
 
         colorSensor = hardwareMap.get(NormalizedColorSensor.class, Constants.HMColorSensorFront);
+        colorSensorV3 = hardwareMap.get(RevColorSensorV3.class, Constants.HMColorSensorFront);
         colorSensorTimer = new ElapsedTime();
     }
 
@@ -74,17 +79,39 @@ public class Spindexer {
 
         // double output = (kP * error) + (-kD * derivative);
 
-        /* FEEDFORWARD + RANGING/CLIPPING
+        // FEEDFORWARD + RANGING/CLIPPING
         // output *= 0.5; // Ranging to match actuator output
         // output  = Range.clip(output, -1.0, 1.0);
 
         // Feedforward to overcome static friction
-        // double ff = Math.signum(error) * 0.1;
-
-        // spindexerServo.setPower(output + ff);
-         */
+        // double ff = Math.signum(error) * 0.05;
 
         spindexerServo.setPower(output);
+
+        lastError = error;
+        pidTimer.reset();
+    }
+
+    public void goToAngleSlow(double target) {
+        double error = getAngleError(target, getAngle());
+
+        double derivative = (error - lastError) / pidTimer.seconds();
+
+        // Derivative filtering to reduce oscillations
+        filteredDerivative = alpha * derivative + (1-alpha) * filteredDerivative;
+
+        double output = (kP * error) + (-kD * filteredDerivative);
+
+        // double output = (kP * error) + (-kD * derivative);
+
+        // FEEDFORWARD + RANGING/CLIPPING
+        // output *= 0.5; // Ranging to match actuator output
+        // output  = Range.clip(output, -1.0, 1.0);
+
+        // Feedforward to overcome static friction
+        // double ff = Math.signum(error) * 0.05;
+
+        spindexerServo.setPower(output * 0.75);
 
         lastError = error;
         pidTimer.reset();
@@ -94,10 +121,8 @@ public class Spindexer {
         double error = targetAngle - currentAngle;
 
         // Normalize error to the range (-180, 180]
-
-        error = error % 360;
-        if (error >= 180) error -= 360;
-        if (error < -180) error += 360;
+        while (error > 180) error -= 360;
+        while (error < -180) error += 360;
 
         return error;
     }
@@ -136,7 +161,7 @@ public class Spindexer {
     /*
     COLOR SENSOR CODE
      */
-    public double getHue() {
+    public float[] getHue() {
         NormalizedRGBA colors = colorSensor.getNormalizedColors();
 
         // Convert RGB → HSV
@@ -147,6 +172,21 @@ public class Spindexer {
                 hsv
         );
 
-        return hsv[0];
+        return hsv;
+    }
+
+    public float[] getHSVRev() {
+        int r = colorSensorV3.red();
+        int g = colorSensorV3.green();
+        int b = colorSensorV3.blue();
+
+        float[] hsv = new float[3];
+        Color.RGBToHSV(r, g, b, hsv);
+
+        return hsv;
+    }
+
+    public int getAlpha() {
+        return colorSensorV3.alpha();
     }
 }
