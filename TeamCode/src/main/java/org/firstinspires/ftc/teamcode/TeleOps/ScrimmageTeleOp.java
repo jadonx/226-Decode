@@ -28,6 +28,9 @@ public class ScrimmageTeleOp extends OpMode {
     public static double yValueBot = 0;
 
 
+    public double pinPointDistance;
+
+
     FieldCentricDrive drive;
     MecanumDrive drive_roadrunner;
     Pose2d initialPose = new Pose2d(xValueBot, yValueBot, Math.toRadians(180));
@@ -105,13 +108,13 @@ public class ScrimmageTeleOp extends OpMode {
 
         // SPINDEXER LAUNCH LOGIC
         if (gamepad1.a) {
-            launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher);
+            launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher, drive_roadrunner);
             // launchArtifactCommand.startPID();
             launchArtifactCommand.start();
         }
 
         if (gamepad1.b) {
-            launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher);
+            launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher, drive_roadrunner);
             launchArtifactCommand.startFar();
         }
 
@@ -120,7 +123,7 @@ public class ScrimmageTeleOp extends OpMode {
         }
 
         if (gamepad1.b) {
-            launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher);
+            launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher, drive_roadrunner);
             launchArtifactCommand.startFar();
         }
 
@@ -137,6 +140,7 @@ public class ScrimmageTeleOp extends OpMode {
                 BLUE_GOALPose.position.x - drive_roadrunner.localizer.getPose().position.x,
                 Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log()));
 
+
         turret.setRobotHeading(Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log()));
 
         if (gamepad1.dpad_down) {
@@ -152,6 +156,8 @@ public class ScrimmageTeleOp extends OpMode {
                 turret.trackTargetAngle(ta);
             }
         }
+
+
 
 
         // Calculate Theoretical Angle to Goal
@@ -174,6 +180,8 @@ public class ScrimmageTeleOp extends OpMode {
         telemetry.addData("3 Bot Position Heading log: ", Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log()));
         telemetry.addData("4 Offset: ", turret.getTurretZeroOffsetField());
         telemetry.addData("5 Robot Angle at init", turret.getRobotHeadingDeg());
+        telemetry.addData("Limelight Distance", limelight.getDistance());
+        telemetry.addData("Pinpoint Distance", launcher.getPinPointDistance());
 
         telemetry.update();
 

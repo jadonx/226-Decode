@@ -1,5 +1,11 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import static org.firstinspires.ftc.teamcode.TeleOps.ScrimmageTeleOp.xValueBot;
+import static org.firstinspires.ftc.teamcode.TeleOps.ScrimmageTeleOp.xValueGoal;
+import static org.firstinspires.ftc.teamcode.TeleOps.ScrimmageTeleOp.yValueBot;
+import static org.firstinspires.ftc.teamcode.TeleOps.ScrimmageTeleOp.yValueGoal;
+
+import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -8,6 +14,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
 
 public class Launcher {
     // LAUNCHER
@@ -20,11 +27,15 @@ public class Launcher {
 
     // LIMELIGHT
     private Limelight3A limelight;
+
     private double distance = 0;
+    double pinPointDistance = 0;
 
     private final double CAM_DEG = 29.78;
     private final double CAM_H = 12;
     private final double TARGET_H = 29;
+
+    Pose2d BLUE_GOALPose = new Pose2d(xValueGoal, yValueGoal, 0);
 
     public Launcher(HardwareMap hardwareMap) {
         launcher1 = hardwareMap.get(DcMotorEx.class, Constants.HMMotorShooter1);
@@ -38,13 +49,20 @@ public class Launcher {
         limelight = hardwareMap.get(Limelight3A.class, Constants.HMLimelight);
         limelight.pipelineSwitch(1);
         limelight.start();
+        Pose2d initialPose = new Pose2d(xValueBot, yValueBot, Math.toRadians(180));
+
+
     }
 
     // Returns [target velocity, target angle]
-    public double[] getVelocityAndAngle() {
+    public double[] getVelocityAndAngle(Pose2d currentPose) {
         double targetVelocity;
         double coverPos;
         calculateLimelightDistance();
+        calculatePinPointDistance(currentPose);
+        if(distance < 29.71 && distance > 29.70 ){
+            distance = pinPointDistance - 9;
+        }
         if (distance > 76){
             coverPos = 0.05;
             if (distance > 100){
@@ -54,10 +72,13 @@ public class Launcher {
                 targetVelocity = calculateTargetVelocity();
             }
         }
+        /*
         else if (distance < 29.70772 && distance > 29.7077){
             coverPos = 1;
             targetVelocity = 1400;
         }
+
+         */
         else {
             coverPos = calculateCoverAngle();
             targetVelocity = calculateTargetVelocity();
@@ -96,6 +117,18 @@ public class Launcher {
         if(result != null){
             distance = getDistanceInches(result.getTy());
         }
+    }
+
+    private void calculatePinPointDistance(Pose2d currentPose){
+        // Use currentPose instead of drive_roadrunner.localizer.getPose()
+        pinPointDistance = Math.sqrt(
+                Math.pow(BLUE_GOALPose.position.y - currentPose.position.y, 2) +
+                        Math.pow(BLUE_GOALPose.position.x - currentPose.position.x, 2)
+        );
+    }
+
+    public double getPinPointDistance(){
+        return pinPointDistance;
     }
 
     // CALCULATE TARGET VELOCITY

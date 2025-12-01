@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Subsystems.Commands;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
@@ -11,6 +12,7 @@ public class LaunchArtifactCommand {
     private final Spindexer spindexer;
     private final Popper popper;
     private final Launcher launcher;
+    private final MecanumDrive drive;
 
     private int[] launchAngleSequence = new int[3];
     private int target;
@@ -38,10 +40,11 @@ public class LaunchArtifactCommand {
     private double targetVelocity;
     private double targetAngle;
 
-    public LaunchArtifactCommand(Spindexer spindexer, Popper popper, Launcher launcher) {
+    public LaunchArtifactCommand(Spindexer spindexer, Popper popper, Launcher launcher, MecanumDrive drive_roadrunner) {
         this.spindexer = spindexer;
         this.popper = popper;
         this.launcher = launcher;
+        this.drive = drive_roadrunner;
     }
 
     public void start() {
@@ -52,11 +55,12 @@ public class LaunchArtifactCommand {
 
         popper.spinPopper();
 
-        double[] targetVelocityAngle = launcher.getVelocityAndAngle();
+        double[] targetVelocityAngle = launcher.getVelocityAndAngle(drive.localizer.getPose());
         targetVelocity = targetVelocityAngle[0]; targetAngle = targetVelocityAngle[1];
 
         launcher.setVelocity(targetVelocity);
         launcher.setCoverAngle(targetAngle);
+
     }
 
     public void startFar() {

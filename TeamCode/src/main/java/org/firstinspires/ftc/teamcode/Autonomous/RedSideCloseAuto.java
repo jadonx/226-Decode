@@ -84,7 +84,7 @@ public class RedSideCloseAuto extends LinearOpMode {
         popper = new Popper(hardwareMap);
         launcher = new Launcher(hardwareMap);
 
-        launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher);
+
 
         /*
         TRAJECTORIES
@@ -93,6 +93,8 @@ public class RedSideCloseAuto extends LinearOpMode {
         Pose2d startPose = new Pose2d(-48, 48, Math.toRadians(128));
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, startPose);
+
+        launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher, drive);
 
         // Trajectory Variables
         TrajectoryActionBuilder firstLaunch = drive.actionBuilder(startPose)
