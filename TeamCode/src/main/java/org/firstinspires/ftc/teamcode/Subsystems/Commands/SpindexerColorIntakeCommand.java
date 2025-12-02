@@ -35,7 +35,19 @@ public class SpindexerColorIntakeCommand {
         colorSensorTimer = new ElapsedTime();
     }
 
-    public void update(Telemetry telemetry) {
+    public void update() {
+        if (colorSensorTimer.milliseconds() > colorSensorUpdateTime) {
+            currentHSV = spindexer.getHSVRev();
+            currentHue = currentHSV[0];
+
+            colorSensorTimer.reset();
+        }
+
+        currentAngle = spindexer.getAngle();
+    }
+
+    /*
+    public void update(TelemetryPacket packet) {
         if (colorSensorTimer.milliseconds() > colorSensorUpdateTime) {
             currentHSV = spindexer.getHSVRev();
             currentHue = currentHSV[0];
@@ -60,15 +72,15 @@ public class SpindexerColorIntakeCommand {
         // GOING TO EMPTY HOLDERS
         if (holderStatuses[0] == HolderStatus.NONE) {
             targetAngle = intakePositions[0][0];
-            telemetry.addData("GOING TO HOLDER 0", null);
+            packet.put("GOING TO HOLDER 0", null);
         }
         else if (holderStatuses[1] == HolderStatus.NONE) {
             targetAngle = intakePositions[1][0];
-            telemetry.addData("GOING TO HOLDER 1", null);
+            packet.put("GOING TO HOLDER 1", null);
         }
         else if (holderStatuses[2] == HolderStatus.NONE) {
             targetAngle = intakePositions[2][0];
-            telemetry.addData("GOING TO HOLDER 2", null);
+            packet.put("GOING TO HOLDER 2", null);
         }
         else {
             targetAngle = 49;
@@ -76,14 +88,13 @@ public class SpindexerColorIntakeCommand {
 
         spindexer.goToAngleSlow(targetAngle);
 
-        telemetry.addData("hue ", currentHue);
-        telemetry.addData("alpha ", alpha);
-        telemetry.addData("holder 0 ", holderStatuses[0]);
-        telemetry.addData("holder 1 ", holderStatuses[1]);
-        telemetry.addData("holder 2 ", holderStatuses[2]);
-
-
+        packet.put("hue ", currentHue);
+        packet.put("alpha ", alpha);
+        packet.put("holder 0 ", holderStatuses[0]);
+        packet.put("holder 1 ", holderStatuses[1]);
+        packet.put("holder 2 ", holderStatuses[2]);
     }
+     */
 
     public void resetHolderStatuses() {
         holderStatuses[0] = HolderStatus.NONE;

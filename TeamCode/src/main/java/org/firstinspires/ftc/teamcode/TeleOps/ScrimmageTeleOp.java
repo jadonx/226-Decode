@@ -106,7 +106,8 @@ public class ScrimmageTeleOp extends OpMode {
 
         // If launch sequence not engaged, set spindexer to intake mode
         if (launchArtifactCommand == null) {
-            spindexerColorSensorIntakeCommand.update(telemetry);
+            spindexerColorSensorIntakeCommand.update();
+            // spindexerColorSensorIntakeCommand.update(packet);
         }
 
         // SPINDEXER LAUNCH LOGIC
@@ -122,11 +123,6 @@ public class ScrimmageTeleOp extends OpMode {
 
         if (launchArtifactCommand != null && !launchArtifactCommand.isFinished()) {
             launchArtifactCommand.update(packet);
-        }
-
-        if (gamepad1.b) {
-            launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher, drive_roadrunner);
-            launchArtifactCommand.startFar();
         }
 
         if (launchArtifactCommand != null && launchArtifactCommand.isFinished()) {
@@ -171,8 +167,8 @@ public class ScrimmageTeleOp extends OpMode {
         packet.put("1 Turret Angle: ", turret.getTurretAngle());
         packet.put("2 Desired Angle: ", ta);
 
-//        packet.put("Bot Position X: ", drive_roadrunner.localizer.getPose().position.x);
-//        packet.put("Bot Position Y: ", drive_roadrunner.localizer.getPose().position.y);
+        // packet.put("Bot Position X: ", drive_roadrunner.localizer.getPose().position.x);
+        // packet.put("Bot Position Y: ", drive_roadrunner.localizer.getPose().position.y);
         packet.put("3 Bot Position Heading log: ", Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log()));
         packet.put("4 Offset: ", turret.getTurretZeroOffsetField());
         packet.put("5 Robot Angle at init", turret.getRobotHeadingDeg());
