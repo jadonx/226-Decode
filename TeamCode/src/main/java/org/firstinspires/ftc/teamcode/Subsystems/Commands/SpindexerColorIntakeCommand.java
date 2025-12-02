@@ -27,15 +27,18 @@ public class SpindexerColorIntakeCommand {
     private HolderStatus[] holderStatuses = {HolderStatus.NONE, HolderStatus.NONE, HolderStatus.NONE};
     private double[][] intakePositions = {{231, 222, 235}, {107, 93, 115}, {1, 356, 14}};
 
+    private int currentHolderPos;
+
     public SpindexerColorIntakeCommand(Spindexer spindexer) {
         this.spindexer = spindexer;
     }
 
     public void start() {
         colorSensorTimer = new ElapsedTime();
+        currentHolderPos = 0;
     }
 
-    public void update() {
+    public void update(Telemetry telemetry) {
         if (colorSensorTimer.milliseconds() > colorSensorUpdateTime) {
             currentHSV = spindexer.getHSVRev();
             currentHue = currentHSV[0];
@@ -44,6 +47,16 @@ public class SpindexerColorIntakeCommand {
         }
 
         currentAngle = spindexer.getAngle();
+        spindexer.goToAngle(intakePositions[currentHolderPos][0]);
+
+        if (isWithinAngleRange(currentAngle, currentHolderPos) && hasBall(currentHue)) {
+            currentHolderPos = (currentHolderPos + 1) % 3;
+        }
+
+        telemetry.addData("hue ", currentHue);
+        telemetry.addData("currentAngle ", currentAngle);
+        telemetry.addData("target intake position ", intakePositions[currentHolderPos][0]);
+        telemetry.addData("currentHolderPos ", currentHolderPos);
     }
 
     /*
@@ -111,6 +124,19 @@ public class SpindexerColorIntakeCommand {
         }
         else {
             return HolderStatus.NONE;
+        }
+    }
+
+    private boolean hasBall(double hue) {
+        return (hue > 130 && hue < 190) || (hue > 210 && hue < 270);
+    }
+
+    private boolean isWithinAngleRange(double current, int holderPos) {
+        if (holderPos == 2) {
+            return current > intakePositions[holderPos][1] || current < intakePositions[holderPos][2];
+        }
+        else {
+            return current > intakePositions[holderPos][1] && current < intakePositions[holderPos][2];
         }
     }
 }

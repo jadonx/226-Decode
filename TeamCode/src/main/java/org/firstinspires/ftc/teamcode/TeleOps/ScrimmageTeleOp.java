@@ -65,6 +65,9 @@ public class ScrimmageTeleOp extends OpMode {
         launcher = new Launcher(hardwareMap);
         turret = new Turret(hardwareMap);
 
+        spindexerColorSensorIntakeCommand = new SpindexerColorIntakeCommand(spindexer);
+        spindexerColorSensorIntakeCommand.start();
+
         packet = new TelemetryPacket();
         dashboard = FtcDashboard.getInstance();
 
@@ -106,8 +109,7 @@ public class ScrimmageTeleOp extends OpMode {
 
         // If launch sequence not engaged, set spindexer to intake mode
         if (launchArtifactCommand == null) {
-            spindexerColorSensorIntakeCommand.update();
-            // spindexerColorSensorIntakeCommand.update(packet);
+            spindexerColorSensorIntakeCommand.update(telemetry);
         }
 
         // SPINDEXER LAUNCH LOGIC
