@@ -127,7 +127,8 @@ public class Launcher {
         );
     }
 
-    public double getPinPointDistance(){
+    public double getPinPointDistance(Pose2d currentPose){
+        calculatePinPointDistance(currentPose);
         return pinPointDistance;
     }
 

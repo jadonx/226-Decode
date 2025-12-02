@@ -181,7 +181,7 @@ public class ScrimmageTeleOp extends OpMode {
         telemetry.addData("4 Offset: ", turret.getTurretZeroOffsetField());
         telemetry.addData("5 Robot Angle at init", turret.getRobotHeadingDeg());
         telemetry.addData("Limelight Distance", limelight.getDistance());
-        telemetry.addData("Pinpoint Distance", launcher.getPinPointDistance());
+        telemetry.addData("Pinpoint Distance", launcher.getPinPointDistance(drive_roadrunner.localizer.getPose())- 9);
 
         telemetry.update();
 
