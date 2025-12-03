@@ -81,7 +81,7 @@ public class LaunchArtifactCommand {
         spindexer.goToAngle(target);
         launcher.setVelocity(targetVelocity);
         launcher.setCoverAngle(targetAngle);
-
+//a
         switch (currentState) {
             // WAIT UNTIL SPINDEXER IS AT POSITION
             case MOVE_TO_FIRST_LAUNCH:
