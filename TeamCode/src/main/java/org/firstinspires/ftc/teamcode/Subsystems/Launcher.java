@@ -60,7 +60,7 @@ public class Launcher {
         double coverPos;
         calculateLimelightDistance();
         calculatePinPointDistance(currentPose);
-        if(distance < 29.71 && distance > 29.70 ){
+        if(distance < 34.4 && distance > 34.3 ){
             distance = pinPointDistance - 9;
         }
         if (distance > 76){
