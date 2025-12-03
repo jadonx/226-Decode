@@ -17,15 +17,19 @@ public class SpindexerColorIntakeCommand {
 
     private double currentHue;
     private float[] currentHSV;
+
     private int alpha;
 
     private double currentAngle;
-
     private double targetAngle;
+
+    private ElapsedTime holdingBallTimer;
 
     public enum HolderStatus { NONE, GREEN, PURPLE }
     private HolderStatus[] holderStatuses = {HolderStatus.NONE, HolderStatus.NONE, HolderStatus.NONE};
     private double[][] intakePositions = {{231, 222, 235}, {107, 93, 115}, {1, 356, 14}};
+
+    private int currentHolderPos;
 
     public SpindexerColorIntakeCommand(Spindexer spindexer) {
         this.spindexer = spindexer;
@@ -33,9 +37,37 @@ public class SpindexerColorIntakeCommand {
 
     public void start() {
         colorSensorTimer = new ElapsedTime();
+        holdingBallTimer = new ElapsedTime();
+        currentHolderPos = 0;
     }
 
     public void update(Telemetry telemetry) {
+        if (colorSensorTimer.milliseconds() > colorSensorUpdateTime) {
+            currentHSV = spindexer.getHSVRev();
+            currentHue = currentHSV[0];
+
+            colorSensorTimer.reset();
+        }
+
+        currentAngle = spindexer.getAngle();
+        spindexer.goToAngle(intakePositions[currentHolderPos][0]);
+
+        if (isWithinAngleRange(currentAngle, currentHolderPos) && holdingBallTimer.milliseconds() > 1000) {
+            currentHolderPos = (currentHolderPos + 1) % 3;
+        }
+
+        if (!hasBall(currentHue)) {
+            holdingBallTimer.reset();
+        }
+
+        telemetry.addData("hue ", currentHue);
+        telemetry.addData("currentAngle ", currentAngle);
+        telemetry.addData("target intake position ", intakePositions[currentHolderPos][0]);
+        telemetry.addData("currentHolderPos ", currentHolderPos);
+    }
+
+    /*
+    public void update(TelemetryPacket packet) {
         if (colorSensorTimer.milliseconds() > colorSensorUpdateTime) {
             currentHSV = spindexer.getHSVRev();
             currentHue = currentHSV[0];
@@ -60,15 +92,15 @@ public class SpindexerColorIntakeCommand {
         // GOING TO EMPTY HOLDERS
         if (holderStatuses[0] == HolderStatus.NONE) {
             targetAngle = intakePositions[0][0];
-            telemetry.addData("GOING TO HOLDER 0", null);
+            packet.put("GOING TO HOLDER 0", null);
         }
         else if (holderStatuses[1] == HolderStatus.NONE) {
             targetAngle = intakePositions[1][0];
-            telemetry.addData("GOING TO HOLDER 1", null);
+            packet.put("GOING TO HOLDER 1", null);
         }
         else if (holderStatuses[2] == HolderStatus.NONE) {
             targetAngle = intakePositions[2][0];
-            telemetry.addData("GOING TO HOLDER 2", null);
+            packet.put("GOING TO HOLDER 2", null);
         }
         else {
             targetAngle = 49;
@@ -76,14 +108,13 @@ public class SpindexerColorIntakeCommand {
 
         spindexer.goToAngleSlow(targetAngle);
 
-        telemetry.addData("hue ", currentHue);
-        telemetry.addData("alpha ", alpha);
-        telemetry.addData("holder 0 ", holderStatuses[0]);
-        telemetry.addData("holder 1 ", holderStatuses[1]);
-        telemetry.addData("holder 2 ", holderStatuses[2]);
-
-
+        packet.put("hue ", currentHue);
+        packet.put("alpha ", alpha);
+        packet.put("holder 0 ", holderStatuses[0]);
+        packet.put("holder 1 ", holderStatuses[1]);
+        packet.put("holder 2 ", holderStatuses[2]);
     }
+     */
 
     public void resetHolderStatuses() {
         holderStatuses[0] = HolderStatus.NONE;
@@ -100,6 +131,19 @@ public class SpindexerColorIntakeCommand {
         }
         else {
             return HolderStatus.NONE;
+        }
+    }
+
+    private boolean hasBall(double hue) {
+        return (hue > 130 && hue < 190) || (hue > 210 && hue < 270);
+    }
+
+    private boolean isWithinAngleRange(double current, int holderPos) {
+        if (holderPos == 2) {
+            return current > intakePositions[holderPos][1] || current < intakePositions[holderPos][2];
+        }
+        else {
+            return current > intakePositions[holderPos][1] && current < intakePositions[holderPos][2];
         }
     }
 }

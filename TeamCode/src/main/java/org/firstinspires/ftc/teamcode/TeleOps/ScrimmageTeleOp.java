@@ -39,6 +39,9 @@ public class ScrimmageTeleOp extends OpMode {
 
     Intake intake;
     Spindexer spindexer;
+    public static double kP, kS;
+    public static int slowingThreshold, stoppingThreshold;
+    public static double slowingMultiplier;
     Popper popper;
     Launcher launcher;
     Turret turret;
@@ -61,9 +64,14 @@ public class ScrimmageTeleOp extends OpMode {
 
         intake = new Intake(hardwareMap);
         spindexer = new Spindexer(hardwareMap);
+        kP = 0.005; kS = 0.12;
+        slowingThreshold = 15; slowingMultiplier = 0.75; stoppingThreshold = 5;
         popper = new Popper(hardwareMap);
         launcher = new Launcher(hardwareMap);
         turret = new Turret(hardwareMap);
+
+        spindexerColorSensorIntakeCommand = new SpindexerColorIntakeCommand(spindexer);
+        spindexerColorSensorIntakeCommand.start();
 
         packet = new TelemetryPacket();
         dashboard = FtcDashboard.getInstance();
@@ -115,18 +123,8 @@ public class ScrimmageTeleOp extends OpMode {
             launchArtifactCommand.start();
         }
 
-        if (gamepad1.b) {
-            launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher, drive_roadrunner);
-            launchArtifactCommand.startFar();
-        }
-
         if (launchArtifactCommand != null && !launchArtifactCommand.isFinished()) {
             launchArtifactCommand.update(packet);
-        }
-
-        if (gamepad1.b) {
-            launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher, drive_roadrunner);
-            launchArtifactCommand.startFar();
         }
 
         if (launchArtifactCommand != null && launchArtifactCommand.isFinished()) {
@@ -137,6 +135,8 @@ public class ScrimmageTeleOp extends OpMode {
             // Reset holder statuses
             spindexerColorSensorIntakeCommand.resetHolderStatuses();
         }
+
+        spindexer.updatePID(kP, kS, slowingThreshold, slowingMultiplier, stoppingThreshold);
 
         // TURRET LOGIC
 
@@ -171,8 +171,8 @@ public class ScrimmageTeleOp extends OpMode {
         packet.put("1 Turret Angle: ", turret.getTurretAngle());
         packet.put("2 Desired Angle: ", ta);
 
-//        packet.put("Bot Position X: ", drive_roadrunner.localizer.getPose().position.x);
-//        packet.put("Bot Position Y: ", drive_roadrunner.localizer.getPose().position.y);
+        // packet.put("Bot Position X: ", drive_roadrunner.localizer.getPose().position.x);
+        // packet.put("Bot Position Y: ", drive_roadrunner.localizer.getPose().position.y);
         packet.put("3 Bot Position Heading log: ", Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log()));
         packet.put("4 Offset: ", turret.getTurretZeroOffsetField());
         packet.put("5 Robot Angle at init", turret.getRobotHeadingDeg());
