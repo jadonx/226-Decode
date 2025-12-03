@@ -19,12 +19,17 @@ public class Spindexer {
     private AS5600Encoder spindexerEncoder;
 
     // PID VARIABLES
-    // 0.015, 0, -0.0005
     private double kP = 0.005, kD = 0, kS = 0.12;
+    private int slowingThreshold = 15;
+    private double slowingMultiplier = 0.75;
+    private int stoppingThreshold = 5;
+
+    /*
     private double alpha = 0.1;
     private double filteredDerivative = 0;
     private double lastError = 0;
     private ElapsedTime pidTimer;
+     */
 
     private int[] launchHolderAngles = {49, 181, 283};
 
@@ -38,7 +43,7 @@ public class Spindexer {
         spindexerServo = hardwareMap.get(CRServo.class, Constants.HMServospinDexer);
         spindexerEncoder = hardwareMap.get(AS5600Encoder.class, Constants.HMSpindexerEncoder);
 
-        pidTimer = new ElapsedTime();
+        // pidTimer = new ElapsedTime();
 
         colorSensor = hardwareMap.get(NormalizedColorSensor.class, Constants.HMFrontColorSensor);
         colorSensorV3 = hardwareMap.get(RevColorSensorV3.class, Constants.HMFrontColorSensor);
@@ -70,22 +75,28 @@ public class Spindexer {
     public void goToAngle(double target) {
         double error = getAngleError(target, getAngle());
 
+        /* DERIVATIVE (NOT USED)
         double derivative = (error - lastError) / pidTimer.seconds();
 
-        // Derivative filtering to reduce oscillations
+        Derivative filtering to reduce oscillations
         filteredDerivative = alpha * derivative + (1-alpha) * filteredDerivative;
+
+        double output = (kP * error) + (-kD * filteredDerivative);
+         */
+
+        double output = kP * error;
 
         // Feedforward to overcome static friction
         double ff = kS * Math.signum(error);
 
-        double output = (kP * error) + (-kD * filteredDerivative) + ff;
-
         if (Math.abs(error) < 15) {
-            output *= 0.4;
+            output = output * 0.75 + ff;
         }
-
-        if (Math.abs(error) < 2) {
+        else if (Math.abs(error) < 4) {
             output = 0;
+        }
+        else {
+            output = output + ff;
         }
 
         // FEEDFORWARD + RANGING/CLIPPING
@@ -93,38 +104,8 @@ public class Spindexer {
 
         spindexerServo.setPower(output);
 
-        lastError = error;
-        pidTimer.reset();
-    }
-
-    public void goToAngleSlow(double target) {
-        double error = getAngleError(target, getAngle());
-
-        double derivative = (error - lastError) / pidTimer.seconds();
-
-        // Derivative filtering to reduce oscillations
-        filteredDerivative = alpha * derivative + (1-alpha) * filteredDerivative;
-
-        // Feedforward to overcome static friction
-        double ff = kS * Math.signum(error);
-
-        double output = (kP * error) + (-kD * filteredDerivative);
-
-        if (Math.abs(error) < 15) {
-            output = output * 0.75 + ff;
-        }
-
-        if (Math.abs(error) < 4) {
-            output = 0;
-        }
-
-        // FEEDFORWARD + RANGING/CLIPPING
-        output  = Range.clip(output, -0.55, 0.55);
-
-        spindexerServo.setPower(output * 0.75);
-
-        lastError = error;
-        pidTimer.reset();
+        // lastError = error;
+        // pidTimer.reset();
     }
 
     private double getAngleError(double targetAngle, double currentAngle) {
@@ -141,10 +122,12 @@ public class Spindexer {
         return spindexerEncoder.getAngleDegrees();
     }
 
-    public void updatePID(double kP, double kD, double kS) {
+    public void updatePID(double kP, double kS, int slowingThreshold, double slowingMultiplier, int stoppingThreshold) {
         this.kP = kP;
-        this.kD = kD;
         this.kS = kS;
+        this.slowingThreshold = slowingThreshold;
+        this.slowingMultiplier = slowingMultiplier;
+        this.stoppingThreshold = stoppingThreshold;
     }
 
     // Returns the sequence of shooting angles starting from the closest (for shooting)

@@ -17,11 +17,13 @@ public class SpindexerColorIntakeCommand {
 
     private double currentHue;
     private float[] currentHSV;
+
     private int alpha;
 
     private double currentAngle;
-
     private double targetAngle;
+
+    private ElapsedTime holdingBallTimer;
 
     public enum HolderStatus { NONE, GREEN, PURPLE }
     private HolderStatus[] holderStatuses = {HolderStatus.NONE, HolderStatus.NONE, HolderStatus.NONE};
@@ -35,6 +37,7 @@ public class SpindexerColorIntakeCommand {
 
     public void start() {
         colorSensorTimer = new ElapsedTime();
+        holdingBallTimer = new ElapsedTime();
         currentHolderPos = 0;
     }
 
@@ -47,10 +50,14 @@ public class SpindexerColorIntakeCommand {
         }
 
         currentAngle = spindexer.getAngle();
-        spindexer.goToAngleSlow(intakePositions[currentHolderPos][0]);
+        spindexer.goToAngle(intakePositions[currentHolderPos][0]);
 
-        if (isWithinAngleRange(currentAngle, currentHolderPos) && hasBall(currentHue)) {
+        if (isWithinAngleRange(currentAngle, currentHolderPos) && holdingBallTimer.milliseconds() > 1000) {
             currentHolderPos = (currentHolderPos + 1) % 3;
+        }
+
+        if (!hasBall(currentHue)) {
+            holdingBallTimer.reset();
         }
 
         telemetry.addData("hue ", currentHue);

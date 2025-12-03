@@ -39,6 +39,9 @@ public class ScrimmageTeleOp extends OpMode {
 
     Intake intake;
     Spindexer spindexer;
+    public static double kP, kS;
+    public static int slowingThreshold, stoppingThreshold;
+    public static double slowingMultiplier;
     Popper popper;
     Launcher launcher;
     Turret turret;
@@ -61,6 +64,8 @@ public class ScrimmageTeleOp extends OpMode {
 
         intake = new Intake(hardwareMap);
         spindexer = new Spindexer(hardwareMap);
+        kP = 0.005; kS = 0.12;
+        slowingThreshold = 15; slowingMultiplier = 0.75; stoppingThreshold = 5;
         popper = new Popper(hardwareMap);
         launcher = new Launcher(hardwareMap);
         turret = new Turret(hardwareMap);
@@ -118,11 +123,6 @@ public class ScrimmageTeleOp extends OpMode {
             launchArtifactCommand.start();
         }
 
-        if (gamepad1.b) {
-            launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher, drive_roadrunner);
-            launchArtifactCommand.startFar();
-        }
-
         if (launchArtifactCommand != null && !launchArtifactCommand.isFinished()) {
             launchArtifactCommand.update(packet);
         }
@@ -135,6 +135,8 @@ public class ScrimmageTeleOp extends OpMode {
             // Reset holder statuses
             spindexerColorSensorIntakeCommand.resetHolderStatuses();
         }
+
+        spindexer.updatePID(kP, kS, slowingThreshold, slowingMultiplier, stoppingThreshold);
 
         // TURRET LOGIC
 
