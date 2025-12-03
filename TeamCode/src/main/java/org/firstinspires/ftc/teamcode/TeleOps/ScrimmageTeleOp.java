@@ -68,6 +68,9 @@ public class ScrimmageTeleOp extends OpMode {
         packet = new TelemetryPacket();
         dashboard = FtcDashboard.getInstance();
 
+        spindexerColorSensorIntakeCommand = new SpindexerColorIntakeCommand(spindexer);
+        spindexerColorSensorIntakeCommand.start();
+
         drive.resetIMU();
     }
 
@@ -156,10 +159,7 @@ public class ScrimmageTeleOp extends OpMode {
             turret.trackAprilTag(limelight.getTX());
             packet.put("Turret Mode: ", "LimeLight");
         } else {
-            packet.put("Turret Mode: ", "PinPoint");
-            if (turret.getTurretZeroOffsetField() != -10000) {
-                turret.trackTargetAngle(ta);
-            }
+            turret.setPower(0);
         }
 
         // Calculate Theoretical Angle to Goal
@@ -182,6 +182,7 @@ public class ScrimmageTeleOp extends OpMode {
         telemetry.addData("3 Bot Position Heading log: ", Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log()));
         telemetry.addData("4 Offset: ", turret.getTurretZeroOffsetField());
         telemetry.addData("5 Robot Angle at init", turret.getRobotHeadingDeg());
+        telemetry.addData("Launcher Actual Speed", launcher.getVelocity());
         telemetry.addData("Limelight Distance", limelight.getDistance());
         telemetry.addData("Pinpoint Distance", launcher.getPinPointDistance(drive_roadrunner.localizer.getPose())- 9);
 

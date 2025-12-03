@@ -66,7 +66,7 @@ public class Launcher {
         if (distance > 76){
             coverPos = 0.05;
             if (distance > 100){
-                targetVelocity = 2800;
+                targetVelocity = 2300;
             }
             else {
                 targetVelocity = calculateTargetVelocity();
@@ -130,6 +130,10 @@ public class Launcher {
     public double getPinPointDistance(Pose2d currentPose){
         calculatePinPointDistance(currentPose);
         return pinPointDistance;
+    }
+
+    public double getVelocity(){
+        return launcher1.getVelocity();
     }
 
     // CALCULATE TARGET VELOCITY
