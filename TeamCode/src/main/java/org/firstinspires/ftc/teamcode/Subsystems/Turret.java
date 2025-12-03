@@ -76,7 +76,7 @@ public class Turret {
         setPower(correction);
     }
 
-    private void setPower(double power) {
+    public void setPower(double power) {
         turretLeft.setPower(power);
         turretRight.setPower(power);
     }
