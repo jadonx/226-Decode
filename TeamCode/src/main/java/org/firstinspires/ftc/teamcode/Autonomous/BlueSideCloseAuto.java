@@ -84,7 +84,7 @@ public class BlueSideCloseAuto extends LinearOpMode {
             }
 
             intake.runIntake(1);
-            spindexerColorIntakeCommand.update(telemetryPacket);
+            spindexerColorIntakeCommand.update(telemetry);
 
             return true;
         }

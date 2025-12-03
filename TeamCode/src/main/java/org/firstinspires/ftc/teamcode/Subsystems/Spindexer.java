@@ -108,13 +108,13 @@ public class Spindexer {
         // Feedforward to overcome static friction
         double ff = kS * Math.signum(error);
 
-        double output = (kP * error) + (-kD * filteredDerivative) + ff;
+        double output = (kP * error) + (-kD * filteredDerivative);
 
         if (Math.abs(error) < 15) {
-            output *= 0.4;
+            output = output * 0.75 + ff;
         }
 
-        if (Math.abs(error) < 2) {
+        if (Math.abs(error) < 4) {
             output = 0;
         }
 

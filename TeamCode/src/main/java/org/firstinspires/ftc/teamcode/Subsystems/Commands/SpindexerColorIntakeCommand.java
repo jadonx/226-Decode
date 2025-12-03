@@ -47,7 +47,7 @@ public class SpindexerColorIntakeCommand {
         }
 
         currentAngle = spindexer.getAngle();
-        spindexer.goToAngle(intakePositions[currentHolderPos][0]);
+        spindexer.goToAngleSlow(intakePositions[currentHolderPos][0]);
 
         if (isWithinAngleRange(currentAngle, currentHolderPos) && hasBall(currentHue)) {
             currentHolderPos = (currentHolderPos + 1) % 3;
