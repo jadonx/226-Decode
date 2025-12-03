@@ -20,9 +20,9 @@ public class Spindexer {
 
     // PID VARIABLES
     private double kP = 0.005, kD = 0, kS = 0.12;
-    private int slowingThreshold = 15;
-    private double slowingMultiplier = 0.75;
-    private int stoppingThreshold = 5;
+    private int slowingThreshold = 40;
+    private double slowingMultiplier = 0.45;
+    private int stoppingThreshold = 3;
 
     /*
     private double alpha = 0.1;
@@ -89,11 +89,11 @@ public class Spindexer {
         // Feedforward to overcome static friction
         double ff = kS * Math.signum(error);
 
-        if (Math.abs(error) < 15) {
-            output = output * 0.75 + ff;
-        }
-        else if (Math.abs(error) < 4) {
+        if (Math.abs(error) < stoppingThreshold) {
             output = 0;
+        }
+        else if (Math.abs(error) < slowingThreshold) {
+            output = (output + ff) * slowingMultiplier;
         }
         else {
             output = output + ff;

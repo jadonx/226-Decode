@@ -88,11 +88,33 @@ public class IntakeAutonomous extends LinearOpMode {
             intake.runIntake(1);
             spindexerColorIntakeCommand.update(telemetry);
 
+            telemetry.update();
+
             return true;
         }
     }
     public Action intakeArtifacts(SpindexerColorIntakeCommand spindexerColorIntakeCommand, Intake intake) {
         return new IntakeArtifacts(spindexerColorIntakeCommand, intake);
+    }
+
+    public class StopIntakeSpindexer implements Action {
+        private final Spindexer spindexer;
+        private final Intake intake;
+
+        public StopIntakeSpindexer(Spindexer spindexer, Intake intake) {
+            this.spindexer = spindexer;
+            this.intake = intake;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            spindexer.stopSpindexer();
+            intake.stopIntake();
+            return false;
+        }
+    }
+    public Action stopIntakeSpindexer(Spindexer spindexer, Intake intake) {
+        return new StopIntakeSpindexer(spindexer, intake);
     }
 
     @Override
@@ -119,7 +141,7 @@ public class IntakeAutonomous extends LinearOpMode {
 
         // Trajectory Variables
         TrajectoryActionBuilder intakeBallPath = drive.actionBuilder(initialPose)
-                .lineToX(20, new TranslationalVelConstraint(10.0));
+                .lineToX(40, new TranslationalVelConstraint(10.0));
 
         TrajectoryActionBuilder moveAfterIntake = intakeBallPath.endTrajectory().fresh()
                 .lineToX(-20, new TranslationalVelConstraint(50.0));
@@ -128,23 +150,24 @@ public class IntakeAutonomous extends LinearOpMode {
 
         if (isStopRequested()) return;
 
+        /*
         Actions.runBlocking(
                 new SequentialAction(
                         intakeBallPath.build(),
                         moveAfterIntake.build()
                 )
         );
+        */
 
-        /*
         Actions.runBlocking(
                 new SequentialAction(
                         new RaceAction(
                                 intakeBallPath.build(),
                                 intakeArtifacts(spindexerColorIntakeCommand, intake)
                         ),
+                        stopIntakeSpindexer(spindexer, intake),
                         moveAfterIntake.build()
                 )
         );
-         */
     }
 }

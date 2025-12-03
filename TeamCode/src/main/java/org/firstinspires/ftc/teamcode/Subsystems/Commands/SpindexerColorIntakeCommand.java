@@ -54,6 +54,7 @@ public class SpindexerColorIntakeCommand {
 
         if (isWithinAngleRange(currentAngle, currentHolderPos) && holdingBallTimer.milliseconds() > 1000) {
             currentHolderPos = (currentHolderPos + 1) % 3;
+            holdingBallTimer.reset();
         }
 
         if (!hasBall(currentHue)) {
@@ -64,6 +65,7 @@ public class SpindexerColorIntakeCommand {
         telemetry.addData("currentAngle ", currentAngle);
         telemetry.addData("target intake position ", intakePositions[currentHolderPos][0]);
         telemetry.addData("currentHolderPos ", currentHolderPos);
+        telemetry.addData("timer ", holdingBallTimer.milliseconds());
     }
 
     /*
