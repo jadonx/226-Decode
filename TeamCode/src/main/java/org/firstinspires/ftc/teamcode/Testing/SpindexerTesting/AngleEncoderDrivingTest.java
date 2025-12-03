@@ -38,7 +38,7 @@ public class AngleEncoderDrivingTest extends OpMode {
             drive.resetIMU();
         }
 
-        spindexer.runSpindexer();
+        // spindexer.runSpindexer();
 
         packet.put("imu ", drive.getYaw());
         packet.put("spindexer angle ", spindexer.getAngle());

@@ -34,8 +34,8 @@ public class LaunchArtifactCommand {
     private State currentState = State.MOVE_TO_FIRST_LAUNCH;
 
     private double stateStartTime = 0;
-    private final double popperWaitTime = 300; // Wait time for popper to move in and out
-    private final double spindexerWaitTime = 800; // Wait time for spindexer to get to target position (steady-state)
+    private final double popperWaitTime = 350; // Wait time for popper to move in and out
+    private final double spindexerWaitTime = 500; // Wait time for spindexer to get to target position (steady-state)
     private ElapsedTime timer;
 
     private double targetVelocity;
