@@ -23,7 +23,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.Subsystems.Encoder.AS5600Encoder;
+import org.firstinspires.ftc.teamcode.Subsystems.AS5600Encoder;
 
 @TeleOp(name="Drive_Tester", group="Tester")
 public class DrivingTesting extends OpMode {

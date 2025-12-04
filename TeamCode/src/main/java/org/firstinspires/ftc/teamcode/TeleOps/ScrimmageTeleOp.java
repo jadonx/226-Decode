@@ -39,9 +39,9 @@ public class ScrimmageTeleOp extends OpMode {
 
     Intake intake;
     Spindexer spindexer;
-//    public static double kP, kS;
-//    public static int slowingThreshold, stoppingThreshold;
-//    public static double slowingMultiplier;
+    public static double kP, kS;
+    public static int slowingThreshold, stoppingThreshold;
+    public static double slowingMultiplier;
     Popper popper;
     Launcher launcher;
     Turret turret;
@@ -64,8 +64,8 @@ public class ScrimmageTeleOp extends OpMode {
 
         intake = new Intake(hardwareMap);
         spindexer = new Spindexer(hardwareMap);
-//        kP = 0.005; kS = 0.12;
-//        slowingThreshold = 15; slowingMultiplier = 0.75; stoppingThreshold = 5;
+        kP = 0.004; kS = 0.12;
+        slowingThreshold = 40; slowingMultiplier = 0.45; stoppingThreshold = 3;
         popper = new Popper(hardwareMap);
         launcher = new Launcher(hardwareMap);
         turret = new Turret(hardwareMap);
@@ -139,7 +139,7 @@ public class ScrimmageTeleOp extends OpMode {
             spindexerColorSensorIntakeCommand.resetHolderStatuses();
         }
 
-        // spindexer.updatePID(kP, kS, slowingThreshold, slowingMultiplier, stoppingThreshold);
+        spindexer.updatePID(kP, kS, slowingThreshold, slowingMultiplier, stoppingThreshold);
 
         // TURRET LOGIC
 

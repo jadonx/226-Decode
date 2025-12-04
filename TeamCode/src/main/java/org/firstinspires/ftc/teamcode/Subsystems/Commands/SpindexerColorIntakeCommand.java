@@ -27,7 +27,7 @@ public class SpindexerColorIntakeCommand {
 
     public enum HolderStatus { NONE, GREEN, PURPLE }
     private HolderStatus[] holderStatuses = {HolderStatus.NONE, HolderStatus.NONE, HolderStatus.NONE};
-    private double[][] intakePositions = {{231, 222, 235}, {107, 93, 115}, {1, 356, 14}};
+    private double[][] intakePositions = {{76, 73, 79}, {209, 206, 212}, {343, 340, 346}};
 
     private int currentHolderPos;
 

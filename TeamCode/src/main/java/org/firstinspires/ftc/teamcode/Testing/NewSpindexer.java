@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.Subsystems.Encoder.AS5600Encoder;
+import org.firstinspires.ftc.teamcode.Subsystems.AS5600Encoder;
 
 
 @TeleOp(name = "New Spindexer Test")

@@ -12,9 +12,7 @@ import static org.firstinspires.ftc.teamcode.Constants.HMServospinDexer;
 import static org.firstinspires.ftc.teamcode.Constants.HMSpindexerEncoder;
 
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -23,7 +21,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.Subsystems.Encoder.AS5600Encoder;
+import org.firstinspires.ftc.teamcode.Subsystems.AS5600Encoder;
 
 @Config
 @TeleOp(name = "Shooter_Tester" , group = "Tester")

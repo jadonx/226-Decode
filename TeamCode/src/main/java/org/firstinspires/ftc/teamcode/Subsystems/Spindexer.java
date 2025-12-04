@@ -11,7 +11,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.Subsystems.Encoder.AS5600Encoder;
 
 public class Spindexer {
     // HARDWARE VARIABLES
@@ -19,7 +18,7 @@ public class Spindexer {
     private AS5600Encoder spindexerEncoder;
 
     // PID VARIABLES
-    private double kP = 0.005, kD = 0, kS = 0.12;
+    private double kP = 0.004, kD = 0, kS = 0.12;
     private int slowingThreshold = 40;
     private double slowingMultiplier = 0.45;
     private int stoppingThreshold = 3;
@@ -31,7 +30,7 @@ public class Spindexer {
     private ElapsedTime pidTimer;
      */
 
-    private int[] launchHolderAngles = {49, 181, 283};
+    private int[] launchHolderAngles = {26, 160, 258};
 
     // COLOR SENSOR VARIABLES
     private NormalizedColorSensor colorSensor;
@@ -73,7 +72,7 @@ public class Spindexer {
     PID CODE
      */
     public void goToAngle(double target) {
-        double error = getAngleError(target, getAngle());
+        double error = getError(target);
 
         /* DERIVATIVE (NOT USED)
         double derivative = (error - lastError) / pidTimer.seconds();
@@ -108,18 +107,12 @@ public class Spindexer {
         // pidTimer.reset();
     }
 
-    private double getAngleError(double targetAngle, double currentAngle) {
-        double error = targetAngle - currentAngle;
-
-        // Normalize error to the range (-180, 180]
-        while (error > 180) error -= 360;
-        while (error < -180) error += 360;
-
-        return error;
+    public double getError(double target) {
+        return Math.IEEEremainder(target - spindexerEncoder.getContinuousAngle(), 360.0);
     }
 
     public double getAngle() {
-        return spindexerEncoder.getAngleDegrees();
+        return spindexerEncoder.getContinuousAngle();
     }
 
     public void updatePID(double kP, double kS, int slowingThreshold, double slowingMultiplier, int stoppingThreshold) {
@@ -154,20 +147,6 @@ public class Spindexer {
     /*
     COLOR SENSOR CODE
      */
-    public float[] getHue() {
-        NormalizedRGBA colors = colorSensor.getNormalizedColors();
-
-        // Convert RGB → HSV
-        android.graphics.Color.RGBToHSV(
-                (int) (colors.red * 255),
-                (int) (colors.green * 255),
-                (int) (colors.blue * 255),
-                hsv
-        );
-
-        return hsv;
-    }
-
     public float[] getHSVRev() {
         int r = colorSensorV3.red();
         int g = colorSensorV3.green();

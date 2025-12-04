@@ -154,8 +154,10 @@ public class LaunchArtifactCommand {
 
         packet.put("state ", currentState);
         packet.put("stateStartTime ", stateStartTime);
+        packet.put("currentAngle ", spindexer.getAngle());
         packet.put("timer ", timer.milliseconds());
         packet.put("target ", target);
+        packet.put("error ", spindexer.getError(target));
     }
 
     // FAR SHOOTING FOR SCRIMMAGE
