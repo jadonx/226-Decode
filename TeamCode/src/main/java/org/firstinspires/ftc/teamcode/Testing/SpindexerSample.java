@@ -80,7 +80,7 @@ public class SpindexerSample {
     }
 
     public double getAngle() {
-        return spindexerEncoder.getAngleDegrees();
+        return spindexerEncoder.getWrappedAngle();
     }
 
     public void updatePID(double kP, double kD) {

@@ -35,7 +35,7 @@ public class SpindexerPIDTest extends OpMode {
         // spindexer.updatePID(kP, kD, 0);
 
         packet.put("target ", targetAngle);
-        packet.put("current ", spindexer.getAngle());
+        packet.put("current ", spindexer.getWrappedAngle());
 
         dashboard.sendTelemetryPacket(packet);
     }

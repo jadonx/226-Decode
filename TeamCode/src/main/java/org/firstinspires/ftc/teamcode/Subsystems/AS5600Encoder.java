@@ -27,7 +27,7 @@ public class AS5600Encoder extends I2cDeviceSynchDevice<I2cDeviceSynch> {
         return true;
     }
 
-    public double readWrappedAngle() {
+    public double getWrappedAngle() {
         byte[] rawBytes = deviceClient.read(ANGLE_REG, 2);
 
         int raw12 = ((rawBytes[0] & 0x0F) << 8) | (rawBytes[1] & 0xFF);
@@ -35,13 +35,14 @@ public class AS5600Encoder extends I2cDeviceSynchDevice<I2cDeviceSynch> {
     }
 
     public double getContinuousAngle() {
-        double raw = readWrappedAngle();
+        double raw = getWrappedAngle();
 
         // First read: don't compute delta, just initialize
         if (firstRead) {
             lastRawAngle = raw;
             firstRead = false;
-            return continuousAngle;  // typically 0
+            continuousAngle = raw;
+            return raw;  // typically 0
         }
 
         double delta = raw - lastRawAngle;
@@ -54,6 +55,10 @@ public class AS5600Encoder extends I2cDeviceSynchDevice<I2cDeviceSynch> {
         lastRawAngle = raw;
 
         return continuousAngle;
+    }
+
+    public void rebaseContinuousAngle() {
+        continuousAngle = getWrappedAngle();
     }
 
     @Override

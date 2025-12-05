@@ -26,7 +26,7 @@ public class ContinuousAngleTest extends OpMode {
 
     @Override
     public void loop() {
-        packet.put("angle ", spindexer.getAngle());
+        packet.put("angle ", spindexer.getContinuousAngle());
         packet.put("error ", spindexer.getError(10));
         dashboard.sendTelemetryPacket(packet);
     }

@@ -27,7 +27,7 @@ public class SpindexerColorIntakeCommand {
 
     public enum HolderStatus { NONE, GREEN, PURPLE }
     private HolderStatus[] holderStatuses = {HolderStatus.NONE, HolderStatus.NONE, HolderStatus.NONE};
-    private double[][] intakePositions = {{76, 73, 79}, {209, 206, 212}, {343, 340, 346}};
+    private double[][] intakePositions = {{101, 98, 104}, {232, 229, 235}, {358, 355, 1}};
 
     private int currentHolderPos;
 
@@ -49,11 +49,12 @@ public class SpindexerColorIntakeCommand {
             colorSensorTimer.reset();
         }
 
-        currentAngle = spindexer.getAngle();
+        currentAngle = spindexer.getWrappedAngle();
         spindexer.goToAngle(intakePositions[currentHolderPos][0]);
 
         if (isWithinAngleRange(currentAngle, currentHolderPos) && holdingBallTimer.milliseconds() > 1000) {
             currentHolderPos = (currentHolderPos + 1) % 3;
+            spindexer.rebaseContinuousAngle();
             holdingBallTimer.reset();
         }
 

@@ -42,7 +42,7 @@ public class UnjammerSystem {
         // Checks whether intake is intaking and is not jammed
         if (intake.isIntaking() && !isJammed) {
             // Checks if spindexer is stuck
-            if (Math.abs(spindexer.getAngle() - lastAngle) < 2) {
+            if (Math.abs(spindexer.getWrappedAngle() - lastAngle) < 2) {
                 if (jamStartTime == -1) {
                     jamStartTime = timer.milliseconds();
                 }
@@ -70,7 +70,7 @@ public class UnjammerSystem {
         }
 
         if (!isJammed) {
-            lastAngle = spindexer.getAngle();
+            lastAngle = spindexer.getWrappedAngle();
         }
     }
 }

@@ -41,7 +41,7 @@ public class AngleEncoderDrivingTest extends OpMode {
         // spindexer.runSpindexer();
 
         packet.put("imu ", drive.getYaw());
-        packet.put("spindexer angle ", spindexer.getAngle());
+        packet.put("spindexer angle ", spindexer.getWrappedAngle());
         dashboard.sendTelemetryPacket(packet);
     }
 }

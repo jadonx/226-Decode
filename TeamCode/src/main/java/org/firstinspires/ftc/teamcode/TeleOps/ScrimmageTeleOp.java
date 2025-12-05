@@ -162,6 +162,8 @@ public class ScrimmageTeleOp extends OpMode {
             turret.setPower(0);
         }
 
+        telemetry.addData("angle ", spindexer.getContinuousAngle());
+
         // Calculate Theoretical Angle to Goal
 
         //Theoretical Angle Calculation

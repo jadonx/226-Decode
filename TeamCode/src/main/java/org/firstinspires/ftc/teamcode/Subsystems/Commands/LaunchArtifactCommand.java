@@ -34,8 +34,8 @@ public class LaunchArtifactCommand {
     private State currentState = State.MOVE_TO_FIRST_LAUNCH;
 
     private double stateStartTime = 0;
-    private final double popperWaitTime = 350; // Wait time for popper to move in and out
-    private final double spindexerWaitTime = 500; // Wait time for spindexer to get to target position (steady-state)
+    private final double popperWaitTime = 500; // Wait time for popper to move in and out
+    private final double spindexerWaitTime = 300; // Wait time for spindexer to get to target position (steady-state)
     private ElapsedTime timer;
 
     private double targetVelocity;
@@ -72,7 +72,7 @@ public class LaunchArtifactCommand {
         switch (currentState) {
             // WAIT UNTIL SPINDEXER IS AT POSITION
             case MOVE_TO_FIRST_LAUNCH:
-                if(spindexerReachedTarget(spindexer.getAngle(), target)) {
+                if(spindexerReachedTarget(spindexer.getWrappedAngle(), target)) {
                     currentState = State.LAUNCH_FIRST;
                     stateStartTime = timer.milliseconds();
                 }
@@ -101,7 +101,7 @@ public class LaunchArtifactCommand {
                 }
                 break;
             case MOVE_TO_SECOND_LAUNCH:
-                if(spindexerReachedTarget(spindexer.getAngle(), target)) {
+                if(spindexerReachedTarget(spindexer.getWrappedAngle(), target)) {
                     currentState = State.LAUNCH_SECOND;
                     stateStartTime = timer.milliseconds();
                 }
@@ -127,7 +127,7 @@ public class LaunchArtifactCommand {
                 }
                 break;
             case MOVE_TO_THIRD_LAUNCH:
-                if(spindexerReachedTarget(spindexer.getAngle(), target)) {
+                if(spindexerReachedTarget(spindexer.getWrappedAngle(), target)) {
                     currentState = State.LAUNCH_THIRD;
                     stateStartTime = timer.milliseconds();
                 }
@@ -154,7 +154,7 @@ public class LaunchArtifactCommand {
 
         packet.put("state ", currentState);
         packet.put("stateStartTime ", stateStartTime);
-        packet.put("currentAngle ", spindexer.getAngle());
+        packet.put("currentAngle ", spindexer.getWrappedAngle());
         packet.put("timer ", timer.milliseconds());
         packet.put("target ", target);
         packet.put("error ", spindexer.getError(target));
@@ -185,6 +185,6 @@ public class LaunchArtifactCommand {
     }
 
     public boolean spindexerReachedTarget(double currentAngle, double targetAngle) {
-        return Math.abs(currentAngle - targetAngle) < 7;
+        return Math.abs(currentAngle - targetAngle) < 3;
     }
 }

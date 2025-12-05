@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Constants;
 
 public class Spindexer {
@@ -20,8 +21,8 @@ public class Spindexer {
     // PID VARIABLES
     private double kP = 0.004, kD = 0, kS = 0.12;
     private int slowingThreshold = 40;
-    private double slowingMultiplier = 0.45;
-    private int stoppingThreshold = 3;
+    private double slowingMultiplier = 0.475;
+    private double stoppingThreshold = 2.5;
 
     /*
     private double alpha = 0.1;
@@ -30,7 +31,7 @@ public class Spindexer {
     private ElapsedTime pidTimer;
      */
 
-    private int[] launchHolderAngles = {26, 160, 258};
+    private int[] launchHolderAngles = {46, 179, 275};
 
     // COLOR SENSOR VARIABLES
     private NormalizedColorSensor colorSensor;
@@ -108,11 +109,19 @@ public class Spindexer {
     }
 
     public double getError(double target) {
-        return Math.IEEEremainder(target - spindexerEncoder.getContinuousAngle(), 360.0);
+        return AngleUnit.normalizeDegrees(target - getContinuousAngle());
     }
 
-    public double getAngle() {
+    public double getContinuousAngle() {
         return spindexerEncoder.getContinuousAngle();
+    }
+
+    public double getWrappedAngle() {
+        return spindexerEncoder.getWrappedAngle();
+    }
+
+    public void rebaseContinuousAngle() {
+        spindexerEncoder.rebaseContinuousAngle();
     }
 
     public void updatePID(double kP, double kS, int slowingThreshold, double slowingMultiplier, int stoppingThreshold) {
@@ -125,7 +134,7 @@ public class Spindexer {
 
     // Returns the sequence of shooting angles starting from the closest (for shooting)
     public int[] getLaunchAngleSequence() {
-        int current = (int) getAngle();
+        int current = (int) getWrappedAngle();
 
         int a = launchHolderAngles[0], b = launchHolderAngles[1], c = launchHolderAngles[2];
 
