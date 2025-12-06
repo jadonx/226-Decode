@@ -27,7 +27,7 @@ public class SpindexerColorIntakeCommand {
 
     public enum HolderStatus { NONE, GREEN, PURPLE }
     private HolderStatus[] holderStatuses = {HolderStatus.NONE, HolderStatus.NONE, HolderStatus.NONE};
-    private double[][] intakePositions = {{101, 98, 104}, {232, 229, 235}, {358, 355, 1}};
+    private double[][] intakePositions = {{47, 42, 52}, {172, 167, 177}, {288, 283, 293}};
 
     private int currentHolderPos;
 
@@ -142,11 +142,6 @@ public class SpindexerColorIntakeCommand {
     }
 
     private boolean isWithinAngleRange(double current, int holderPos) {
-        if (holderPos == 2) {
-            return current > intakePositions[holderPos][1] || current < intakePositions[holderPos][2];
-        }
-        else {
-            return current > intakePositions[holderPos][1] && current < intakePositions[holderPos][2];
-        }
+        return current > intakePositions[holderPos][1] && current < intakePositions[holderPos][2];
     }
 }
