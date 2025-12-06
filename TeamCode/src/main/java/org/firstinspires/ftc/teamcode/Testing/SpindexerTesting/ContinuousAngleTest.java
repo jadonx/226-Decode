@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 
 @Config
-@TeleOp(name="ContinuousAngleTest")
+@TeleOp(name="ContinuousAngle_Tester", group = "Tester")
 public class ContinuousAngleTest extends OpMode {
     Spindexer spindexer;
 

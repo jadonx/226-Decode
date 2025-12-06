@@ -50,8 +50,6 @@ public class Launcher {
         limelight.pipelineSwitch(1);
         limelight.start();
         Pose2d initialPose = new Pose2d(xValueBot, yValueBot, Math.toRadians(180));
-
-
     }
 
     // Returns [target velocity, target angle]
