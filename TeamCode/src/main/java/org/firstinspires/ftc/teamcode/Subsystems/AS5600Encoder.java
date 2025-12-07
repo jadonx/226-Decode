@@ -10,7 +10,9 @@ import com.qualcomm.robotcore.hardware.configuration.annotations.I2cDeviceType;
 @DeviceProperties(name = "AS5600 Encoder", xmlTag = "AS5600Encoder")
 public class AS5600Encoder extends I2cDeviceSynchDevice<I2cDeviceSynch> {
     private static final I2cAddr ADDRESS_AS5600 = I2cAddr.create7bit(0x36);
-    private static final int ANGLE_REG = 0x0E;
+
+    private static final int RAW_ANGLE_HIGH = 0x0C;
+    private static final int RAW_ANGLE_LOW  = 0x0D;
 
     private double lastRawAngle = 0.0;
     private double continuousAngle = 0.0;
@@ -24,14 +26,29 @@ public class AS5600Encoder extends I2cDeviceSynchDevice<I2cDeviceSynch> {
 
     @Override
     protected boolean doInitialize() {
+        deviceClient.setReadWindow(
+                new I2cDeviceSynch.ReadWindow(
+                        RAW_ANGLE_HIGH, // start here
+                        2,              // read 0x0C and 0x0D
+                        I2cDeviceSynch.ReadMode.REPEAT
+                )
+        );
+
         return true;
     }
 
-    public double getWrappedAngle() {
-        byte[] rawBytes = deviceClient.read(ANGLE_REG, 2);
+    // Get raw 12 bits
+    private int getRaw12() {
+        byte[] data = deviceClient.read(RAW_ANGLE_HIGH, 2);
 
-        int raw12 = ((rawBytes[0] & 0x0F) << 8) | (rawBytes[1] & 0xFF);
-        return raw12 * (360.0 / 4096.0);
+        int high = data[0] & 0x0F;  // lower 4 bits are valid
+        int low  = data[1] & 0xFF;
+
+        return (high << 8) | low;
+    }
+
+    public double getWrappedAngle() {
+        return getRaw12() * (360.0 / 4096.0);
     }
 
     public double getContinuousAngle() {

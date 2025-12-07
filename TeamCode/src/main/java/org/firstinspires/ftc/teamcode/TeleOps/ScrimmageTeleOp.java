@@ -40,6 +40,7 @@ public class ScrimmageTeleOp extends OpMode {
     Intake intake;
     Spindexer spindexer;
     public static double kP, kD, kS;
+    public static double target;
     public static int slowingThreshold, stoppingThreshold;
     public static double slowingMultiplier;
     Popper popper;
@@ -75,78 +76,28 @@ public class ScrimmageTeleOp extends OpMode {
         packet = new TelemetryPacket();
         dashboard = FtcDashboard.getInstance();
 
-        spindexerColorSensorIntakeCommand = new SpindexerColorIntakeCommand(spindexer);
-        spindexerColorSensorIntakeCommand.start();
-
         drive.resetIMU();
     }
 
     @Override
     public void loop() {
-        // DRIVE LOGIC
-        double y = -gamepad1.left_stick_y;
-        double x = gamepad1.left_stick_x;
-        double rx = gamepad1.right_stick_x;
+        drive();
 
-        drive.drive(y, x, rx);
-        packet.put("IMU: ", drive.getYaw());
+        intake();
+
+        colorSensorIntake();
+
+        launchCommand();
+
+        // TURRET LOGIC
 
         //Limelight Logic
         limelight.getResult();
-//        packet.put("Limelight tX: ", limelight.getTX());
-//        packet.put("Limelight tY: ", limelight.getTY());
-//        packet.put("LimeLight distance: ", limelight.getDistance());
-
-        if (gamepad1.x) {
-            drive.resetIMU();
-        }
-
-        if (gamepad1.right_trigger > 0.1) {
-            // Canceling launch command sequence
-            launchArtifactCommand = null;
-            launcher.stopLauncher();
-            popper.deactivatePopper();
-
-            // Intake logic
-            intake.runIntake(gamepad1.right_trigger);
-        }
-        else {
-            intake.stopIntake();
-        }
-
-        // If launch sequence not engaged, set spindexer to intake mode
-        if (launchArtifactCommand == null) {
-            spindexerColorSensorIntakeCommand.update(telemetry);
-        }
-
-        // SPINDEXER LAUNCH LOGIC
-        if (gamepad1.a) {
-            launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher, drive_roadrunner);
-            launchArtifactCommand.start();
-        }
-
-        if (launchArtifactCommand != null && !launchArtifactCommand.isFinished()) {
-            launchArtifactCommand.update(packet);
-        }
-
-        if (launchArtifactCommand != null && launchArtifactCommand.isFinished()) {
-            launchArtifactCommand = null;
-            launcher.stopLauncher();
-            popper.deactivatePopper();
-
-            // Reset holder statuses
-            spindexerColorSensorIntakeCommand.resetHolderStatuses();
-        }
-
-        spindexer.updatePID(kP, kD, kS);
-
-        // TURRET LOGIC
 
         double ta = turret.angleBotToGoal(
                 BLUE_GOALPose.position.y - drive_roadrunner.localizer.getPose().position.y,
                 BLUE_GOALPose.position.x - drive_roadrunner.localizer.getPose().position.x,
                 Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log()));
-
 
         turret.setRobotHeading(Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log()));
 
@@ -161,35 +112,82 @@ public class ScrimmageTeleOp extends OpMode {
             turret.setPower(0);
         }
 
-        telemetry.addData("angle ", spindexer.getContinuousAngle());
-
         // Calculate Theoretical Angle to Goal
 
         //Theoretical Angle Calculation
         drive_roadrunner.updatePoseEstimate();
-        packet.put("Is resulted: ", limelight.isResulted());
-        packet.put("LimeLight Tx: ", limelight.getTX());
-        packet.put("1 Turret Angle: ", turret.getTurretAngle());
-        packet.put("2 Desired Angle: ", ta);
-
-        // packet.put("Bot Position X: ", drive_roadrunner.localizer.getPose().position.x);
-        // packet.put("Bot Position Y: ", drive_roadrunner.localizer.getPose().position.y);
-        packet.put("3 Bot Position Heading log: ", Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log()));
-        packet.put("4 Offset: ", turret.getTurretZeroOffsetField());
-        packet.put("5 Robot Angle at init", turret.getRobotHeadingDeg());
-
-        telemetry.addData("1 Turret Angle: ", turret.getTurretAngle());
-        telemetry.addData("2 Desired Angle: ", ta);
-        telemetry.addData("3 Bot Position Heading log: ", Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log()));
-        telemetry.addData("4 Offset: ", turret.getTurretZeroOffsetField());
-        telemetry.addData("5 Robot Angle at init", turret.getRobotHeadingDeg());
-        telemetry.addData("Launcher Actual Speed", launcher.getVelocity());
-        telemetry.addData("Limelight Distance", limelight.getDistance());
-        telemetry.addData("Pinpoint Distance", launcher.getPinPointDistance(drive_roadrunner.localizer.getPose())- 9);
+//        packet.put("Is resulted: ", limelight.isResulted());
+//        packet.put("LimeLight Tx: ", limelight.getTX());
+//        packet.put("1 Turret Angle: ", turret.getTurretAngle());
+//        packet.put("2 Desired Angle: ", ta);
+//
+//        // packet.put("Bot Position X: ", drive_roadrunner.localizer.getPose().position.x);
+//        // packet.put("Bot Position Y: ", drive_roadrunner.localizer.getPose().position.y);
+//        packet.put("3 Bot Position Heading log: ", Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log()));
+//        packet.put("4 Offset: ", turret.getTurretZeroOffsetField());
+//        packet.put("5 Robot Angle at init", turret.getRobotHeadingDeg());
+//
+//        telemetry.addData("1 Turret Angle: ", turret.getTurretAngle());
+//        telemetry.addData("2 Desired Angle: ", ta);
+//        telemetry.addData("3 Bot Position Heading log: ", Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log()));
+//        telemetry.addData("4 Offset: ", turret.getTurretZeroOffsetField());
+//        telemetry.addData("5 Robot Angle at init", turret.getRobotHeadingDeg());
+//        telemetry.addData("Launcher Actual Speed", launcher.getVelocity());
+//        telemetry.addData("Limelight Distance", limelight.getDistance());
+//        telemetry.addData("Pinpoint Distance", launcher.getPinPointDistance(drive_roadrunner.localizer.getPose())- 9);
 
         telemetry.update();
-
         dashboard.sendTelemetryPacket(packet);
+    }
+
+    public void drive() {
+        double y = -gamepad1.left_stick_y;
+        double x = gamepad1.left_stick_x;
+        double rx = gamepad1.right_stick_x;
+
+        drive.drive(y, x, rx);
+
+        if (gamepad1.x) {
+            drive.resetIMU();
+        }
+    }
+
+    public void intake() {
+        if (gamepad1.right_trigger > 0.1) {
+            // Canceling launch command sequence
+            launchArtifactCommand = null;
+            launcher.stopLauncher();
+            popper.deactivatePopper();
+
+            // Intake logic
+            intake.runIntake(gamepad1.right_trigger);
+        }
+        else {
+            intake.stopIntake();
+        }
+    }
+
+    public void launchCommand() {
+        if (gamepad1.a) {
+            launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher, drive_roadrunner);
+            launchArtifactCommand.start();
+        }
+
+        if (launchArtifactCommand != null && !launchArtifactCommand.isFinished()) {
+            launchArtifactCommand.update(packet);
+        }
+
+        if (launchArtifactCommand != null && launchArtifactCommand.isFinished()) {
+            launchArtifactCommand = null;
+            launcher.stopLauncher();
+            popper.deactivatePopper();
+        }
+    }
+
+    public void colorSensorIntake() {
+        if (launchArtifactCommand == null) {
+            spindexerColorSensorIntakeCommand.update(telemetry);
+        }
     }
 
     @Override

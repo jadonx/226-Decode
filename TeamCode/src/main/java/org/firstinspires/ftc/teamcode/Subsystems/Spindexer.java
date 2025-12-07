@@ -2,8 +2,10 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 import android.graphics.Color;
 
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
@@ -19,31 +21,23 @@ public class Spindexer {
     private AS5600Encoder spindexerEncoder;
 
     // PID VARIABLES
-    private double kP = 0, kD = 0, kS = 0;
-    private int slowingThreshold = 40;
-    private double slowingMultiplier = 0.475;
-    private double stoppingThreshold = 2.5;
+    private double kP = 0.005, kS = 0.04;
 
-    private double alpha = 0.1;
-    private double filteredDerivative = 0;
-    private double lastError = 0;
-    private ElapsedTime pidTimer;
-
+    // SPINDEXER ANGLE VALUES AND HOLDER STATUSES
     private int[] launchHolderAngles = {103, 228, 348};
+    public enum HolderStatus { NONE, GREEN, PURPLE }
+    private HolderStatus[] holderStatuses = {HolderStatus.NONE, HolderStatus.NONE, HolderStatus.NONE};
 
     // COLOR SENSOR VARIABLES
-    private NormalizedColorSensor colorSensor;
     private RevColorSensorV3 colorSensorV3;
     float[] hsv = new float[3];
     private ElapsedTime colorSensorTimer;
 
     public Spindexer(HardwareMap hardwareMap) {
         spindexerServo = hardwareMap.get(CRServo.class, Constants.HMServospinDexer);
+        spindexerServo.setDirection(DcMotorSimple.Direction.REVERSE);
         spindexerEncoder = hardwareMap.get(AS5600Encoder.class, Constants.HMSpindexerEncoder);
 
-        pidTimer = new ElapsedTime();
-
-        colorSensor = hardwareMap.get(NormalizedColorSensor.class, Constants.HMFrontColorSensor);
         colorSensorV3 = hardwareMap.get(RevColorSensorV3.class, Constants.HMFrontColorSensor);
         colorSensorTimer = new ElapsedTime();
     }
@@ -110,24 +104,19 @@ public class Spindexer {
     public void goToAngle(double target) {
         double error = getError(target);
 
-        double derivative = (error - lastError) / pidTimer.seconds();
-
         // Feedforward to overcome static friction (kS = 0.095)
         double ff = kS * Math.signum(error);
 
-        double output = (kP * error) + (kD * filteredDerivative) + ff;
+        double output = (kP * error) + ff;
 
         // Clipping output
-        output  = Range.clip(output, -0.4, 0.4);
+        output = Range.clip(output, -0.4, 0.4);
 
         spindexerServo.setPower(output);
-
-        lastError = error;
-        pidTimer.reset();
     }
 
     public double getError(double target) {
-        return AngleUnit.normalizeDegrees(target - getContinuousAngle());
+        return AngleUnit.normalizeDegrees(target - getWrappedAngle());
     }
 
     public double getContinuousAngle() {
@@ -140,20 +129,6 @@ public class Spindexer {
 
     public void rebaseContinuousAngle() {
         spindexerEncoder.rebaseContinuousAngle();
-    }
-
-    /*
-    public void updatePID(double kP, double kS, int slowingThreshold, double slowingMultiplier, int stoppingThreshold) {
-        this.kP = kP;
-        this.kS = kS;
-        this.slowingThreshold = slowingThreshold;
-        this.slowingMultiplier = slowingMultiplier;
-        this.stoppingThreshold = stoppingThreshold;
-    }
-     */
-
-    public void updatePID(double kP, double kD, double kS) {
-        this.kP = kP; this.kD = kD; this.kS = kS;
     }
 
     // Returns the sequence of shooting angles starting from the closest (for shooting)
@@ -189,9 +164,5 @@ public class Spindexer {
         Color.RGBToHSV(r, g, b, hsv);
 
         return hsv;
-    }
-
-    public int getAlpha() {
-        return colorSensorV3.alpha();
     }
 }

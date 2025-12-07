@@ -31,7 +31,7 @@ public class SpindexerPIDTest extends OpMode {
 
     @Override
     public void loop() {
-        spindexer.goToAngle(targetAngle);
+        // spindexer.goToAngle(targetAngle);
         // spindexer.updatePID(kP, kD, 0);
 
         packet.put("target ", targetAngle);
