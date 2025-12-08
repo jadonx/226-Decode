@@ -29,10 +29,6 @@ public class ScrimmageTeleOp extends OpMode {
     LimeLight limelight;
     Intake intake;
     Spindexer spindexer;
-    public static double kP, kD, kS;
-    public static double target;
-    public static int slowingThreshold, stoppingThreshold;
-    public static double slowingMultiplier;
     Popper popper;
     Launcher launcher;
     Turret turret;
