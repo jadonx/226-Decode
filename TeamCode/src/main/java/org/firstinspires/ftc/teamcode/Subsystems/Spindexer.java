@@ -24,8 +24,8 @@ public class Spindexer {
     private double kP = 0.005, kS = 0.04;
 
     // SPINDEXER ANGLE VALUES AND HOLDER STATUSES
-    private int[] launchHolderAngles = {287, 48, 169};
-    private int[] intakePositions = {106, 231, 349};
+    private int[] launchHolderAngles = {233, 352, 106};
+    private int[] intakePositions = {46, 172, 287};
     public enum HolderStatus { NONE, GREEN, PURPLE }
     private HolderStatus[] holderStatuses = {HolderStatus.NONE, HolderStatus.NONE, HolderStatus.NONE};
 
@@ -139,6 +139,22 @@ public class Spindexer {
 
     public int[] getLaunchPositions() {
         return launchHolderAngles;
+    }
+
+    public int[] getLaunchPositionsDyanmic() {
+        int[] launchPositions = {999, 999, 999};
+
+        if (holderStatuses[0] != HolderStatus.NONE) {
+            launchPositions[0] = launchHolderAngles[0];
+        }
+        if (holderStatuses[1] != HolderStatus.NONE) {
+            launchPositions[1] = launchHolderAngles[1];
+        }
+        if (holderStatuses[2] != HolderStatus.NONE) {
+            launchPositions[2] = launchHolderAngles[2];
+        }
+
+        return launchPositions;
     }
 
     public int[] getIntakePositions() {

@@ -13,8 +13,10 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.Constants;
 
 @Config
 @TeleOp(name="Spindexer_Tester", group = "Tester")
@@ -28,9 +30,13 @@ public class SpindexerTurretPrototype extends OpMode {
 
     public static double intakeSpeed;
 
+    public static double popperPos;
+
     // Turret/Spindexer Servos
     CRServo leftServo, rightServo;
     CRServo spindexerServo;
+
+    Servo popperServo;
 
     // Launcher Motors
     DcMotor shooter1, shooter2, spinner, intake;
@@ -39,9 +45,6 @@ public class SpindexerTurretPrototype extends OpMode {
     DcMotor frontLeft, frontRight, backLeft, backRight;
     IMU imu;
 
-    // Color Sensor
-    NormalizedColorSensor colorSensor;
-
     float[] hsv = new float[3];
 
     FtcDashboard dashboard;
@@ -49,20 +52,21 @@ public class SpindexerTurretPrototype extends OpMode {
 
     @Override
     public void init() {
-        shooter1 = hardwareMap.get(DcMotorEx.class, "shooter1");
-        shooter2 = hardwareMap.get(DcMotorEx.class, "shooter2");
+        shooter1 = hardwareMap.get(DcMotorEx.class, Constants.HMMotorShooter1);
+        shooter2 = hardwareMap.get(DcMotorEx.class, Constants.HMMotorShooter2);
 
-        spinner = hardwareMap.get(DcMotorEx.class, "spinner");
+        spinner = hardwareMap.get(DcMotorEx.class, Constants.HMMotorPopper);
         spinner.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        intake = hardwareMap.get(DcMotorEx.class, "intake");
+        intake = hardwareMap.get(DcMotorEx.class, Constants.HMMotorIntake);
 
-        spindexerServo = hardwareMap.get(CRServo.class, "leftCRServo");
+        spindexerServo = hardwareMap.get(CRServo.class, Constants.HMServospinDexer);
+        popperServo = hardwareMap.get(Servo.class, Constants.HMServoPopper);
 
-        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
-        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
-        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
-        backRight = hardwareMap.get(DcMotor.class, "backRight");
+        frontLeft = hardwareMap.get(DcMotor.class, Constants.HMMotorFrontLeft);
+        frontRight = hardwareMap.get(DcMotor.class, Constants.HMMotorFrontRight);
+        backLeft = hardwareMap.get(DcMotor.class, Constants.HMMotorBackLeft);
+        backRight = hardwareMap.get(DcMotor.class, Constants.HMMotorBackRight);
 
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -72,8 +76,6 @@ public class SpindexerTurretPrototype extends OpMode {
         turretSpeed = 0;
         spindexerSpeed = 0;
         intakeSpeed = 0;
-
-         colorSensor = hardwareMap.get(NormalizedColorSensor.class, "colorSensor");
 
         dashboard = FtcDashboard.getInstance();
         packet = new TelemetryPacket();
@@ -89,6 +91,8 @@ public class SpindexerTurretPrototype extends OpMode {
         intake.setPower(intakeSpeed);
 
         spindexerServo.setPower(spindexerSpeed);
+
+        popperServo.setPosition(popperPos);
 
         double y = -gamepad1.left_stick_y;
         double x = gamepad1.left_stick_x;
