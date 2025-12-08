@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.Subsystems.Encoder.AS5600Encoder;
+import org.firstinspires.ftc.teamcode.Subsystems.AS5600Encoder;
 
 public class SpindexerSample {
     // Spindexer
