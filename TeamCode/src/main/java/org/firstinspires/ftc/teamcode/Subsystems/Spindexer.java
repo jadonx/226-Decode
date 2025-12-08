@@ -141,6 +141,22 @@ public class Spindexer {
         return launchHolderAngles;
     }
 
+    public int[] getLaunchPositionsDyanmic() {
+        int[] launchPositions = {999, 999, 999};
+
+        if (holderStatuses[0] != HolderStatus.NONE) {
+            launchPositions[0] = launchHolderAngles[0];
+        }
+        if (holderStatuses[1] != HolderStatus.NONE) {
+            launchPositions[1] = launchHolderAngles[1];
+        }
+        if (holderStatuses[2] != HolderStatus.NONE) {
+            launchPositions[2] = launchHolderAngles[2];
+        }
+
+        return launchPositions;
+    }
+
     public int[] getIntakePositions() {
         return intakePositions;
     }

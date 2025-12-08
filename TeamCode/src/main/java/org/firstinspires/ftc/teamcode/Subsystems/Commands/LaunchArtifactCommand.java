@@ -50,9 +50,11 @@ public class LaunchArtifactCommand {
     }
 
     public void start() {
-        launchAngleSequence = spindexer.getLaunchPositions();
+        // launchAngleSequence = spindexer.getLaunchPositions();
+        launchAngleSequence = spindexer.getLaunchPositionsDyanmic();
         target = launchAngleSequence[0];
         currentState = State.MOVE_TO_FIRST_LAUNCH;
+
         timer = new ElapsedTime();
 
         popper.spinPopper();
@@ -60,22 +62,28 @@ public class LaunchArtifactCommand {
         double[] targetVelocityAngle = launcher.getVelocityAndAngle(drive.localizer.getPose());
         targetVelocity = targetVelocityAngle[0]; targetAngle = targetVelocityAngle[1];
 
-        targetVelocity = 0;
-
         launcher.setVelocity(targetVelocity);
         launcher.setCoverAngle(targetAngle);
     }
 
     public void update(Telemetry telemetry) {
-        spindexer.goToAngle(target);
+        if (target != 999) {
+            spindexer.goToAngle(target);
+        }
         launcher.setVelocity(targetVelocity);
         launcher.setCoverAngle(targetAngle);
 
         switch (currentState) {
             // WAIT UNTIL SPINDEXER IS AT POSITION
             case MOVE_TO_FIRST_LAUNCH:
-                if(spindexer.reachedTarget(spindexer.getWrappedAngle(), target)) {
-                    currentState = State.LAUNCH_FIRST;
+                if (target != 999) {
+                    if (spindexer.reachedTarget(spindexer.getWrappedAngle(), target)) {
+                        currentState = State.LAUNCH_FIRST;
+                    }
+                }
+                else {
+                    target = launchAngleSequence[1];
+                    currentState = State.MOVE_TO_SECOND_LAUNCH;
                 }
                 break;
             // IF LAUNCHER AT TARGET VELOCITY, PUSH IN POPPER
@@ -101,8 +109,14 @@ public class LaunchArtifactCommand {
                 }
                 break;
             case MOVE_TO_SECOND_LAUNCH:
-                if(spindexer.reachedTarget(spindexer.getWrappedAngle(), target)) {
-                    currentState = State.LAUNCH_SECOND;
+                if (target != 999) {
+                    if (spindexer.reachedTarget(spindexer.getWrappedAngle(), target)) {
+                        currentState = State.LAUNCH_SECOND;
+                    }
+                }
+                else {
+                    target = launchAngleSequence[2];
+                    currentState = State.MOVE_TO_THIRD_LAUNCH;
                 }
                 break;
             case LAUNCH_SECOND:
@@ -126,8 +140,13 @@ public class LaunchArtifactCommand {
                 }
                 break;
             case MOVE_TO_THIRD_LAUNCH:
-                if(spindexer.reachedTarget(spindexer.getWrappedAngle(), target)) {
-                    currentState = State.LAUNCH_THIRD;
+                if (target != 999) {
+                    if (spindexer.reachedTarget(spindexer.getWrappedAngle(), target)) {
+                        currentState = State.LAUNCH_THIRD;
+                    }
+                }
+                else {
+                    currentState = State.FINISHED;
                 }
                 break;
             case LAUNCH_THIRD:
@@ -154,6 +173,8 @@ public class LaunchArtifactCommand {
         telemetry.addData("spindexer target ", target);
         telemetry.addData("spindexer at target ", spindexer.reachedTarget(spindexer.getWrappedAngle(), target));
         telemetry.addData("at target velocity ", launcher.atTargetVelocity(targetVelocity));
+        telemetry.addData("launch sequence ", launchAngleSequence[0] + " " + launchAngleSequence[1] + " " + launchAngleSequence[2]);
+        telemetry.addData("current state ", currentState);
     }
 
     public boolean isFinished() {
