@@ -60,6 +60,8 @@ public class LaunchArtifactCommand {
         double[] targetVelocityAngle = launcher.getVelocityAndAngle(drive.localizer.getPose());
         targetVelocity = targetVelocityAngle[0]; targetAngle = targetVelocityAngle[1];
 
+        targetVelocity = 0;
+
         launcher.setVelocity(targetVelocity);
         launcher.setCoverAngle(targetAngle);
     }

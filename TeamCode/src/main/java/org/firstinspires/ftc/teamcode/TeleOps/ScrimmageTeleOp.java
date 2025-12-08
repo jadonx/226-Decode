@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Commands.SpindexerColorIntakeCommand;
@@ -22,26 +23,26 @@ import org.firstinspires.ftc.teamcode.Subsystems.UnjammerSystem;
 @Config
 @TeleOp(name="ScrimmageTeleOp", group="!TeleOp")
 public class ScrimmageTeleOp extends OpMode {
-
-    public static double xValueGoal = -60;
-    public static double yValueGoal = 60;
-    public static double xValueBot = 0;
-    public static double yValueBot = 0;
-
     public double pinPointDistance;
 
     FieldCentricDrive drive;
-    MecanumDrive drive_roadrunner;
-    Pose2d initialPose = new Pose2d(xValueBot, yValueBot, Math.toRadians(180));
-    Pose2d BLUE_GOALPose = new Pose2d(xValueGoal, yValueGoal, 0);
-
     LimeLight limelight;
-
     Intake intake;
     Spindexer spindexer;
     Popper popper;
     Launcher launcher;
     Turret turret;
+        ElapsedTime offSetTurretTime = new ElapsedTime();
+        public static double xValueGoal = -60;
+        public static double yValueGoal = 60;
+        public static double xValueBot = 0;
+        public static double yValueBot = 0;
+        boolean isUsingTurret = false;
+        boolean prevDpadUp = false;
+        MecanumDrive drive_roadrunner;
+        Pose2d initialPose = new Pose2d(xValueBot, yValueBot, Math.toRadians(180));
+        Pose2d BLUE_GOALPose = new Pose2d(xValueGoal, yValueGoal, 0);
+
 
     // COMMANDS
     LaunchArtifactCommand launchArtifactCommand;
@@ -52,10 +53,10 @@ public class ScrimmageTeleOp extends OpMode {
 
     @Override
     public void init() {
-        drive = new FieldCentricDrive(hardwareMap);
+        telemetry.addData("Status", "Initializing");
+        telemetry.update();
 
-        //Roadrunner Initialization
-        drive_roadrunner = new MecanumDrive(hardwareMap, initialPose);
+        drive = new FieldCentricDrive(hardwareMap);
 
         limelight = new LimeLight(hardwareMap);
 
@@ -65,6 +66,8 @@ public class ScrimmageTeleOp extends OpMode {
         popper = new Popper(hardwareMap);
         launcher = new Launcher(hardwareMap);
         turret = new Turret(hardwareMap);
+            drive_roadrunner = new MecanumDrive(hardwareMap, initialPose);
+            offSetTurretTime.reset();
 
         spindexerColorSensorIntakeCommand = new SpindexerColorIntakeCommand(spindexer);
         spindexerColorSensorIntakeCommand.start();
@@ -73,6 +76,9 @@ public class ScrimmageTeleOp extends OpMode {
         dashboard = FtcDashboard.getInstance();
 
         drive.resetIMU();
+
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
     }
 
     @Override
