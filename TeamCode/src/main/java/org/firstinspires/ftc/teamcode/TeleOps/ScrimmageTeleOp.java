@@ -88,6 +88,7 @@ public class ScrimmageTeleOp extends OpMode {
         colorSensorIntake();
 
         launchCommand();
+        spindexerTelemetry();
 
         // TURRET LOGIC
 
@@ -174,7 +175,7 @@ public class ScrimmageTeleOp extends OpMode {
         }
 
         if (launchArtifactCommand != null && !launchArtifactCommand.isFinished()) {
-            launchArtifactCommand.update(packet);
+            launchArtifactCommand.update(telemetry);
         }
 
         if (launchArtifactCommand != null && launchArtifactCommand.isFinished()) {
@@ -188,6 +189,14 @@ public class ScrimmageTeleOp extends OpMode {
         if (launchArtifactCommand == null) {
             spindexerColorSensorIntakeCommand.update(telemetry);
         }
+    }
+
+    public void spindexerTelemetry() {
+        telemetry.addData("spindexer ", spindexer.getWrappedAngle());
+        telemetry.addData("holder 1 ", spindexer.getHolderStatus()[0]);
+        telemetry.addData("holder 2 ", spindexer.getHolderStatus()[1]);
+        telemetry.addData("holder 3", spindexer.getHolderStatus()[2]);
+        telemetry.addData("hue ", spindexer.getHSVRev()[0]);
     }
 
     @Override
