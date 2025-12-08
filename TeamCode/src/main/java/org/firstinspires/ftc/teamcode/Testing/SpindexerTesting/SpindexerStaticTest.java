@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 
 @Config
-@TeleOp(name = "SpindexerStaticTest")
+@TeleOp(name = "SpindexerStaticTest_Tester", group = "Tester")
 public class SpindexerStaticTest extends OpMode {
     Spindexer spindexer;
     public static double kS; // 0.12

@@ -130,15 +130,13 @@ public class DrivingTesting extends OpMode {
         }
 
         if(Math.abs(bigSpinSpeed) > 0.05 && !isJammed){
-            if(Math.abs(spinEncoder.getAngleDegrees() - lastAngle) < angleDiff){
+            if(Math.abs(spinEncoder.getWrappedAngle() - lastAngle) < angleDiff){
                 if(jamStart == -1){
                     jamStart = runtime.milliseconds();
                 }
 
                 if(runtime.milliseconds() - jamStart > jamThreshold){
                     isJammed = true;
-
-
                 }
             } else{
                 jamStart = -1;
@@ -162,7 +160,7 @@ public class DrivingTesting extends OpMode {
 
 
         if(!isJammed){
-            lastAngle = spinEncoder.getAngleDegrees();
+            lastAngle = spinEncoder.getContinuousAngle();
         }
 
 
@@ -183,7 +181,7 @@ public class DrivingTesting extends OpMode {
         }
         */
 
-        telemetry.addData("spin Angle", spinEncoder.getAngleDegrees ());
+        telemetry.addData("spin Angle", spinEncoder.getWrappedAngle());
         telemetry.addData("isJammed?", isJammed);
         telemetry.addData("jamStart?", jamStart);
         telemetry.addData("jamCool?", jamCool);

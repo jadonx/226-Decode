@@ -29,10 +29,10 @@ public class ScrimmageTeleOp extends OpMode {
     LimeLight limelight;
     Intake intake;
     Spindexer spindexer;
-        public static double kP, kD, kS;
-        public static double target;
-        public static int slowingThreshold, stoppingThreshold;
-        public static double slowingMultiplier;
+    public static double kP, kD, kS;
+    public static double target;
+    public static int slowingThreshold, stoppingThreshold;
+    public static double slowingMultiplier;
     Popper popper;
     Launcher launcher;
     Turret turret;
@@ -94,8 +94,54 @@ public class ScrimmageTeleOp extends OpMode {
         colorSensorIntake();
 
         launchCommand();
+        spindexerTelemetry();
 
-        turret();
+        // TURRET LOGIC
+
+        //Limelight Logic
+        limelight.getResult();
+
+        double ta = turret.angleBotToGoal(
+                BLUE_GOALPose.position.y - drive_roadrunner.localizer.getPose().position.y,
+                BLUE_GOALPose.position.x - drive_roadrunner.localizer.getPose().position.x,
+                Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log()));
+
+        turret.setRobotHeading(Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log()));
+
+        if (gamepad1.dpad_down) {
+            turret.zeroTurretRelativeToRobot();
+        }
+
+        if (limelight.getTX() != 0) {
+            turret.trackAprilTag(limelight.getTX());
+            packet.put("Turret Mode: ", "LimeLight");
+        } else {
+            turret.setPower(0);
+        }
+
+        // Calculate Theoretical Angle to Goal
+
+        //Theoretical Angle Calculation
+        drive_roadrunner.updatePoseEstimate();
+//        packet.put("Is resulted: ", limelight.isResulted());
+//        packet.put("LimeLight Tx: ", limelight.getTX());
+//        packet.put("1 Turret Angle: ", turret.getTurretAngle());
+//        packet.put("2 Desired Angle: ", ta);
+//
+//        // packet.put("Bot Position X: ", drive_roadrunner.localizer.getPose().position.x);
+//        // packet.put("Bot Position Y: ", drive_roadrunner.localizer.getPose().position.y);
+//        packet.put("3 Bot Position Heading log: ", Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log()));
+//        packet.put("4 Offset: ", turret.getTurretZeroOffsetField());
+//        packet.put("5 Robot Angle at init", turret.getRobotHeadingDeg());
+//
+//        telemetry.addData("1 Turret Angle: ", turret.getTurretAngle());
+//        telemetry.addData("2 Desired Angle: ", ta);
+//        telemetry.addData("3 Bot Position Heading log: ", Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log()));
+//        telemetry.addData("4 Offset: ", turret.getTurretZeroOffsetField());
+//        telemetry.addData("5 Robot Angle at init", turret.getRobotHeadingDeg());
+//        telemetry.addData("Launcher Actual Speed", launcher.getVelocity());
+//        telemetry.addData("Limelight Distance", limelight.getDistance());
+//        telemetry.addData("Pinpoint Distance", launcher.getPinPointDistance(drive_roadrunner.localizer.getPose())- 9);
 
         telemetry.update();
         dashboard.sendTelemetryPacket(packet);
@@ -135,7 +181,7 @@ public class ScrimmageTeleOp extends OpMode {
         }
 
         if (launchArtifactCommand != null && !launchArtifactCommand.isFinished()) {
-            launchArtifactCommand.update(packet);
+            launchArtifactCommand.update(telemetry);
         }
 
         if (launchArtifactCommand != null && launchArtifactCommand.isFinished()) {
@@ -151,39 +197,12 @@ public class ScrimmageTeleOp extends OpMode {
         }
     }
 
-    public void turret() {
-        // TURRET LOGIC
-        drive_roadrunner.updatePoseEstimate();
-        turret.setRobotHeading(Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log()));
-        double targetangle = turret.angleBotToGoal(
-                BLUE_GOALPose.position.y - drive_roadrunner.localizer.getPose().position.y,
-                BLUE_GOALPose.position.x - drive_roadrunner.localizer.getPose().position.x,
-                Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log()));
-
-        if (offSetTurretTime.seconds() < 2) {
-            turret.zeroTurretRelativeToRobot();
-        }
-        boolean current = gamepad1.dpad_up;
-        if (current && !prevDpadUp) {
-            isUsingTurret = !isUsingTurret;
-        }
-        prevDpadUp = current;
-        if(turret.getTurretZeroOffsetField() != 0.0) {
-            if (isUsingTurret) {
-                if (limelight.getTX() != 0) {
-                    turret.trackAprilTag(limelight.getTX());
-                    packet.put("Turret Mode: ", "LimeLight");
-                } else {
-                    packet.put("Turret Mode: ", "PinPoint");
-                    turret.trackTargetAngle(targetangle);
-                }
-                packet.put("Turret Mode: ", "ON");
-            } else {
-                turret.setPower(0);
-                packet.put("Turret Mode: ", "OFF");
-            }
-        }
-
+    public void spindexerTelemetry() {
+        telemetry.addData("spindexer ", spindexer.getWrappedAngle());
+        telemetry.addData("holder 1 ", spindexer.getHolderStatus()[0]);
+        telemetry.addData("holder 2 ", spindexer.getHolderStatus()[1]);
+        telemetry.addData("holder 3", spindexer.getHolderStatus()[2]);
+        telemetry.addData("hue ", spindexer.getHSVRev()[0]);
     }
 
     @Override

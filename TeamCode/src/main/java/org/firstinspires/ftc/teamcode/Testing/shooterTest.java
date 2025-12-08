@@ -90,11 +90,7 @@ public class shooterTest extends OpMode {
             spinner.setVelocity(spinSpeed);
         }
 
-
-
-
-
-        if(gamepad1.y && (spinEncoder.getAngleDegrees() > 290.05 || spinEncoder.getAngleDegrees() < 289.5)){
+        if(gamepad1.y && (spinEncoder.getWrappedAngle() > 290.05 || spinEncoder.getWrappedAngle() < 289.5)){
             bigSpin.setPower(0.025);
         }
 
@@ -156,7 +152,7 @@ public class shooterTest extends OpMode {
         }
 
         if(Math.abs(bigSpinSpeed) > 0.05 && !isJammed && intake.getPower() > 0.05 ){
-            if(Math.abs(spinEncoder.getAngleDegrees() - lastAngle) < angleDiff){
+            if(Math.abs(spinEncoder.getWrappedAngle() - lastAngle) < angleDiff){
                 if(jamStart == -1){
                     jamStart = runtime.milliseconds();
                 }
@@ -188,7 +184,7 @@ public class shooterTest extends OpMode {
 
 
         if(!isJammed){
-            lastAngle = spinEncoder.getAngleDegrees();
+            lastAngle = spinEncoder.getWrappedAngle();
         }
 
 
@@ -198,7 +194,7 @@ public class shooterTest extends OpMode {
         telemetry.addData("Velocity", shooter1.getVelocity());
         telemetry.addData("Popper Spinner Speed", spinner.getVelocity());
         telemetry.addData("cover pos", coverPos);
-        telemetry.addData("spin Angle", spinEncoder.getAngleDegrees ());
+        telemetry.addData("spin Angle", spinEncoder.getWrappedAngle());
         telemetry.addData("isJammed?", isJammed);
         telemetry.addData("runtime", runtime.milliseconds());
         telemetry.addData("bigSPinSpeed", bigSpinSpeed);

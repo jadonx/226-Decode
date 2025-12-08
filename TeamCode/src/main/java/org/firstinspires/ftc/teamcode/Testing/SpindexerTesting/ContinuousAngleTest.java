@@ -1,16 +1,16 @@
 package org.firstinspires.ftc.teamcode.Testing.SpindexerTesting;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain.FieldCentricDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 
-@TeleOp(name="AngleEncoderDriving_Tester", group = "Tester")
-public class AngleEncoderDrivingTest extends OpMode {
-    FieldCentricDrive drive;
+@Config
+@TeleOp(name="ContinuousAngle_Tester", group = "Tester")
+public class ContinuousAngleTest extends OpMode {
     Spindexer spindexer;
 
     TelemetryPacket packet;
@@ -18,7 +18,6 @@ public class AngleEncoderDrivingTest extends OpMode {
 
     @Override
     public void init() {
-        drive = new FieldCentricDrive(hardwareMap);
         spindexer = new Spindexer(hardwareMap);
 
         packet = new TelemetryPacket();
@@ -27,21 +26,8 @@ public class AngleEncoderDrivingTest extends OpMode {
 
     @Override
     public void loop() {
-        // DRIVE LOGIC
-        double y = -gamepad1.left_stick_y;
-        double x = gamepad1.left_stick_x;
-        double rx = gamepad1.right_stick_x;
-
-        drive.drive(y, x, rx);
-
-        if (gamepad1.x) {
-            drive.resetIMU();
-        }
-
-        // spindexer.runSpindexer();
-
-        packet.put("imu ", drive.getYaw());
-        packet.put("spindexer angle ", spindexer.getWrappedAngle());
+        packet.put("angle ", spindexer.getWrappedAngle());
+        packet.put("error ", spindexer.getError(10));
         dashboard.sendTelemetryPacket(packet);
     }
 }
