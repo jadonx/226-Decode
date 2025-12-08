@@ -24,7 +24,7 @@ public class Turret {
     public static double kD_Turret = 0.0008;
     public static double tolerance_Turret = 0.5;
 
-    private double turretZeroOffsetField = -10000;
+    private double turretZeroOffsetField = 0;
     private double robotHeadingDeg = 0;
 
 
@@ -92,6 +92,10 @@ public class Turret {
     public double getTurretAngle() {
         double turretField = turretEncoder.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
         return normalize(turretField - robotHeadingDeg - turretZeroOffsetField);
+    }
+
+    public double getTurretAngleRaw() {
+        return turretEncoder.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
     }
 
     public void setRobotHeading(double headingDeg) {
