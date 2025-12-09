@@ -99,7 +99,7 @@ public class Launcher {
     }
 
     public boolean atTargetVelocity(double targetVelocity) {
-        return Math.abs(getCurrentVelocity() - targetVelocity) < 10;
+        return Math.abs(getCurrentVelocity() - targetVelocity) < 80;
     }
 
     public void stopLauncher() {

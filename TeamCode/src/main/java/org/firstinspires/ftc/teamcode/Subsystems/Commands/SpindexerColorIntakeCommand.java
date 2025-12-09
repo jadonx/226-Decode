@@ -16,31 +16,84 @@ public class SpindexerColorIntakeCommand {
     private int colorSensorUpdateTime = 10;
 
     private double currentHue;
-    private float[] currentHSV;
-
-    private int alpha;
-
     private double currentAngle;
-    private double targetAngle;
+    private int targetAngle;
 
     private ElapsedTime holdingBallTimer;
+    private int holdingBallThreshold = 800; // Must hold ball for 800ms to move to next holder
 
-    public enum HolderStatus { NONE, GREEN, PURPLE }
-    private HolderStatus[] holderStatuses = {HolderStatus.NONE, HolderStatus.NONE, HolderStatus.NONE};
-    private double[][] intakePositions = {{47, 42, 52}, {172, 167, 177}, {288, 283, 293}};
+    private int[] intakePositions;
 
-    private int currentHolderPos;
+    private enum State {
+        WAIT_AT_FIRST_HOLDER,
+        WAIT_AT_SECOND_HOLDER,
+        WAIT_AT_THIRD_HOLDER,
+        GO_TO_LAUNCH,
+        FINISHED
+    }
+    private State currentState;
 
     public SpindexerColorIntakeCommand(Spindexer spindexer) {
         this.spindexer = spindexer;
+        intakePositions = spindexer.getIntakePositions();
     }
 
     public void start() {
         colorSensorTimer = new ElapsedTime();
         holdingBallTimer = new ElapsedTime();
-        currentHolderPos = 0;
+        currentState = State.WAIT_AT_FIRST_HOLDER;
+        targetAngle = intakePositions[0];
     }
 
+    public void update(Telemetry telemetry) {
+        // Color sensor readings
+        if (colorSensorTimer.milliseconds() > colorSensorUpdateTime) {
+            currentHue = spindexer.getHSVRev()[0];
+            colorSensorTimer.reset();
+        }
+
+        spindexer.goToAngle(targetAngle);
+        currentAngle = spindexer.getWrappedAngle();
+
+        if (!hasBall(currentHue)) {
+            holdingBallTimer.reset();
+        }
+
+        switch (currentState) {
+            case WAIT_AT_FIRST_HOLDER:
+                if (withinIntakeAngle(currentAngle, 0) && holdingBallTimer.milliseconds() > holdingBallThreshold) {
+                    spindexer.setHolderStatus(0, getBallColor(currentHue));
+                    targetAngle = intakePositions[1];
+                    holdingBallTimer.reset();
+                    currentState = State.WAIT_AT_SECOND_HOLDER;
+                }
+                break;
+            case WAIT_AT_SECOND_HOLDER:
+                if (withinIntakeAngle(currentAngle, 1) && holdingBallTimer.milliseconds() > holdingBallThreshold) {
+                    spindexer.setHolderStatus(1, getBallColor(currentHue));
+                    targetAngle = intakePositions[2];
+                    holdingBallTimer.reset();
+                    currentState = State.WAIT_AT_THIRD_HOLDER;
+                }
+                break;
+            case WAIT_AT_THIRD_HOLDER:
+                if (withinIntakeAngle(currentAngle, 2) && holdingBallTimer.milliseconds() > holdingBallThreshold) {
+                    spindexer.setHolderStatus(2, getBallColor(currentHue));
+                    targetAngle = spindexer.getLaunchPositions()[0];
+                    currentState = State.GO_TO_LAUNCH;
+                }
+                break;
+            case GO_TO_LAUNCH:
+                if (spindexer.reachedTarget(currentAngle, targetAngle)) {
+                    currentState = State.FINISHED;
+                }
+                break;
+            case FINISHED:
+                break;
+        }
+    }
+
+    /*
     public void update(Telemetry telemetry) {
         if (colorSensorTimer.milliseconds() > colorSensorUpdateTime) {
             currentHSV = spindexer.getHSVRev();
@@ -68,6 +121,7 @@ public class SpindexerColorIntakeCommand {
         telemetry.addData("currentHolderPos ", currentHolderPos);
         telemetry.addData("timer ", holdingBallTimer.milliseconds());
     }
+     */
 
     /*
     public void update(TelemetryPacket packet) {
@@ -119,29 +173,17 @@ public class SpindexerColorIntakeCommand {
     }
      */
 
-    public void resetHolderStatuses() {
-        holderStatuses[0] = HolderStatus.NONE;
-        holderStatuses[1] = HolderStatus.NONE;
-        holderStatuses[2] = HolderStatus.NONE;
-    }
-
-    private HolderStatus getHolderStatus(double hue, int alpha) {
-        if (hue > 130 && hue < 190 && alpha > 600 && alpha < 900) {
-            return HolderStatus.GREEN;
-        }
-        else if (hue > 210 && hue < 270) {
-            return HolderStatus.PURPLE;
-        }
-        else {
-            return HolderStatus.NONE;
-        }
+    private Spindexer.HolderStatus getBallColor(double hue) {
+        if (hue > 130 && hue < 190) return Spindexer.HolderStatus.GREEN;
+        if (hue > 210 && hue < 270) return Spindexer.HolderStatus.PURPLE;
+        else return Spindexer.HolderStatus.NONE;
     }
 
     private boolean hasBall(double hue) {
         return (hue > 130 && hue < 190) || (hue > 210 && hue < 270);
     }
 
-    private boolean isWithinAngleRange(double current, int holderPos) {
-        return current > intakePositions[holderPos][1] && current < intakePositions[holderPos][2];
+    private boolean withinIntakeAngle(double current, int currentHolder) {
+        return current > (intakePositions[currentHolder]-3) && current < (intakePositions[currentHolder]+3);
     }
 }

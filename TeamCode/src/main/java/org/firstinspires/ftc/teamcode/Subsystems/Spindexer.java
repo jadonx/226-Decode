@@ -24,7 +24,8 @@ public class Spindexer {
     private double kP = 0.005, kS = 0.04;
 
     // SPINDEXER ANGLE VALUES AND HOLDER STATUSES
-    private int[] launchHolderAngles = {103, 228, 348};
+    private int[] launchHolderAngles = {233, 352, 106};
+    private int[] intakePositions = {46, 172, 287};
     public enum HolderStatus { NONE, GREEN, PURPLE }
     public HolderStatus[] holderStatuses = {HolderStatus.NONE, HolderStatus.NONE, HolderStatus.NONE};
 
@@ -42,15 +43,7 @@ public class Spindexer {
         colorSensorTimer = new ElapsedTime();
     }
 
-    //toString method
-    public String printPattern() {
-        return "Spindexer{" +
-                "holderStatuses=" + holderStatuses[0] + ", " + holderStatuses[1] + ", " + holderStatuses[2] +
-                '}';
-    }
-    /*
-    INTAKE CODE
-     */
+    /** Intake Code (CLEAN UP UNNECESSARY METHODS)*/
     public void runSpindexer() {
         spindexerServo.setPower(1);
     }
@@ -67,9 +60,7 @@ public class Spindexer {
         spindexerServo.setPower(0);
     }
 
-    /*
-    PID CODE
-     */
+    /** PID Code */
     /*
     public void goToAngle(double target) {
         double error = getError(target);
@@ -125,42 +116,52 @@ public class Spindexer {
         return AngleUnit.normalizeDegrees(target - getWrappedAngle());
     }
 
-    public double getContinuousAngle() {
-        return spindexerEncoder.getContinuousAngle();
-    }
-
     public double getWrappedAngle() {
         return spindexerEncoder.getWrappedAngle();
     }
 
-    public void rebaseContinuousAngle() {
-        spindexerEncoder.rebaseContinuousAngle();
+    public boolean reachedTarget(double current, int target) {
+        return Math.abs(current - target) < 3;
     }
 
-    // Returns the sequence of shooting angles starting from the closest (for shooting)
-    public int[] getLaunchAngleSequence() {
-        int current = (int) getWrappedAngle();
-
-        int a = launchHolderAngles[0], b = launchHolderAngles[1], c = launchHolderAngles[2];
-
-        int da = Math.abs(current - a);
-        int db = Math.abs(current - b);
-        int dc = Math.abs(current - c);
-
-        if (da <= db && da <= dc) {
-            return new int[] {a, b, c};
-        }
-        else if (db <= da && db <= dc) {
-            return new int[] {b, c, a};
-        }
-        else {
-            return new int[] {c, a, b};
-        }
+    /** Color sensing intake logic */
+    public void setHolderStatus(int index, HolderStatus status) {
+        holderStatuses[index] = status;
     }
 
-    /*
-    COLOR SENSOR CODE
-     */
+    public HolderStatus[] getHolderStatus() {
+        return holderStatuses;
+    }
+
+    public void resetHolderStatuses() {
+        holderStatuses[0] = HolderStatus.NONE; holderStatuses[1] = HolderStatus.NONE; holderStatuses[2] = HolderStatus.NONE;
+    }
+
+    public int[] getLaunchPositions() {
+        return launchHolderAngles;
+    }
+
+    public int[] getLaunchPositionsDyanmic() {
+        int[] launchPositions = {999, 999, 999};
+
+        if (holderStatuses[0] != HolderStatus.NONE) {
+            launchPositions[0] = launchHolderAngles[0];
+        }
+        if (holderStatuses[1] != HolderStatus.NONE) {
+            launchPositions[1] = launchHolderAngles[1];
+        }
+        if (holderStatuses[2] != HolderStatus.NONE) {
+            launchPositions[2] = launchHolderAngles[2];
+        }
+
+        return launchPositions;
+    }
+
+    public int[] getIntakePositions() {
+        return intakePositions;
+    }
+
+    /** Color sensor code */
     public float[] getHSVRev() {
         int r = colorSensorV3.red();
         int g = colorSensorV3.green();
