@@ -219,7 +219,7 @@ public class MeetOneTeleOp extends OpMode {
             isUsingTurret = !isUsingTurret;
         }
         prevDpadUp = current;
-        if(turret.getTurretZeroOffsetField() != 0.0) {
+        if (turret.getTurretZeroOffsetField() != 0.0) {
             if (isUsingTurret) {
                 if (limelight.isResulted()) {
                     if (limelight.getAprilTagID() == 20) {
@@ -236,6 +236,7 @@ public class MeetOneTeleOp extends OpMode {
                 packet.put("Turret Mode: ", "OFF");
             }
         }
+    }
 
     public void spindexerTelemetry() {
         telemetry.addData("spindexer ", spindexer.getWrappedAngle());
