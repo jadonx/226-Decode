@@ -24,8 +24,8 @@ public class Spindexer {
     private double kP = 0.005, kS = 0.04;
 
     // SPINDEXER ANGLE VALUES AND HOLDER STATUSES
-    private int[] launchHolderAngles = {233, 352, 106};
-    private int[] intakePositions = {46, 172, 287};
+    private int[] launchHolderAngles = {47, 283, 174};
+    private int[] intakePositions = {234, 107, 355};
     public enum HolderStatus { NONE, GREEN, PURPLE }
     public HolderStatus[] holderStatuses = {HolderStatus.NONE, HolderStatus.NONE, HolderStatus.NONE};
 
@@ -61,43 +61,6 @@ public class Spindexer {
     }
 
     /** PID Code */
-    /*
-    public void goToAngle(double target) {
-        double error = getError(target);
-
-        // DERIVATIVE (NOT USED)
-        double derivative = (error - lastError) / pidTimer.seconds();
-
-        Derivative filtering to reduce oscillations
-        filteredDerivative = alpha * derivative + (1-alpha) * filteredDerivative;
-
-        double output = (kP * error) + (-kD * filteredDerivative);
-
-
-        double output = kP * error;
-
-        // Feedforward to overcome static friction
-        double ff = kS * Math.signum(error);
-
-        if (Math.abs(error) < stoppingThreshold) {
-            output = 0;
-        }
-        else if (Math.abs(error) < slowingThreshold) {
-            output = (output + ff) * slowingMultiplier;
-        }
-        else {
-            output = output + ff;
-        }
-
-        // FEEDFORWARD + RANGING/CLIPPING
-        output  = Range.clip(output, -0.55, 0.55);
-
-        spindexerServo.setPower(output);
-
-        // lastError = error;
-        // pidTimer.reset();
-    }
-    */
     public void goToAngle(double target) {
         double error = getError(target);
 
@@ -155,6 +118,17 @@ public class Spindexer {
         }
 
         return launchPositions;
+    }
+
+    public int[] getLaunchPositionsColor(HolderStatus[] motifPattern) {
+        int[] launchPositions = {999, 999, 999};
+
+        // Loop through motif pattern
+        for (HolderStatus status: motifPattern) {
+            
+        }
+
+        return new int[3];
     }
 
     public int[] getIntakePositions() {

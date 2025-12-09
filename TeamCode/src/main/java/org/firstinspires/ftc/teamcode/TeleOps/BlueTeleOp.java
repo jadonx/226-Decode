@@ -140,7 +140,7 @@ public class BlueTeleOp extends OpMode {
         }
 
         if (launchArtifactCommand != null && !launchArtifactCommand.isFinished()) {
-            launchArtifactCommand.update(packet);
+            launchArtifactCommand.update(telemetry);
         }
 
         if (launchArtifactCommand != null && launchArtifactCommand.isFinished()) {
