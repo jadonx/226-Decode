@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
-import static org.firstinspires.ftc.teamcode.TeleOps.ScrimmageTeleOp.xValueBot;
-import static org.firstinspires.ftc.teamcode.TeleOps.ScrimmageTeleOp.xValueGoal;
-import static org.firstinspires.ftc.teamcode.TeleOps.ScrimmageTeleOp.yValueBot;
-import static org.firstinspires.ftc.teamcode.TeleOps.ScrimmageTeleOp.yValueGoal;
+import static org.firstinspires.ftc.teamcode.TeleOps.MeetOneTeleOp.xValueBot;
+import static org.firstinspires.ftc.teamcode.TeleOps.MeetOneTeleOp.xValueGoal;
+import static org.firstinspires.ftc.teamcode.TeleOps.MeetOneTeleOp.yValueBot;
+import static org.firstinspires.ftc.teamcode.TeleOps.MeetOneTeleOp.yValueGoal;
 
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.hardware.limelightvision.LLResult;

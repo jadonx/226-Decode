@@ -21,8 +21,8 @@ import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 import org.firstinspires.ftc.teamcode.Subsystems.UnjammerSystem;
 
 @Config
-@TeleOp(name="ScrimmageTeleOp", group="!TeleOp")
-public class ScrimmageTeleOp extends OpMode {
+@TeleOp(name="MeetOneTeleOp", group="!TeleOp")
+public class MeetOneTeleOp extends OpMode {
     public double pinPointDistance;
 
     FieldCentricDrive drive;
