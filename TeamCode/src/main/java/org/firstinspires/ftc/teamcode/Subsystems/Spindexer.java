@@ -27,7 +27,7 @@ public class Spindexer {
     private int[] launchHolderAngles = {233, 352, 106};
     private int[] intakePositions = {46, 172, 287};
     public enum HolderStatus { NONE, GREEN, PURPLE }
-    private HolderStatus[] holderStatuses = {HolderStatus.NONE, HolderStatus.NONE, HolderStatus.NONE};
+    public HolderStatus[] holderStatuses = {HolderStatus.NONE, HolderStatus.NONE, HolderStatus.NONE};
 
     // COLOR SENSOR VARIABLES
     private RevColorSensorV3 colorSensorV3;

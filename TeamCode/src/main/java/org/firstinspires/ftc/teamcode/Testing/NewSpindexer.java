@@ -150,4 +150,3 @@ public class NewSpindexer extends OpMode {
         green
     }
 }
-

@@ -174,9 +174,9 @@ public class shooterTest extends OpMode {
             bigSpin.setPower(-0.5);
             intake.setPower(0);
             if(runtime.milliseconds() - jamCool > unJamTime){
-                 bigSpin.setPower(bigSpinSpeed);
-                 intake.setPower(0.8);
-                 jamCool = -1;
+                bigSpin.setPower(bigSpinSpeed);
+                intake.setPower(0.8);
+                jamCool = -1;
                 isJammed = false;
                 jamStart = -1;
             }

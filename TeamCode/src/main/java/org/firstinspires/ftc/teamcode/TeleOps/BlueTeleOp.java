@@ -21,8 +21,8 @@ import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 import org.firstinspires.ftc.teamcode.Subsystems.UnjammerSystem;
 
 @Config
-@TeleOp(name="MeetOneTeleOp", group="!TeleOp")
-public class MeetOneTeleOp extends OpMode {
+@TeleOp(name="BlueTeleOp", group="!TeleOp")
+public class BlueTeleOp extends OpMode {
     public double pinPointDistance;
 
     FieldCentricDrive drive;
@@ -98,54 +98,8 @@ public class MeetOneTeleOp extends OpMode {
         colorSensorIntake();
 
         launchCommand();
-        spindexerTelemetry();
 
-        // TURRET LOGIC
-
-        //Limelight Logic
-        limelight.getResult();
-
-        double ta = turret.angleBotToGoal(
-                BLUE_GOALPose.position.y - drive_roadrunner.localizer.getPose().position.y,
-                BLUE_GOALPose.position.x - drive_roadrunner.localizer.getPose().position.x,
-                Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log()));
-
-        turret.setRobotHeading(Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log()));
-
-        if (gamepad1.dpad_down) {
-            turret.zeroTurretRelativeToRobot();
-        }
-
-        if (limelight.getTX() != 0) {
-            turret.trackAprilTag(limelight.getTX());
-            packet.put("Turret Mode: ", "LimeLight");
-        } else {
-            turret.setPower(0);
-        }
-
-        // Calculate Theoretical Angle to Goal
-
-        //Theoretical Angle Calculation
-        drive_roadrunner.updatePoseEstimate();
-//        packet.put("Is resulted: ", limelight.isResulted());
-//        packet.put("LimeLight Tx: ", limelight.getTX());
-//        packet.put("1 Turret Angle: ", turret.getTurretAngle());
-//        packet.put("2 Desired Angle: ", ta);
-//
-//        // packet.put("Bot Position X: ", drive_roadrunner.localizer.getPose().position.x);
-//        // packet.put("Bot Position Y: ", drive_roadrunner.localizer.getPose().position.y);
-//        packet.put("3 Bot Position Heading log: ", Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log()));
-//        packet.put("4 Offset: ", turret.getTurretZeroOffsetField());
-//        packet.put("5 Robot Angle at init", turret.getRobotHeadingDeg());
-//
-//        telemetry.addData("1 Turret Angle: ", turret.getTurretAngle());
-//        telemetry.addData("2 Desired Angle: ", ta);
-//        telemetry.addData("3 Bot Position Heading log: ", Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log()));
-//        telemetry.addData("4 Offset: ", turret.getTurretZeroOffsetField());
-//        telemetry.addData("5 Robot Angle at init", turret.getRobotHeadingDeg());
-//        telemetry.addData("Launcher Actual Speed", launcher.getVelocity());
-//        telemetry.addData("Limelight Distance", limelight.getDistance());
-//        telemetry.addData("Pinpoint Distance", launcher.getPinPointDistance(drive_roadrunner.localizer.getPose())- 9);
+        turret();
 
 
         telemetry.update();
@@ -186,7 +140,7 @@ public class MeetOneTeleOp extends OpMode {
         }
 
         if (launchArtifactCommand != null && !launchArtifactCommand.isFinished()) {
-            launchArtifactCommand.update(telemetry);
+            launchArtifactCommand.update(packet);
         }
 
         if (launchArtifactCommand != null && launchArtifactCommand.isFinished()) {
@@ -222,7 +176,7 @@ public class MeetOneTeleOp extends OpMode {
         if(turret.getTurretZeroOffsetField() != 0.0) {
             if (isUsingTurret) {
                 if (limelight.isResulted()) {
-                    if (limelight.getAprilTagID() == 20) {
+                    if (limelight.getAprilTagID() == 21) {
                         turret.trackAprilTag(limelight.getTX());
                         packet.put("Turret Mode: ", "LimeLight");
                     }
@@ -237,20 +191,14 @@ public class MeetOneTeleOp extends OpMode {
             }
         }
 
-    public void spindexerTelemetry() {
-        telemetry.addData("spindexer ", spindexer.getWrappedAngle());
-        telemetry.addData("holder 1 ", spindexer.getHolderStatus()[0]);
-        telemetry.addData("holder 2 ", spindexer.getHolderStatus()[1]);
-        telemetry.addData("holder 3", spindexer.getHolderStatus()[2]);
-        telemetry.addData("hue ", spindexer.getHSVRev()[0]);
     }
 
     public void limelight() {
         limelight.getResult();
         aprilTagID = limelight.getAprilTagID();
         motifID = limelight.getMotifID();
-//        packet.put("AprilTag ID: ", limelight.getAprilTagID());
-//        packet.put("Motif ID: ", limelight.getMotifID());
+        packet.put("AprilTag ID: ", limelight.getAprilTagID());
+        packet.put("Motif ID: ", limelight.getMotifID());
     }
 
     @Override
