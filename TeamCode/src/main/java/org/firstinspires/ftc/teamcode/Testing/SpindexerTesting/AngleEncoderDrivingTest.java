@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain.FieldCentricDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 
-@TeleOp(name="AngleEncoderDrivingTest")
+@TeleOp(name="AngleEncoderDriving_Tester", group = "Tester")
 public class AngleEncoderDrivingTest extends OpMode {
     FieldCentricDrive drive;
     Spindexer spindexer;
@@ -41,7 +41,7 @@ public class AngleEncoderDrivingTest extends OpMode {
         // spindexer.runSpindexer();
 
         packet.put("imu ", drive.getYaw());
-        packet.put("spindexer angle ", spindexer.getAngle());
+        packet.put("spindexer angle ", spindexer.getWrappedAngle());
         dashboard.sendTelemetryPacket(packet);
     }
 }

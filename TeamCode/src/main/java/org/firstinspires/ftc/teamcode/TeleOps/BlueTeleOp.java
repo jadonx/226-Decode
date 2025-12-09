@@ -21,8 +21,8 @@ import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 import org.firstinspires.ftc.teamcode.Subsystems.UnjammerSystem;
 
 @Config
-@TeleOp(name="ScrimmageTeleOp", group="!TeleOp")
-public class ScrimmageTeleOp extends OpMode {
+@TeleOp(name="BlueTeleOp", group="!TeleOp")
+public class BlueTeleOp extends OpMode {
     public double pinPointDistance;
 
     FieldCentricDrive drive;
@@ -176,7 +176,7 @@ public class ScrimmageTeleOp extends OpMode {
         if(turret.getTurretZeroOffsetField() != 0.0) {
             if (isUsingTurret) {
                 if (limelight.isResulted()) {
-                    if (limelight.getAprilTagID() == 20) {
+                    if (limelight.getAprilTagID() == 21) {
                         turret.trackAprilTag(limelight.getTX());
                         packet.put("Turret Mode: ", "LimeLight");
                     }
@@ -197,8 +197,8 @@ public class ScrimmageTeleOp extends OpMode {
         limelight.getResult();
         aprilTagID = limelight.getAprilTagID();
         motifID = limelight.getMotifID();
-//        packet.put("AprilTag ID: ", limelight.getAprilTagID());
-//        packet.put("Motif ID: ", limelight.getMotifID());
+        packet.put("AprilTag ID: ", limelight.getAprilTagID());
+        packet.put("Motif ID: ", limelight.getMotifID());
     }
 
     @Override

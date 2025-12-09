@@ -72,7 +72,7 @@ public class NewSpindexer extends OpMode {
             gamepad1.rumble(1000);
         }
 
-        if(spinEncoder.getAngleDegrees() < pos1B+3 && spinEncoder.getAngleDegrees() > pos1B-3){
+        if(spinEncoder.getWrappedAngle() < pos1B+3 && spinEncoder.getWrappedAngle() > pos1B-3){
             if(colors.green*255 > 5.5 && hsv[1] > 0.61){
                 hold1 = ball.green;
             } else if(colors.blue*255 > 6){
@@ -82,7 +82,7 @@ public class NewSpindexer extends OpMode {
             }
         }
 
-        if(spinEncoder.getAngleDegrees() < pos2B+3 && spinEncoder.getAngleDegrees() > pos2B-3){
+        if(spinEncoder.getWrappedAngle() < pos2B+3 && spinEncoder.getWrappedAngle() > pos2B-3){
             if(colors.green*255 > 5 && hsv[1] > 0.61){
                 hold2 = ball.green;
             } else if(colors.blue*255 > 6){
@@ -92,7 +92,7 @@ public class NewSpindexer extends OpMode {
             }
         }
 
-        if(spinEncoder.getAngleDegrees() < pos3B+3 && spinEncoder.getAngleDegrees() > pos3B-3){
+        if(spinEncoder.getWrappedAngle() < pos3B+3 && spinEncoder.getWrappedAngle() > pos3B-3){
             if(colors.green*255 > 5 && hsv[1] > 0.61){
                 hold3 = ball.green;
             } else if(colors.blue*255 > 6){
@@ -119,11 +119,11 @@ public class NewSpindexer extends OpMode {
         telemetry.addData("hold3", hold3);
         telemetry.addData("Green", colors.green*255);
         telemetry.addData("Blue", colors.blue*255);
-        telemetry.addData("Encoder Pos", spinEncoder.getAngleDegrees());
+        telemetry.addData("Encoder Pos", spinEncoder.getWrappedAngle());
     }
 
     public void goToAngle(double target) {
-        double error = getAngleError(target, spinEncoder.getAngleDegrees());
+        double error = getAngleError(target, spinEncoder.getWrappedAngle());
 
         double derivative = (error - lastError) / pidTimer.seconds();
 
@@ -150,4 +150,3 @@ public class NewSpindexer extends OpMode {
         green
     }
 }
-
