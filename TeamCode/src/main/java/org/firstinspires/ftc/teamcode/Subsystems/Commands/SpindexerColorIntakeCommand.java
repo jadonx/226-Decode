@@ -20,7 +20,7 @@ public class SpindexerColorIntakeCommand {
     private int targetAngle;
 
     private ElapsedTime holdingBallTimer;
-    private int holdingBallThreshold = 800; // Must hold ball for 800ms to move to next holder
+    private int holdingBallThreshold = 150; // Must hold ball for 800ms to move to next holder
 
     private int[] intakePositions;
 
