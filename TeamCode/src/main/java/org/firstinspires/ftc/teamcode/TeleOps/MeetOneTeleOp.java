@@ -99,6 +99,7 @@ public class MeetOneTeleOp extends OpMode {
 
         launchCommand();
         spindexerTelemetry();
+        // spindexer.updatePIDValues(kP, kD, kS);
 
         // TURRET LOGIC
 
@@ -191,6 +192,7 @@ public class MeetOneTeleOp extends OpMode {
 
         if (launchArtifactCommand != null && launchArtifactCommand.isFinished()) {
             launchArtifactCommand = null;
+            spindexerColorSensorIntakeCommand.start();
             launcher.stopLauncher();
             popper.deactivatePopper();
         }
