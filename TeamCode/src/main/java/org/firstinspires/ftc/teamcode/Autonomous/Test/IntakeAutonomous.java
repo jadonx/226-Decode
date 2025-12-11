@@ -169,7 +169,7 @@ public class IntakeAutonomous extends LinearOpMode {
 
         // Trajectory Variables
         TrajectoryActionBuilder intakeBallPath = drive.actionBuilder(initialPose)
-                .lineToX(40, new TranslationalVelConstraint(6));
+                .lineToX(40, new TranslationalVelConstraint(5));
 
         TrajectoryActionBuilder moveAfterIntake = intakeBallPath.endTrajectory().fresh()
                 .lineToX(-20, new TranslationalVelConstraint(50.0));

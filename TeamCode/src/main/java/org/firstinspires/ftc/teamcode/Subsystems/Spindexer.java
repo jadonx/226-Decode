@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Constants;
 
 public class Spindexer {
@@ -177,5 +178,9 @@ public class Spindexer {
         Color.RGBToHSV(r, g, b, hsv);
 
         return hsv;
+    }
+
+    public double getColorDistance() {
+        return colorSensorV3.getDistance(DistanceUnit.INCH);
     }
 }
