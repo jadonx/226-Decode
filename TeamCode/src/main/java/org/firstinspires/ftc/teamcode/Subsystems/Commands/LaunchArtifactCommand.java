@@ -40,7 +40,7 @@ public class LaunchArtifactCommand {
     private double stateStartTime = 0;
     private final double popperPushInWait = 400; // Wait time for popper to move in
     private final double popperPullOutWait = 400;
-    private final double spindexerWaitTime = 500;
+    private final double spindexerWaitTime = 750;
     private ElapsedTime timer;
 
     private double atLaunchTimer = 0;
