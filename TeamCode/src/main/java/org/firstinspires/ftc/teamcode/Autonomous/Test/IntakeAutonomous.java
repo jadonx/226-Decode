@@ -117,6 +117,34 @@ public class IntakeAutonomous extends LinearOpMode {
         return new StopIntakeSpindexer(spindexer, intake);
     }
 
+    public class GoToFirstColorHolder implements Action {
+        private final Spindexer spindexer;
+        private final Spindexer.HolderStatus[] motifPattern;
+
+        private int targetAngle;
+
+        public GoToFirstColorHolder(Spindexer spindexer, Spindexer.HolderStatus[] motifPattern) {
+            this.spindexer = spindexer;
+            this.motifPattern = motifPattern;
+
+            targetAngle = spindexer.getLaunchPositionsColor(motifPattern)[0];
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            spindexer.goToAngle(targetAngle);
+
+            if (spindexer.reachedTarget(spindexer.getWrappedAngle(), targetAngle)) {
+                return false;
+            }
+
+            return true;
+        }
+    }
+    public Action goToFirstColorHolder(Spindexer spindexer, Spindexer.HolderStatus[] motifPattern) {
+        return new GoToFirstColorHolder(spindexer, motifPattern);
+    }
+
     @Override
     public void runOpMode() throws InterruptedException {
         /*
