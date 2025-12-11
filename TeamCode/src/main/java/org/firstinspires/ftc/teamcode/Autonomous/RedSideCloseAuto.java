@@ -58,7 +58,7 @@ public class RedSideCloseAuto extends LinearOpMode {
                 initialized = true;
             }
 
-            launcherArtifactCommand.update(telemetry);
+            // launcherArtifactCommand.update(telemetry);
 
             if (launcherArtifactCommand.isFinished()) {
                 launcherArtifactCommand.stop();

@@ -51,7 +51,7 @@ public class BlueSideCloseAuto extends LinearOpMode {
                 initialized = true;
             }
 
-            launcherArtifactCommand.update(telemetry);
+            // launcherArtifactCommand.update(packet, telemetry);
 
             if (launcherArtifactCommand.isFinished()) {
                 launcherArtifactCommand.stop();

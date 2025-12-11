@@ -21,26 +21,27 @@ public class Spindexer {
     private AS5600Encoder spindexerEncoder;
 
     // PID VARIABLES
-    private double kP = 0.005, kS = 0.04;
+    private double kP = 0.0065, kD = 0, kS = 0.055;
+    private double lastError = 0;
+    private ElapsedTime pidTimer;
 
     // SPINDEXER ANGLE VALUES AND HOLDER STATUSES
-    private int[] launchHolderAngles = {47, 283, 174};
-    private int[] intakePositions = {234, 107, 355};
+    private int[] launchHolderAngles = {48, 285, 173};
+    private int[] intakePositions = {235, 112, 1};
     public enum HolderStatus { NONE, GREEN, PURPLE }
     public HolderStatus[] holderStatuses = {HolderStatus.NONE, HolderStatus.NONE, HolderStatus.NONE};
 
     // COLOR SENSOR VARIABLES
     private RevColorSensorV3 colorSensorV3;
-    float[] hsv = new float[3];
-    private ElapsedTime colorSensorTimer;
 
     public Spindexer(HardwareMap hardwareMap) {
         spindexerServo = hardwareMap.get(CRServo.class, Constants.HMServospinDexer);
         spindexerServo.setDirection(DcMotorSimple.Direction.REVERSE);
         spindexerEncoder = hardwareMap.get(AS5600Encoder.class, Constants.HMSpindexerEncoder);
 
+        pidTimer = new ElapsedTime();
+
         colorSensorV3 = hardwareMap.get(RevColorSensorV3.class, Constants.HMFrontColorSensor);
-        colorSensorTimer = new ElapsedTime();
     }
 
     /** Intake Code (CLEAN UP UNNECESSARY METHODS)*/
@@ -64,15 +65,37 @@ public class Spindexer {
     public void goToAngle(double target) {
         double error = getError(target);
 
+        double dt = pidTimer.seconds();
+        pidTimer.reset();
+
+        if (dt < 0.001) dt = 0.001;
+
+        double derivative = (error - lastError) / dt;
+
         // Feedforward to overcome static friction (kS = 0.095)
         double ff = kS * Math.signum(error);
 
-        double output = (kP * error) + ff;
+        double output = (kP * error) + (kD * derivative) + ff;
+
+        if (Math.abs(error) < 2) {
+            output = 0;
+        }
+        else if (Math.abs(error) < 10) {
+            output *= 0.5;
+        }
 
         // Clipping output
         output = Range.clip(output, -0.4, 0.4);
 
         spindexerServo.setPower(output);
+
+        lastError = error;
+    }
+
+    public void updatePIDValues(double kP, double kD, double kS) {
+        this.kP = kP;
+        this.kD = kD;
+        this.kS = kS;
     }
 
     public double getError(double target) {
@@ -84,7 +107,7 @@ public class Spindexer {
     }
 
     public boolean reachedTarget(double current, int target) {
-        return Math.abs(current - target) < 3;
+        return Math.abs(current - target) < 5.5;
     }
 
     /** Color sensing intake logic */
@@ -122,13 +145,22 @@ public class Spindexer {
 
     public int[] getLaunchPositionsColor(HolderStatus[] motifPattern) {
         int[] launchPositions = {999, 999, 999};
+        int currentPos = 0;
 
         // Loop through motif pattern
         for (HolderStatus status: motifPattern) {
-            
+            // Loop through spindexer holder statuses
+            for (int i=0; i<3; i++) {
+                if (holderStatuses[i] == status) {
+                    launchPositions[currentPos] = launchHolderAngles[i];
+                    holderStatuses[i] = HolderStatus.NONE;
+                    currentPos++;
+                    break;
+                }
+            }
         }
 
-        return new int[3];
+        return launchPositions;
     }
 
     public int[] getIntakePositions() {

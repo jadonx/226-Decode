@@ -53,7 +53,7 @@ public class IntakeAutonomous extends LinearOpMode {
                 initialized = true;
             }
 
-            launcherArtifactCommand.update(telemetry);
+            // launcherArtifactCommand.update(telemetry);
 
             if (launcherArtifactCommand.isFinished()) {
                 launcherArtifactCommand.stop();

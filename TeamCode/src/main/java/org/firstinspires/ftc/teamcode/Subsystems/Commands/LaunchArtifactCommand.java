@@ -35,9 +35,12 @@ public class LaunchArtifactCommand {
     private State currentState = State.MOVE_TO_FIRST_LAUNCH;
 
     private double stateStartTime = 0;
-    private final double popperPushInWait = 400; // Wait time for popper to move in
-    private final double popperPullOutWait = 400;
+    private final double popperPushInWait = 600; // Wait time for popper to move in
+    private final double popperPullOutWait = 600;
     private ElapsedTime timer;
+
+    private double atLaunchTimer = 0;
+    private boolean atLaunchPosition = false;
 
     private double targetVelocity;
     private double targetAngle;
@@ -158,15 +161,13 @@ public class LaunchArtifactCommand {
                 break;
             case WAIT_AFTER_THIRD_LAUNCH:
                 if (timer.milliseconds() - stateStartTime > popperPushInWait) {
-                    popper.pushOutPopper();
-                    popper.stopPopper();
+                    popper.deactivatePopper();
+                    launcher.stopLauncher();
+                    spindexer.resetHolderStatuses();
                     currentState = State.FINISHED;
                 }
                 break;
             case FINISHED:
-                popper.deactivatePopper();
-                launcher.stopLauncher();
-                spindexer.resetHolderStatuses();
                 break;
         }
 
