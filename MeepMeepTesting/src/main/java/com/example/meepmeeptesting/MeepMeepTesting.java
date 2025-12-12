@@ -31,7 +31,7 @@ public class MeepMeepTesting {
                 ;
         TrajectoryActionBuilder shootZone = shiftForward.endTrajectory().fresh()
                 .setReversed(false)
-                .splineToLinearHeading(new Pose2d(-20, 20, Math.toRadians(270)), Math.toRadians(0.00))
+                .splineToLinearHeading(new Pose2d( -20, 20, Math.toRadians(270)), Math.toRadians(0.00))
                 .waitSeconds(2)
                 ;
         TrajectoryActionBuilder collectSample1 = shootZone.endTrajectory().fresh()

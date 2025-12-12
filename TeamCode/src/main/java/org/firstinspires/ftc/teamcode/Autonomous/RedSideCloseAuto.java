@@ -5,9 +5,11 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
+import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -17,6 +19,7 @@ import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Commands.LaunchArtifactCommand;
+import org.firstinspires.ftc.teamcode.Subsystems.LimeLight;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
@@ -31,47 +34,49 @@ public class RedSideCloseAuto extends LinearOpMode {
     Popper popper;
     Launcher launcher;
     Turret turret;
-
+    LimeLight limeLight;
     LaunchArtifactCommand launchArtifactCommand;
+
+    public double aprilTagID = -1;
+    public double motifID = -1;
 
     /*
     ACTIONS
      */
-    public class ShootArtifacts implements Action {
-        private final LaunchArtifactCommand launcherArtifactCommand;
-        private boolean initialized = false;
-        private boolean isTurretReadyToShoot = false;
-        private double taShooting = 45; // Angle to aim turret for shooting
-
-        public ShootArtifacts(LaunchArtifactCommand launchArtifactCommand) {
-            this.launcherArtifactCommand = launchArtifactCommand;
-        }
-
+    public class GetMotifAndAimToAprilTag implements Action {
+        private int goalTagID = 24;
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if (!initialized) {
-                if (!isTurretReadyToShoot) {
-                    turret.trackTargetAngle(taShooting); // Aim turret to shooting angle
-                    isTurretReadyToShoot = true;
-                }
-                launcherArtifactCommand.start();
-                initialized = true;
+            limeLight.getResult();
+            motifID = limeLight.getMotifID();
+            aprilTagID = limeLight.getAprilTagID();
+            telemetryPacket.put("Motif ID", motifID);
+            telemetryPacket.put("April Tag ID", aprilTagID);
+            if (limeLight.isResulted() && aprilTagID == goalTagID) {
+                    turret.trackAprilTag(limeLight.getTX());
+            } else {
+                turret.trackTargetAngleAuto(-65);
             }
 
-            // launcherArtifactCommand.update(telemetry);
-
-            if (launcherArtifactCommand.isFinished()) {
-                launcherArtifactCommand.stop();
-                return false;
-            }
-
+//            if (isMotifAvailable && motifID != -1) {
+//                isMotifAvailable = false;
+//                isAprilTagAvailable = true;
+//            }
+//            if (isAprilTagAvailable) {
+//                if (limeLight.isResulted()) {
+//                    if (aprilTagID == goalTagID) {
+//                        turret.trackAprilTag(limeLight.getTX());
+//                    }
+//                } else {
+//                    turret.trackTargetAngle(45);
+//                }
+//            }
             return true;
         }
     }
-    public Action shootArtifacts(LaunchArtifactCommand launchArtifactCommand) {
-        return new ShootArtifacts(launchArtifactCommand);
+    public Action turretGetMotifAndAimAprilTag() {
+        return new GetMotifAndAimToAprilTag();
     }
-
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -83,65 +88,42 @@ public class RedSideCloseAuto extends LinearOpMode {
         unjamSystem = new UnjammerSystem(intake, spindexer);
         popper = new Popper(hardwareMap);
         launcher = new Launcher(hardwareMap);
-
-
+        turret = new Turret(hardwareMap);
+        limeLight = new LimeLight(hardwareMap);
 
         /*
-        TRAJECTORIES
+        DRIVE AND TRAJECTORIES
          */
-
-        Pose2d startPose = new Pose2d(-48, 48, Math.toRadians(128));
-
+        Pose2d startPose = new Pose2d(-60, 20, Math.toRadians(90));
         MecanumDrive drive = new MecanumDrive(hardwareMap, startPose);
-
         launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher, drive);
-
-        // Trajectory Variables
-        TrajectoryActionBuilder firstLaunch = drive.actionBuilder(startPose)
-                .strafeToLinearHeading(new Vector2d(-11.5,11.5), Math.toRadians(90))
-                .waitSeconds(3);
-
-        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh()
-                .strafeToConstantHeading(new Vector2d(-11.5, 30))
-                .lineToY(44.5)
-                ;
-
-
-        TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh()
-                .strafeToConstantHeading(new Vector2d(-11.5,11.5))
-                .waitSeconds(3);
-
-        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh()
-                .strafeToConstantHeading(new Vector2d(11.5, 30))
-                .strafeToConstantHeading(new Vector2d(11.5,44.5));
-
-
-        TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh()
-                .strafeToConstantHeading(new Vector2d(-11.5,11.5))
-                .waitSeconds(3);
-
-        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh()
-                .strafeToConstantHeading(new Vector2d(36, 30))
-                .strafeToConstantHeading(new Vector2d(36,44.5))
-                .waitSeconds(0.3);
-
-        TrajectoryActionBuilder fourthLaunch = thirdPickup.endTrajectory().fresh()
-                .strafeToConstantHeading(new Vector2d(-11.5,11.5))
-                .waitSeconds(3);
+        TrajectoryActionBuilder firstLaunch = drive.actionBuilder(startPose).strafeToLinearHeading(new Vector2d(-10,35), Math.toRadians(90));
+        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-10,60), new TranslationalVelConstraint(10));
+        TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-7,35));
+        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(15, 35)).strafeToConstantHeading(new Vector2d(15,60) , new TranslationalVelConstraint(10));
+        TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-7,35));
+        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(39, 35)).strafeToConstantHeading(new Vector2d(39,60), new TranslationalVelConstraint(10));
+        TrajectoryActionBuilder fourthLaunch = thirdPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-7,35));
 
         waitForStart();
 
         if (isStopRequested()) return;
 
         Actions.runBlocking(
-                new SequentialAction(
-                        firstLaunch.build(),
-                        firstPickup.build(),
-                        secondLaunch.build(),
-                        secondPickup.build(),
-                        thirdLaunch.build(),
-                        thirdPickup.build(),
-                        fourthLaunch.build()
+                new ParallelAction(
+                        turretGetMotifAndAimAprilTag(),
+                        new SequentialAction(
+                            firstLaunch.build(),
+                            firstPickup.build(),
+                            secondLaunch.build(),
+                            secondPickup.build(),
+                            thirdLaunch.build(),
+                            thirdPickup.build(),
+                            fourthLaunch.build()
+//
+                        )
+
+//
                 )
         );
     }

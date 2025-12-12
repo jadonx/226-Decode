@@ -71,6 +71,7 @@ public class Launcher {
             }
         }
         /*
+
         else if (distance < 29.70772 && distance > 29.7077){
             coverPos = 1;
             targetVelocity = 1400;

@@ -18,7 +18,6 @@ import org.firstinspires.ftc.teamcode.Subsystems.LimeLight;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
-import org.firstinspires.ftc.teamcode.Subsystems.UnjammerSystem;
 
 @Config
 @TeleOp(name="BlueTeleOp", group="!TeleOp")
@@ -176,12 +175,12 @@ public class BlueTeleOp extends OpMode {
         if(turret.getTurretZeroOffsetField() != 0.0) {
             if (isUsingTurret) {
                 if (limelight.isResulted()) {
-                    if (limelight.getAprilTagID() == 21) {
+                    if (limelight.getAprilTagID() == 24) {
                         turret.trackAprilTag(limelight.getTX());
-                        packet.put("Turret Mode: ", "LimeLight");
+                        packet.put("Turret with: ", "LimeLight");
                     }
                 } else {
-                    packet.put("Turret Mode: ", "PinPoint");
+                    packet.put("Turret with: ", "PinPoint");
                     turret.trackTargetAngle(targetangle);
                 }
                 packet.put("Turret Mode: ", "ON");
@@ -190,7 +189,6 @@ public class BlueTeleOp extends OpMode {
                 packet.put("Turret Mode: ", "OFF");
             }
         }
-
     }
 
     public void limelight() {

@@ -22,11 +22,9 @@ public class Turret {
     public static double kP_Turret = 0.02;
     public static double kI_Turret = 0.0;
     public static double kD_Turret = 0.0008;
-    public static double tolerance_Turret = 0.5;
-
+    public static double tolerance_Turret = 0.8;
     private double turretZeroOffsetField = 0;
     private double robotHeadingDeg = 0;
-
 
     public Turret(HardwareMap hardwareMap) {
         turretRight = hardwareMap.get(CRServo.class, Constants.HMServoTurretRight);
@@ -49,7 +47,7 @@ public class Turret {
 
         double correction = pid.calculate(targetX, 0);
 
-        correction = Math.max(Math.min(correction, 0.8), -0.8);
+        correction = Math.max(Math.min(correction, 0.5), -0.5);
 
         if (pid.atSetPoint()) {
             setPower(0);
@@ -89,15 +87,6 @@ public class Turret {
         return turretAngle;
     }
 
-    public double getTurretAngle() {
-        double turretField = turretEncoder.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-        return normalize(turretField - robotHeadingDeg - turretZeroOffsetField);
-    }
-
-    public double getTurretAngleRaw() {
-        return turretEncoder.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-    }
-
     public void setRobotHeading(double headingDeg) {
         robotHeadingDeg = headingDeg;
     }
@@ -106,7 +95,6 @@ public class Turret {
         double turretField = turretEncoder.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
         turretZeroOffsetField = normalize(turretField - robotHeadingDeg);
     }
-
 
     public void stopTurret() {
         setPower(0);
@@ -124,6 +112,15 @@ public class Turret {
         return angle;
     }
 
+    public double getTurretAngle() {
+        double turretField = turretEncoder.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+        return normalize(turretField - robotHeadingDeg - turretZeroOffsetField);
+    }
+
+    public double getTurretAngleRaw() {
+        return turretEncoder.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+    }
+
     public double getTurretZeroOffsetField() {
         return turretZeroOffsetField;
     }
@@ -131,4 +128,30 @@ public class Turret {
     public double getRobotHeadingDeg() {
         return robotHeadingDeg;
     }
+
+
+    /*
+    AUTO INITIALIZATIONS
+    **/
+    public void trackTargetAngleAuto(double targetA){
+        pid.setPID(kP_Turret, kI_Turret, kD_Turret);
+
+        double currentAngle = getTurretAngleRaw();
+
+        double correction = pid.calculate(currentAngle, targetA);
+
+        correction = Math.max(Math.min(correction, 0.5), -0.5);
+
+        if (pid.atSetPoint()) {
+            setPower(0);
+            return;
+        }
+
+        setPower(correction);
+    }
+
+    public boolean isAtTarget() {
+        return pid.atSetPoint();
+    }
+
 }
