@@ -100,7 +100,7 @@ public class LaunchArtifactCommand {
         launcher.setCoverAngle(targetAngle);
     }
 
-    public void update(Telemetry telemetry) {
+    public void update(TelemetryPacket telemetryPacket) {
         if (target != 999) {
             spindexer.goToAngle(target);
         }
@@ -220,11 +220,8 @@ public class LaunchArtifactCommand {
                 break;
         }
 
-        telemetry.addData("spindexer target ", target);
-        telemetry.addData("spindexer at target ", spindexer.reachedTarget(spindexer.getWrappedAngle(), target));
-        telemetry.addData("at target velocity ", launcher.atTargetVelocity(targetVelocity));
-        telemetry.addData("launch sequence ", launchAngleSequence[0] + " " + launchAngleSequence[1] + " " + launchAngleSequence[2]);
-        telemetry.addData("current state ", currentState);
+        telemetryPacket.put("target ", target);
+        telemetryPacket.put("current ", spindexer.getWrappedAngle());
     }
 
     public boolean isFinished() {

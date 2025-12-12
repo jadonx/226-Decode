@@ -22,12 +22,14 @@ public class Spindexer {
     private AS5600Encoder spindexerEncoder;
 
     // PID VARIABLES
-    private double kP = 0.005, kD = 0, kS = 0.045;
+    private double kP = 0.002, kD = 0, kS = 0.0575;
+    private int slowingThreshold = 0;
+    private double slowingMultiplier = 0;
     private double lastError = 0;
     private ElapsedTime pidTimer;
 
     // SPINDEXER ANGLE VALUES AND HOLDER STATUSES
-    private int[] launchHolderAngles = {48, 285, 173};
+    private int[] launchHolderAngles = {50, 289, 175};
     private int[] intakePositions = {235, 112, 1};
     public enum HolderStatus { NONE, GREEN, PURPLE }
     public HolderStatus[] holderStatuses = {HolderStatus.NONE, HolderStatus.NONE, HolderStatus.NONE};
@@ -81,8 +83,8 @@ public class Spindexer {
         if (Math.abs(error) < 2) {
             output = 0;
         }
-        else if (Math.abs(error) < 30) {
-            output *= 0.65;
+        else if (Math.abs(error) < slowingThreshold) {
+            output *= slowingMultiplier;
         }
 
         // Clipping output
@@ -93,10 +95,12 @@ public class Spindexer {
         lastError = error;
     }
 
-    public void updatePIDValues(double kP, double kD, double kS) {
+    public void updatePIDValues(double kP, double kD, double kS, int slowingThreshold, double slowingMultiplier) {
         this.kP = kP;
         this.kD = kD;
         this.kS = kS;
+        this.slowingThreshold = slowingThreshold;
+        this.slowingMultiplier = slowingMultiplier;
     }
 
     public double getError(double target) {

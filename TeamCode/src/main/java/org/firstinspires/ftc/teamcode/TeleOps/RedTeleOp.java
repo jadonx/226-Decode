@@ -141,7 +141,7 @@ public class RedTeleOp extends OpMode {
         }
 
         if (launchArtifactCommand != null && !launchArtifactCommand.isFinished()) {
-            launchArtifactCommand.update(telemetry);
+            launchArtifactCommand.update(packet);
         }
 
         if (launchArtifactCommand != null && launchArtifactCommand.isFinished()) {
