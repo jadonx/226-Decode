@@ -57,8 +57,23 @@ public class LaunchArtifactCommand {
     }
 
     public void start() {
-        // launchAngleSequence = spindexer.getLaunchPositions();
         launchAngleSequence = spindexer.getLaunchPositionsDyanmic();
+        target = launchAngleSequence[0];
+        currentState = State.MOVE_TO_FIRST_LAUNCH;
+
+        timer = new ElapsedTime();
+
+        popper.spinPopper();
+
+        double[] targetVelocityAngle = launcher.getVelocityAndAngle(drive.localizer.getPose());
+        targetVelocity = targetVelocityAngle[0]; targetAngle = targetVelocityAngle[1];
+
+        launcher.setVelocity(targetVelocity);
+        launcher.setCoverAngle(targetAngle);
+    }
+
+    public void autoColorStart(Spindexer.HolderStatus[] motifPattern) {
+        launchAngleSequence = spindexer.getLaunchPositionsColor(motifPattern);
         target = launchAngleSequence[0];
         currentState = State.MOVE_TO_FIRST_LAUNCH;
 
@@ -182,7 +197,7 @@ public class LaunchArtifactCommand {
                 }
                 break;
             case WAIT_AFTER_THIRD_LAUNCH:
-                if (timer.milliseconds() - stateStartTime > popperPushInWait) {
+                if (timer.milliseconds() - stateStartTime > 800) {
                     popper.deactivatePopper();
                     launcher.stopLauncher();
                     spindexer.resetHolderStatuses();

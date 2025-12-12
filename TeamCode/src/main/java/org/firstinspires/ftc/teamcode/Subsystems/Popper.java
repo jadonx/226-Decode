@@ -19,11 +19,11 @@ public class Popper {
     }
 
     public void pushInPopper() {
-        popperServo.setPosition(0.012);
+        popperServo.setPosition(0.014);
     }
 
     public void pushOutPopper() {
-        popperServo.setPosition(0.002);
+        popperServo.setPosition(0.0);
     }
 
     public void spinPopper() {

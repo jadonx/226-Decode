@@ -117,6 +117,34 @@ public class IntakeAutonomous extends LinearOpMode {
         return new StopIntakeSpindexer(spindexer, intake);
     }
 
+    public class GoToFirstColorHolder implements Action {
+        private final Spindexer spindexer;
+        private final Spindexer.HolderStatus[] motifPattern;
+
+        private int targetAngle;
+
+        public GoToFirstColorHolder(Spindexer spindexer, Spindexer.HolderStatus[] motifPattern) {
+            this.spindexer = spindexer;
+            this.motifPattern = motifPattern;
+
+            targetAngle = spindexer.getLaunchPositionsColor(motifPattern)[0];
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            spindexer.goToAngle(targetAngle);
+
+            if (spindexer.reachedTarget(spindexer.getWrappedAngle(), targetAngle)) {
+                return false;
+            }
+
+            return true;
+        }
+    }
+    public Action goToFirstColorHolder(Spindexer spindexer, Spindexer.HolderStatus[] motifPattern) {
+        return new GoToFirstColorHolder(spindexer, motifPattern);
+    }
+
     @Override
     public void runOpMode() throws InterruptedException {
         /*
@@ -141,7 +169,7 @@ public class IntakeAutonomous extends LinearOpMode {
 
         // Trajectory Variables
         TrajectoryActionBuilder intakeBallPath = drive.actionBuilder(initialPose)
-                .lineToX(40, new TranslationalVelConstraint(6));
+                .lineToX(40, new TranslationalVelConstraint(5));
 
         TrajectoryActionBuilder moveAfterIntake = intakeBallPath.endTrajectory().fresh()
                 .lineToX(-20, new TranslationalVelConstraint(50.0));
