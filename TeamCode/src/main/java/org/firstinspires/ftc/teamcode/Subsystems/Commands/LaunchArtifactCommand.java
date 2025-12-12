@@ -20,14 +20,17 @@ public class LaunchArtifactCommand {
 
     private enum State {
         MOVE_TO_FIRST_LAUNCH,
+        WAIT_AFTER_AT_FIRST,
         LAUNCH_FIRST,
         WAIT_AFTER_FIRST_LAUNCH,
         PULL_OUT_POPPER_FIRST,
         MOVE_TO_SECOND_LAUNCH,
+        WAIT_AFTER_AT_SECOND,
         LAUNCH_SECOND,
         WAIT_AFTER_SECOND_LAUNCH,
         PULL_OUT_POPPER_SECOND,
         MOVE_TO_THIRD_LAUNCH,
+        WAIT_AFTER_AT_THIRD,
         LAUNCH_THIRD,
         WAIT_AFTER_THIRD_LAUNCH,
         FINISHED
@@ -35,8 +38,9 @@ public class LaunchArtifactCommand {
     private State currentState = State.MOVE_TO_FIRST_LAUNCH;
 
     private double stateStartTime = 0;
-    private final double popperPushInWait = 600; // Wait time for popper to move in
-    private final double popperPullOutWait = 600;
+    private final double popperPushInWait = 400; // Wait time for popper to move in
+    private final double popperPullOutWait = 400;
+    private final double spindexerWaitTime = 750;
     private ElapsedTime timer;
 
     private double atLaunchTimer = 0;
@@ -81,12 +85,18 @@ public class LaunchArtifactCommand {
             case MOVE_TO_FIRST_LAUNCH:
                 if (target != 999) {
                     if (spindexer.reachedTarget(spindexer.getWrappedAngle(), target)) {
-                        currentState = State.LAUNCH_FIRST;
+                        stateStartTime = timer.milliseconds();
+                        currentState = State.WAIT_AFTER_AT_FIRST;
                     }
                 }
                 else {
                     target = launchAngleSequence[1];
                     currentState = State.MOVE_TO_SECOND_LAUNCH;
+                }
+                break;
+            case WAIT_AFTER_AT_FIRST:
+                if (timer.milliseconds() - stateStartTime > spindexerWaitTime) {
+                    currentState = State.LAUNCH_FIRST;
                 }
                 break;
             // IF LAUNCHER AT TARGET VELOCITY, PUSH IN POPPER
@@ -114,12 +124,18 @@ public class LaunchArtifactCommand {
             case MOVE_TO_SECOND_LAUNCH:
                 if (target != 999) {
                     if (spindexer.reachedTarget(spindexer.getWrappedAngle(), target)) {
-                        currentState = State.LAUNCH_SECOND;
+                        stateStartTime = timer.milliseconds();
+                        currentState = State.WAIT_AFTER_AT_SECOND;
                     }
                 }
                 else {
                     target = launchAngleSequence[2];
                     currentState = State.MOVE_TO_THIRD_LAUNCH;
+                }
+                break;
+            case WAIT_AFTER_AT_SECOND:
+                if (timer.milliseconds() - stateStartTime > spindexerWaitTime) {
+                    currentState = State.LAUNCH_SECOND;
                 }
                 break;
             case LAUNCH_SECOND:
@@ -145,11 +161,17 @@ public class LaunchArtifactCommand {
             case MOVE_TO_THIRD_LAUNCH:
                 if (target != 999) {
                     if (spindexer.reachedTarget(spindexer.getWrappedAngle(), target)) {
-                        currentState = State.LAUNCH_THIRD;
+                        stateStartTime = timer.milliseconds();
+                        currentState = State.WAIT_AFTER_AT_THIRD;
                     }
                 }
                 else {
                     currentState = State.FINISHED;
+                }
+                break;
+            case WAIT_AFTER_AT_THIRD:
+                if (timer.milliseconds() - stateStartTime > spindexerWaitTime) {
+                    currentState = State.LAUNCH_THIRD;
                 }
                 break;
             case LAUNCH_THIRD:
