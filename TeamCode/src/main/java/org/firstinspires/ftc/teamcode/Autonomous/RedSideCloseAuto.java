@@ -16,7 +16,6 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.Autonomous.Test.IntakeAutonomous;
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Commands.SpindexerColorIntakeCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
@@ -145,7 +144,7 @@ public class RedSideCloseAuto extends LinearOpMode {
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (!initialized) {
                 launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher, drive);
-                launchArtifactCommand.start();
+                launchArtifactCommand.startAuto(0,0);
                 initialized = true;
             }
 
@@ -183,14 +182,15 @@ public class RedSideCloseAuto extends LinearOpMode {
         DRIVE AND TRAJECTORIES
          */
         Pose2d startPose = new Pose2d(-60, 20, Math.toRadians(90));
-        MecanumDrive drive = new MecanumDrive(hardwareMap, startPose);
-        TrajectoryActionBuilder firstLaunch = drive.actionBuilder(startPose).strafeToLinearHeading(new Vector2d(-10,35), Math.toRadians(90));
-        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-10,60), new TranslationalVelConstraint(5));
+        drive = new MecanumDrive(hardwareMap, startPose);
+        TrajectoryActionBuilder firstLaunch = drive.actionBuilder(startPose).strafeToLinearHeading(new Vector2d(-10,40), Math.toRadians(90));
+        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-10,40)).strafeToConstantHeading(new Vector2d(-10,55), new TranslationalVelConstraint(7));
         TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-7,35));
-        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(15, 35)).strafeToConstantHeading(new Vector2d(15,60) , new TranslationalVelConstraint(7));
+        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(15, 40)).strafeToConstantHeading(new Vector2d(15,55) , new TranslationalVelConstraint(7));
         TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-7,35));
-        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(39, 35)).strafeToConstantHeading(new Vector2d(39,60), new TranslationalVelConstraint(7));
+        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(39, 40)).strafeToConstantHeading(new Vector2d(39,55), new TranslationalVelConstraint(7));
         TrajectoryActionBuilder fourthLaunch = thirdPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-7,35));
+        TrajectoryActionBuilder park = fourthLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-2,40));
 
         /** Commands */
         spindexerColorIntakeCommand = new SpindexerColorIntakeCommand(spindexer);
@@ -214,13 +214,14 @@ public class RedSideCloseAuto extends LinearOpMode {
                                     spindexerColorIntake(spindexerColorIntakeCommand),
                                     intakeCommand(intake)
                             ),
-                            stopIntakeSpindexer(spindexer, intake),
-                            secondLaunch.build(),
-                            shootArtifacts(),
-                            secondPickup.build(),
-                            thirdLaunch.build(),
-                            thirdPickup.build(),
-                            fourthLaunch.build()
+                            stopIntakeSpindexer(spindexer, intake)
+//                            secondLaunch.build(),
+////                            shootArtifacts(),
+//                            secondPickup.build(),
+//                            thirdLaunch.build(),
+//                            thirdPickup.build(),
+//                            fourthLaunch.build(),
+//                            park.build()
                         )
                 )
         );

@@ -9,63 +9,54 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
+import org.firstinspires.ftc.teamcode.Subsystems.Commands.LaunchArtifactCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.Commands.SpindexerColorIntakeCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain.FieldCentricDrive;
-import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
-import org.firstinspires.ftc.teamcode.Subsystems.Commands.LaunchArtifactCommand;
+import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.LimeLight;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
+@TeleOp(name="TeleOp_Tester", group="!TeleOp")
 @Config
-@TeleOp(name="BlueTeleOp", group="!TeleOp")
-public class BlueTeleOp extends OpMode {
-    public double pinPointDistance;
-
-    FieldCentricDrive drive;
+public class TeleOpTesting extends OpMode {
+    Spindexer spindexer;
+    Popper popper;
+    Launcher launcher;
     LimeLight limelight;
     public double motifID = -1;
     public double aprilTagID = -1;
-    Intake intake;
-    Spindexer spindexer;
-    public static double kP, kD, kS;
-    public static double target;
-    public static int slowingThreshold, stoppingThreshold;
-    public static double slowingMultiplier;
-    Popper popper;
-    Launcher launcher;
     Turret turret;
     ElapsedTime offSetTurretTime = new ElapsedTime();
-    public static double xValueGoal = 60;
-    public static double yValueGoal = 60;
-    public static double xValueBot = -2;
-    public static double yValueBot = -40;
     boolean isUsingTurret = false;
     boolean prevDpadUp = false;
-    MecanumDrive drive_roadrunner;
-    Pose2d initialPose = new Pose2d(xValueBot, yValueBot, Math.toRadians(270));
-    Pose2d BLUE_GOALPose = new Pose2d(xValueGoal, yValueGoal, 0);
 
-
-    // COMMANDS
     LaunchArtifactCommand launchArtifactCommand;
     SpindexerColorIntakeCommand spindexerColorSensorIntakeCommand;
+
+    MecanumDrive drive_roadrunner;
+    public static double xValueGoal = -60;
+    public static double yValueGoal = 60;
+    public static double xValueBot = -2;
+    public static double yValueBot = 40;
+    Pose2d initialPose = new Pose2d(xValueBot, yValueBot, Math.toRadians(90));
+    Pose2d BLUE_GOALPose = new Pose2d(xValueGoal, yValueGoal, 0);
+
 
     TelemetryPacket packet;
     FtcDashboard dashboard;
 
+    public static double targetVel = 0;
+    public static double targetAngle = 0;
     @Override
-    public void init() {
+    public void init(){
         telemetry.addData("Status", "Initializing");
         telemetry.update();
 
-        drive = new FieldCentricDrive(hardwareMap);
-
         limelight = new LimeLight(hardwareMap);
 
-        intake = new Intake(hardwareMap);
         spindexer = new Spindexer(hardwareMap);
 
         popper = new Popper(hardwareMap);
@@ -80,7 +71,6 @@ public class BlueTeleOp extends OpMode {
         packet = new TelemetryPacket();
         dashboard = FtcDashboard.getInstance();
 
-        drive.resetIMU();
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -88,11 +78,11 @@ public class BlueTeleOp extends OpMode {
 
     @Override
     public void loop() {
+
+        launcher.setVelocity(targetVel);
+        launcher.setCoverAngle(targetAngle);
+
         limelight();
-
-        drive();
-
-        intake();
 
         colorSensorIntake();
 
@@ -105,40 +95,10 @@ public class BlueTeleOp extends OpMode {
         dashboard.sendTelemetryPacket(packet);
     }
 
-    public void drive() {
-        double y = -gamepad1.left_stick_y;
-        double x = gamepad1.left_stick_x;
-        double rx = gamepad1.right_stick_x;
-
-        drive.drive(y, x, rx);
-
-        if (gamepad1.x) {
-            drive.resetIMU();
-        }
-    }
-
-    public void intake() {
-        if (gamepad1.right_trigger > 0.1) {
-            // Canceling launch command sequence
-            launchArtifactCommand = null;
-            launcher.stopLauncher();
-            popper.deactivatePopper();
-
-            // Intake logic
-            intake.runIntake(gamepad1.right_trigger);
-        } else if (gamepad1.left_trigger > 0.1) {
-            intake.reverseIntake(gamepad1.left_trigger);
-        } else {
-            intake.stopIntake();
-        }
-
-
-    }
-
     public void launchCommand() {
         if (gamepad1.a) {
             launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher, drive_roadrunner);
-            launchArtifactCommand.start();
+            launchArtifactCommand.startAuto(targetVel, targetAngle);
         }
 
         if (launchArtifactCommand != null && !launchArtifactCommand.isFinished()) {
@@ -178,7 +138,7 @@ public class BlueTeleOp extends OpMode {
         if(turret.getTurretZeroOffsetField() != 0.0) {
             if (isUsingTurret) {
                 if (limelight.isResulted()) {
-                    if (limelight.getAprilTagID() == 20) {
+                    if (limelight.getAprilTagID() == 24) {
                         turret.trackAprilTag(limelight.getTX());
                         packet.put("Turret with: ", "LimeLight");
                     }
@@ -203,14 +163,4 @@ public class BlueTeleOp extends OpMode {
         packet.put("Motif ID: ", limelight.getMotifID());
     }
 
-    @Override
-    public void stop() {
-        intake.stopIntake();
-        spindexer.stopSpindexer();
-        drive.stopDrive();
-        popper.deactivatePopper();
-        launcher.stopLauncher();
-        turret.stopTurret();
-        limelight.stopLimeLight();
-    }
 }

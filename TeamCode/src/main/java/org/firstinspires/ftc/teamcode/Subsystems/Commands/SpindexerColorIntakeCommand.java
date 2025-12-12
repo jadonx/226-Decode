@@ -93,6 +93,10 @@ public class SpindexerColorIntakeCommand {
         }
     }
 
+
+
+
+
     /*
     public void update(Telemetry telemetry) {
         if (colorSensorTimer.milliseconds() > colorSensorUpdateTime) {
@@ -178,6 +182,8 @@ public class SpindexerColorIntakeCommand {
         if (hue > 210 && hue < 270) return Spindexer.HolderStatus.PURPLE;
         else return Spindexer.HolderStatus.NONE;
     }
+
+
 
     private boolean hasBall(double hue) {
         return ((hue > 130 && hue < 190) || (hue > 210 && hue < 270)) && spindexer.getColorDistance() < 2;

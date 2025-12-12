@@ -72,6 +72,18 @@ public class LaunchArtifactCommand {
         launcher.setCoverAngle(targetAngle);
     }
 
+    public void startAuto(double tV, double tA) {
+        launchAngleSequence = spindexer.getLaunchPositionsDyanmic();
+        target = launchAngleSequence[0];
+        currentState = State.MOVE_TO_FIRST_LAUNCH;
+
+        timer = new ElapsedTime();
+
+        popper.spinPopper();
+//        launcher.setVelocity(tV);
+//        launcher.setCoverAngle(tA);
+    }
+
     public void autoColorStart(Spindexer.HolderStatus[] motifPattern) {
         launchAngleSequence = spindexer.getLaunchPositionsColor(motifPattern);
         target = launchAngleSequence[0];

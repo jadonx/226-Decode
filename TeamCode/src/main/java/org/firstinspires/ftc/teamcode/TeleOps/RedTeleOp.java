@@ -20,8 +20,8 @@ import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
 @Config
-@TeleOp(name="BlueTeleOp", group="!TeleOp")
-public class BlueTeleOp extends OpMode {
+@TeleOp(name="RedTeleOp", group="!TeleOp")
+public class RedTeleOp extends OpMode {
     public double pinPointDistance;
 
     FieldCentricDrive drive;
@@ -38,14 +38,14 @@ public class BlueTeleOp extends OpMode {
     Launcher launcher;
     Turret turret;
     ElapsedTime offSetTurretTime = new ElapsedTime();
-    public static double xValueGoal = 60;
+    public static double xValueGoal = -60;
     public static double yValueGoal = 60;
     public static double xValueBot = -2;
-    public static double yValueBot = -40;
+    public static double yValueBot = 40;
     boolean isUsingTurret = false;
     boolean prevDpadUp = false;
     MecanumDrive drive_roadrunner;
-    Pose2d initialPose = new Pose2d(xValueBot, yValueBot, Math.toRadians(270));
+    Pose2d initialPose = new Pose2d(xValueBot, yValueBot, Math.toRadians(90));
     Pose2d BLUE_GOALPose = new Pose2d(xValueGoal, yValueGoal, 0);
 
 
@@ -99,7 +99,6 @@ public class BlueTeleOp extends OpMode {
         launchCommand();
 
         turret();
-
 
         telemetry.update();
         dashboard.sendTelemetryPacket(packet);
@@ -178,7 +177,7 @@ public class BlueTeleOp extends OpMode {
         if(turret.getTurretZeroOffsetField() != 0.0) {
             if (isUsingTurret) {
                 if (limelight.isResulted()) {
-                    if (limelight.getAprilTagID() == 20) {
+                    if (limelight.getAprilTagID() == 24) {
                         turret.trackAprilTag(limelight.getTX());
                         packet.put("Turret with: ", "LimeLight");
                     }

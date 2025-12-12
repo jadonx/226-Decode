@@ -20,6 +20,10 @@ public class Intake {
         isIntaking = true;
     }
 
+    public void reverseIntake(float intakePower) {
+        intake.setPower(-intakePower);
+    }
+
     public void unjamIntake() {
         intake.setPower(-0.8);
     }
