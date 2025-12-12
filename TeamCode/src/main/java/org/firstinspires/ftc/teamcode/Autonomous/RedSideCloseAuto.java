@@ -144,12 +144,12 @@ public class RedSideCloseAuto extends LinearOpMode {
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (!initialized) {
                 launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher, drive);
-                launchArtifactCommand.startAuto(0,0);
+                launchArtifactCommand.autoColorStart(motifPattern);
                 initialized = true;
             }
 
             if (launchArtifactCommand != null && !launchArtifactCommand.isFinished()) {
-                launchArtifactCommand.update(telemetry);
+                launchArtifactCommand.update(telemetryPacket);
             }
 
             if (launchArtifactCommand != null && launchArtifactCommand.isFinished()) {

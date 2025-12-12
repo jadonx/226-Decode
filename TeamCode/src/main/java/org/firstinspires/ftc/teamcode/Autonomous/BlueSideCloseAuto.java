@@ -150,7 +150,7 @@ public class BlueSideCloseAuto extends LinearOpMode {
             }
 
             if (launchArtifactCommand != null && !launchArtifactCommand.isFinished()) {
-                launchArtifactCommand.update(telemetry);
+                launchArtifactCommand.update(telemetryPacket);
             }
 
             if (launchArtifactCommand != null && launchArtifactCommand.isFinished()) {

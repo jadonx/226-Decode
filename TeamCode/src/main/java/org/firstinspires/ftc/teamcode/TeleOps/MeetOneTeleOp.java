@@ -32,9 +32,9 @@ public class MeetOneTeleOp extends OpMode {
     Intake intake;
     Spindexer spindexer;
     public static double kP, kD, kS;
-    public static double target;
-    public static int slowingThreshold, stoppingThreshold;
+    public static int slowingThreshold;
     public static double slowingMultiplier;
+    public static double target;
     Popper popper;
     Launcher launcher;
     Turret turret;
@@ -95,9 +95,15 @@ public class MeetOneTeleOp extends OpMode {
 
         intake();
 
-        colorSensorIntake();
+         colorSensorIntake();
 
-        launchCommand();
+         launchCommand();
+
+        // spindexer.goToAngle(target);
+        // spindexer.updatePIDValues(kP, kD, kS, slowingThreshold, slowingMultiplier);
+
+        packet.put("current ", spindexer.getWrappedAngle());
+        packet.put("target ", target);
 
         spindexerTelemetry();
 
@@ -141,7 +147,7 @@ public class MeetOneTeleOp extends OpMode {
         }
 
         if (launchArtifactCommand != null && !launchArtifactCommand.isFinished()) {
-            launchArtifactCommand.update(telemetry);
+            launchArtifactCommand.update(packet);
         }
 
         if (launchArtifactCommand != null && launchArtifactCommand.isFinished()) {
