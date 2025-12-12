@@ -197,7 +197,7 @@ public class LaunchArtifactCommand {
                 }
                 break;
             case WAIT_AFTER_THIRD_LAUNCH:
-                if (timer.milliseconds() - stateStartTime > popperPushInWait) {
+                if (timer.milliseconds() - stateStartTime > 800) {
                     popper.deactivatePopper();
                     launcher.stopLauncher();
                     spindexer.resetHolderStatuses();

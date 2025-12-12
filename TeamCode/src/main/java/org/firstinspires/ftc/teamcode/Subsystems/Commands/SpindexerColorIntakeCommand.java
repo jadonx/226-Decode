@@ -186,8 +186,8 @@ public class SpindexerColorIntakeCommand {
     private boolean withinIntakeAngle(double current, int currentHolder) {
         if (currentHolder == 2) {
             // For intake angle 1
-            return current > 353 || current < 9;
+            return current > 345 || current < 17;
         }
-        else return current > (intakePositions[currentHolder]-6) && current < (intakePositions[currentHolder]+6);
+        else return current > (intakePositions[currentHolder]-12) && current < (intakePositions[currentHolder]+12);
     }
 }

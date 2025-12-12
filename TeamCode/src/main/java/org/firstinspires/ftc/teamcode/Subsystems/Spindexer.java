@@ -22,7 +22,7 @@ public class Spindexer {
     private AS5600Encoder spindexerEncoder;
 
     // PID VARIABLES
-    private double kP = 0.0065, kD = 0, kS = 0.055;
+    private double kP = 0.005, kD = 0, kS = 0.045;
     private double lastError = 0;
     private ElapsedTime pidTimer;
 
@@ -81,8 +81,8 @@ public class Spindexer {
         if (Math.abs(error) < 2) {
             output = 0;
         }
-        else if (Math.abs(error) < 10) {
-            output *= 0.5;
+        else if (Math.abs(error) < 30) {
+            output *= 0.65;
         }
 
         // Clipping output
