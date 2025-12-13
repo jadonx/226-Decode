@@ -44,7 +44,8 @@ public class RedSideCloseAuto extends LinearOpMode {
 
     public double aprilTagID = -1;
     public double motifID = -1;
-    public Spindexer.HolderStatus[] motifPattern;
+    public boolean hasReadMotif = false;
+    public Spindexer.HolderStatus[] motifPattern = new Spindexer.HolderStatus[]{Spindexer.HolderStatus.NONE, Spindexer.HolderStatus.NONE, Spindexer.HolderStatus.NONE};
 
     /*
     ACTIONS
@@ -54,8 +55,13 @@ public class RedSideCloseAuto extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             limeLight.getResult();
-            if (motifID != -1) {
-                motifPattern = limeLight.getMotif();
+            if (!hasReadMotif) {
+                if (motifID != -1) {
+                    motifPattern = limeLight.getMotif();
+                    hasReadMotif = true;
+                } else {
+                    motifPattern = new Spindexer.HolderStatus[]{Spindexer.HolderStatus.GREEN, Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.PURPLE};
+                }
             }
             motifID = limeLight.getMotifID();
             aprilTagID = limeLight.getAprilTagID();
@@ -72,6 +78,30 @@ public class RedSideCloseAuto extends LinearOpMode {
     }
     public Action turretGetMotifAndAimAprilTag() {
         return new GetMotifAndAimToAprilTag();
+    }
+
+
+    public class FirstSpindexerColorIntake implements Action {
+        private final SpindexerColorIntakeCommand spindexerColorIntakeCommand;
+
+        private boolean initialized = false;
+
+        public FirstSpindexerColorIntake(SpindexerColorIntakeCommand spindexerColorIntakeCommand) {
+            this.spindexerColorIntakeCommand = spindexerColorIntakeCommand;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (!initialized) {
+                spindexerColorIntakeCommand.startAuto();
+                initialized = true;
+            }
+            telemetry.update();
+            return true;
+        }
+    }
+    public Action firstSpindexerColorIntake(SpindexerColorIntakeCommand spindexerColorIntakeCommand) {
+        return new FirstSpindexerColorIntake(spindexerColorIntakeCommand);
     }
 
     public class SpindexerColorIntake implements Action {
@@ -110,31 +140,62 @@ public class RedSideCloseAuto extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.runIntake(1);
-            return true;
+            return false;
         }
     }
     public Action intakeCommand(Intake intake) {
         return new IntakeCommand(intake);
     }
 
-    public class StopIntakeSpindexer implements Action {
-        private final Spindexer spindexer;
+    public class ReverseIntakeCommand implements Action {
         private final Intake intake;
 
-        public StopIntakeSpindexer(Spindexer spindexer, Intake intake) {
-            this.spindexer = spindexer;
+        public ReverseIntakeCommand(Intake intake) {
             this.intake = intake;
         }
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            spindexer.stopSpindexer();
+            intake.runIntake(-1);
+            return false;
+        }
+    }
+    public Action reverseIntakeCommand(Intake intake) {
+        return new ReverseIntakeCommand(intake);
+    }
+
+    public class StopIntake implements Action {
+        private final Intake intake;
+
+        public StopIntake(Intake intake) {
+            this.intake = intake;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.stopIntake();
             return false;
         }
     }
-    public Action stopIntakeSpindexer(Spindexer spindexer, Intake intake) {
-        return new StopIntakeSpindexer(spindexer, intake);
+    public Action stopIntake(Intake intake) {
+        return new StopIntake(intake);
+    }
+
+    public class StopSpindexer implements Action {
+        private final Spindexer spindexer;
+
+        public StopSpindexer(Spindexer spindexer) {
+            this.spindexer = spindexer;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            spindexer.stopSpindexer();
+            return false;
+        }
+    }
+    public Action stopSpindexer(Spindexer spindexer) {
+        return new StopSpindexer(spindexer);
     }
 
     public class ShootArtifacts implements Action {
@@ -181,17 +242,17 @@ public class RedSideCloseAuto extends LinearOpMode {
         /*
         DRIVE AND TRAJECTORIES
          */
-        Pose2d startPose = new Pose2d(-60, 20, Math.toRadians(90));
+        Pose2d startPose = new Pose2d(-60, 50, Math.toRadians(90));
         drive = new MecanumDrive(hardwareMap, startPose);
-        TrajectoryActionBuilder firstLaunch = drive.actionBuilder(startPose).strafeToLinearHeading(new Vector2d(-10,40), Math.toRadians(90));
-        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-10,40)).strafeToConstantHeading(new Vector2d(-10,55), new TranslationalVelConstraint(7));
-        TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-7,35));
-        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(15, 40)).strafeToConstantHeading(new Vector2d(15,55) , new TranslationalVelConstraint(7));
-        TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-7,35));
-        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(39, 40)).strafeToConstantHeading(new Vector2d(39,55), new TranslationalVelConstraint(7));
-        TrajectoryActionBuilder fourthLaunch = thirdPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-7,35));
+        TrajectoryActionBuilder getMotif = drive.actionBuilder(startPose).strafeToLinearHeading(new Vector2d(-40,30), Math.toRadians(90));
+        TrajectoryActionBuilder firstLaunch = getMotif.endTrajectory().fresh().strafeToLinearHeading(new Vector2d(-13,40), Math.toRadians(90));
+        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-12,40)).strafeToConstantHeading(new Vector2d(-12,59), new TranslationalVelConstraint(6));
+        TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-9,35));
+        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(13.5, 40)).strafeToConstantHeading(new Vector2d(13.5,59) , new TranslationalVelConstraint(6));
+        TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-9,35));
+        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(39, 40)).strafeToConstantHeading(new Vector2d(39,59), new TranslationalVelConstraint(6));
+        TrajectoryActionBuilder fourthLaunch = thirdPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-8,35));
         TrajectoryActionBuilder park = fourthLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-2,40));
-
         /** Commands */
         spindexerColorIntakeCommand = new SpindexerColorIntakeCommand(spindexer);
         launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher, drive);
@@ -204,24 +265,33 @@ public class RedSideCloseAuto extends LinearOpMode {
                 new ParallelAction(
                         turretGetMotifAndAimAprilTag(),
                         new SequentialAction(
+                            getMotif.build(),
                             new RaceAction(
                                     firstLaunch.build(),
-                                    spindexerColorIntake(spindexerColorIntakeCommand)
+                                    firstSpindexerColorIntake(spindexerColorIntakeCommand)
                             ),
                             shootArtifacts(),
+                            intakeCommand(intake),
                             new RaceAction(
                                     firstPickup.build(),
-                                    spindexerColorIntake(spindexerColorIntakeCommand),
-                                    intakeCommand(intake)
+                                    spindexerColorIntake(spindexerColorIntakeCommand)
                             ),
-                            stopIntakeSpindexer(spindexer, intake)
-//                            secondLaunch.build(),
-////                            shootArtifacts(),
-//                            secondPickup.build(),
-//                            thirdLaunch.build(),
+                            stopIntake(intake),
+                            stopSpindexer(spindexer),
+                            secondLaunch.build(),
+                            shootArtifacts(),
+                            intakeCommand(intake),
+                            new RaceAction(
+                                    secondPickup.build(),
+                                    spindexerColorIntake(spindexerColorIntakeCommand)
+                            ),
+                            stopIntake(intake),
+                            stopSpindexer(spindexer),
+                            thirdLaunch.build(),
+                            shootArtifacts(),
 //                            thirdPickup.build(),
 //                            fourthLaunch.build(),
-//                            park.build()
+                            park.build()
                         )
                 )
         );

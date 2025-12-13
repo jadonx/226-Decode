@@ -121,6 +121,8 @@ public class BlueTeleOp extends OpMode {
         if (gamepad1.right_trigger > 0.1) {
             // Canceling launch command sequence
             launchArtifactCommand = null;
+            spindexer.resetHolderStatuses();
+            spindexerColorSensorIntakeCommand.start();
             launcher.stopLauncher();
             popper.deactivatePopper();
 
@@ -147,6 +149,7 @@ public class BlueTeleOp extends OpMode {
 
         if (launchArtifactCommand != null && launchArtifactCommand.isFinished()) {
             launchArtifactCommand = null;
+            spindexerColorSensorIntakeCommand.start();
             launcher.stopLauncher();
             popper.deactivatePopper();
         }

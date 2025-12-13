@@ -40,7 +40,7 @@ public class LaunchArtifactCommand {
     private double stateStartTime = 0;
     private final double popperPushInWait = 400; // Wait time for popper to move in
     private final double popperPullOutWait = 400;
-    private final double spindexerWaitTime = 750;
+    private final double spindexerWaitTime = 350;
     private ElapsedTime timer;
 
     private double atLaunchTimer = 0;
@@ -72,18 +72,6 @@ public class LaunchArtifactCommand {
         launcher.setCoverAngle(targetAngle);
     }
 
-    public void startAuto(double tV, double tA) {
-        launchAngleSequence = spindexer.getLaunchPositionsDyanmic();
-        target = launchAngleSequence[0];
-        currentState = State.MOVE_TO_FIRST_LAUNCH;
-
-        timer = new ElapsedTime();
-
-        popper.spinPopper();
-//        launcher.setVelocity(tV);
-//        launcher.setCoverAngle(tA);
-    }
-
     public void autoColorStart(Spindexer.HolderStatus[] motifPattern) {
         launchAngleSequence = spindexer.getLaunchPositionsColor(motifPattern);
         target = launchAngleSequence[0];
@@ -93,8 +81,7 @@ public class LaunchArtifactCommand {
 
         popper.spinPopper();
 
-        double[] targetVelocityAngle = launcher.getVelocityAndAngle(drive.localizer.getPose());
-        targetVelocity = targetVelocityAngle[0]; targetAngle = targetVelocityAngle[1];
+        targetVelocity = 1760; targetAngle = 0.35;
 
         launcher.setVelocity(targetVelocity);
         launcher.setCoverAngle(targetAngle);
@@ -220,6 +207,8 @@ public class LaunchArtifactCommand {
                 break;
         }
 
+        telemetryPacket.put("velocity ", targetVelocity);
+        telemetryPacket.put("angle ", targetAngle);
         telemetryPacket.put("target ", target);
         telemetryPacket.put("current ", spindexer.getWrappedAngle());
     }

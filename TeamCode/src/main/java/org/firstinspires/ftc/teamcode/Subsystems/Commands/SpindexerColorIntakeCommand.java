@@ -20,7 +20,7 @@ public class SpindexerColorIntakeCommand {
     private int targetAngle;
 
     private ElapsedTime holdingBallTimer;
-    private int holdingBallThreshold = 150; // Must hold ball for 800ms to move to next holder
+    private int holdingBallThreshold = 50; // Must hold ball for 800ms to move to next holder
 
     private int[] intakePositions;
 
@@ -43,6 +43,12 @@ public class SpindexerColorIntakeCommand {
         holdingBallTimer = new ElapsedTime();
         currentState = State.WAIT_AT_FIRST_HOLDER;
         targetAngle = intakePositions[0];
+    }
+
+    public void startAuto() {
+        spindexer.setHolderStatus(0, Spindexer.HolderStatus.PURPLE);
+        spindexer.setHolderStatus(1, Spindexer.HolderStatus.PURPLE);
+        spindexer.setHolderStatus(2, Spindexer.HolderStatus.GREEN);
     }
 
     public void update(Telemetry telemetry) {
