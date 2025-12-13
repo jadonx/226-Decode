@@ -81,7 +81,7 @@ public class LaunchArtifactCommand {
 
         popper.spinPopper();
 
-        targetVelocity = 1760; targetAngle = 0.35;
+        targetVelocity = 1560; targetAngle = 0.35;
 
         launcher.setVelocity(targetVelocity);
         launcher.setCoverAngle(targetAngle);

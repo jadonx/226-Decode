@@ -289,8 +289,6 @@ public class RedSideCloseAuto extends LinearOpMode {
                             stopSpindexer(spindexer),
                             thirdLaunch.build(),
                             shootArtifacts(),
-//                            thirdPickup.build(),
-//                            fourthLaunch.build(),
                             park.build()
                         )
                 )

@@ -40,8 +40,8 @@ public class BlueTeleOp extends OpMode {
     ElapsedTime offSetTurretTime = new ElapsedTime();
     public static double xValueGoal = 60;
     public static double yValueGoal = 60;
-    public static double xValueBot = -2;
-    public static double yValueBot = -40;
+    public static double xValueBot = 0;
+    public static double yValueBot = 0;
     boolean isUsingTurret = false;
     boolean prevDpadUp = false;
     MecanumDrive drive_roadrunner;
@@ -121,21 +121,17 @@ public class BlueTeleOp extends OpMode {
         if (gamepad1.right_trigger > 0.1) {
             // Canceling launch command sequence
             launchArtifactCommand = null;
-            spindexer.resetHolderStatuses();
-            spindexerColorSensorIntakeCommand.start();
             launcher.stopLauncher();
             popper.deactivatePopper();
 
             // Intake logic
             intake.runIntake(gamepad1.right_trigger);
-        } else if (gamepad1.left_trigger > 0.1) {
-            intake.reverseIntake(gamepad1.left_trigger);
-        } else {
+        }
+        else {
             intake.stopIntake();
         }
-
-
     }
+
 
     public void launchCommand() {
         if (gamepad1.a) {

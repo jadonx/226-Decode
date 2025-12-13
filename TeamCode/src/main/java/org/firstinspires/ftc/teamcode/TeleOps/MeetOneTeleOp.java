@@ -134,8 +134,9 @@ public class MeetOneTeleOp extends OpMode {
 
             // Intake logic
             intake.runIntake(gamepad1.right_trigger);
-        }
-        else {
+        } else if (gamepad1.left_trigger > 0.1) {
+            intake.reverseIntake(gamepad1.left_trigger);
+        } else {
             intake.stopIntake();
         }
     }

@@ -80,7 +80,7 @@ public class Launcher {
          */
         else {
             coverPos = calculateCoverAngle();
-            targetVelocity = calculateTargetVelocity() + 150;
+            targetVelocity = calculateTargetVelocity() + 250;
         }
 
         return new double[] {targetVelocity , coverPos};

@@ -40,8 +40,8 @@ public class RedTeleOp extends OpMode {
     ElapsedTime offSetTurretTime = new ElapsedTime();
     public static double xValueGoal = -60;
     public static double yValueGoal = 60;
-    public static double xValueBot = -2;
-    public static double yValueBot = 40;
+    public static double xValueBot = 0;
+    public static double yValueBot = 0;
     boolean isUsingTurret = false;
     boolean prevDpadUp = false;
     MecanumDrive drive_roadrunner;
