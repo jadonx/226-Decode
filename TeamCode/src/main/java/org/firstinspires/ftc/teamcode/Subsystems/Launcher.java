@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import static org.firstinspires.ftc.teamcode.TeleOps.MeetOneTeleOp.target;
 import static org.firstinspires.ftc.teamcode.TeleOps.MeetOneTeleOp.xValueBot;
 import static org.firstinspires.ftc.teamcode.TeleOps.MeetOneTeleOp.xValueGoal;
 import static org.firstinspires.ftc.teamcode.TeleOps.MeetOneTeleOp.yValueBot;
@@ -80,7 +81,7 @@ public class Launcher {
          */
         else {
             coverPos = calculateCoverAngle();
-            targetVelocity = calculateTargetVelocity();
+            targetVelocity = calculateTargetVelocity() + 150;
         }
 
         return new double[] {targetVelocity, coverPos};

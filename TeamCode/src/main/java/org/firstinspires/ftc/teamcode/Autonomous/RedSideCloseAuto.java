@@ -216,7 +216,7 @@ public class RedSideCloseAuto extends LinearOpMode {
                             ),
                             stopIntakeSpindexer(spindexer, intake)
 //                            secondLaunch.build(),
-////                            shootArtifacts(),
+//                            shootArtifacts(),
 //                            secondPickup.build(),
 //                            thirdLaunch.build(),
 //                            thirdPickup.build(),
