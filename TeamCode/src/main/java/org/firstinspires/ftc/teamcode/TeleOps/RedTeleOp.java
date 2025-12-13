@@ -146,6 +146,7 @@ public class RedTeleOp extends OpMode {
 
         if (launchArtifactCommand != null && launchArtifactCommand.isFinished()) {
             launchArtifactCommand = null;
+            spindexerColorSensorIntakeCommand.start();
             launcher.stopLauncher();
             popper.deactivatePopper();
         }

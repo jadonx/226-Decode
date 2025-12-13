@@ -98,7 +98,7 @@ public class TeleOpTesting extends OpMode {
     public void launchCommand() {
         if (gamepad1.a) {
             launchArtifactCommand = new LaunchArtifactCommand(spindexer, popper, launcher, drive_roadrunner);
-            launchArtifactCommand.startAuto(targetVel, targetAngle);
+            launchArtifactCommand.start();
         }
 
         if (launchArtifactCommand != null && !launchArtifactCommand.isFinished()) {

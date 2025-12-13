@@ -41,9 +41,7 @@ public class Spindexer {
         spindexerServo = hardwareMap.get(CRServo.class, Constants.HMServospinDexer);
         spindexerServo.setDirection(DcMotorSimple.Direction.REVERSE);
         spindexerEncoder = hardwareMap.get(AS5600Encoder.class, Constants.HMSpindexerEncoder);
-
         pidTimer = new ElapsedTime();
-
         colorSensorV3 = hardwareMap.get(RevColorSensorV3.class, Constants.HMFrontColorSensor);
     }
 
@@ -144,7 +142,6 @@ public class Spindexer {
         if (holderStatuses[2] != HolderStatus.NONE) {
             launchPositions[2] = launchHolderAngles[2];
         }
-
         return launchPositions;
     }
 

@@ -84,7 +84,7 @@ public class Launcher {
             targetVelocity = calculateTargetVelocity() + 150;
         }
 
-        return new double[] {targetVelocity, coverPos};
+        return new double[] {targetVelocity , coverPos};
     }
 
     public void setVelocity(double targetVelocity) {
