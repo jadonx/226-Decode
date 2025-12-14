@@ -80,7 +80,7 @@ public class Launcher {
          */
         else {
             coverPos = calculateCoverAngle();
-            targetVelocity = calculateTargetVelocity() + 250;
+            targetVelocity = calculateTargetVelocity() + 150;
         }
 
         return new double[] {targetVelocity , coverPos};
@@ -100,7 +100,7 @@ public class Launcher {
     }
 
     public boolean atTargetVelocity(double targetVelocity) {
-        return Math.abs(getCurrentVelocity() - targetVelocity) < 80;
+        return Math.abs(getCurrentVelocity() - targetVelocity) < 150;
     }
 
     public void stopLauncher() {

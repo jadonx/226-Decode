@@ -207,7 +207,8 @@ public class LaunchArtifactCommand {
                 break;
         }
 
-        telemetryPacket.put("velocity ", targetVelocity);
+        telemetryPacket.put("target velocity ", targetVelocity);
+        telemetryPacket.put("current velocity ", launcher.getCurrentVelocity());
         telemetryPacket.put("angle ", targetAngle);
         telemetryPacket.put("target ", target);
         telemetryPacket.put("current ", spindexer.getWrappedAngle());

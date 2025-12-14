@@ -18,9 +18,10 @@ import org.firstinspires.ftc.teamcode.Subsystems.LimeLight;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
+import org.firstinspires.ftc.teamcode.Subsystems.UnjammerSystem;
 
 @Config
-@TeleOp(name="RedTeleOp", group="!TeleOp")
+@TeleOp(name="Red", group="!TeleOp")
 public class RedTeleOp extends OpMode {
     public double pinPointDistance;
 
@@ -31,21 +32,22 @@ public class RedTeleOp extends OpMode {
     Intake intake;
     Spindexer spindexer;
     public static double kP, kD, kS;
-    public static double target;
-    public static int slowingThreshold, stoppingThreshold;
+    public static int slowingThreshold;
     public static double slowingMultiplier;
+    public static double target;
     Popper popper;
     Launcher launcher;
     Turret turret;
     ElapsedTime offSetTurretTime = new ElapsedTime();
     public static double xValueGoal = -60;
     public static double yValueGoal = 60;
-    public static double xValueBot = 0;
-    public static double yValueBot = 0;
+    public static double xValueBot = -2;
+    public static double yValueBot = 40;
+    public static double robotHeading = 161;
     boolean isUsingTurret = false;
     boolean prevDpadUp = false;
     MecanumDrive drive_roadrunner;
-    Pose2d initialPose = new Pose2d(xValueBot, yValueBot, Math.toRadians(90));
+    Pose2d initialPose = new Pose2d(xValueBot, yValueBot, Math.toRadians(robotHeading));
     Pose2d BLUE_GOALPose = new Pose2d(xValueGoal, yValueGoal, 0);
 
 
@@ -90,13 +92,40 @@ public class RedTeleOp extends OpMode {
     public void loop() {
         limelight();
 
-        drive();
+        double y = -gamepad1.left_stick_y;
+        double x = gamepad1.left_stick_x;
+        double rx = gamepad1.right_stick_x;
+
+        if (gamepad1.left_bumper) {
+            drive.driveSlow(y, x, rx);
+        }
+        else {
+            drive.drive(y, x, rx);
+        }
+
+        if (gamepad1.x) {
+            drive.resetIMU();
+        }
 
         intake();
 
         colorSensorIntake();
 
         launchCommand();
+
+        if (gamepad1.dpadDownWasPressed()) {
+            launchArtifactCommand = null;
+            spindexer.resetHolderStatuses();
+            spindexerColorSensorIntakeCommand.start();
+        }
+
+        // spindexer.goToAngle(target);
+        // spindexer.updatePIDValues(kP, kD, kS, slowingThreshold, slowingMultiplier);
+
+        packet.put("current ", spindexer.getWrappedAngle());
+        packet.put("target ", target);
+
+        spindexerTelemetry();
 
         turret();
 
@@ -130,8 +159,6 @@ public class RedTeleOp extends OpMode {
         } else {
             intake.stopIntake();
         }
-
-
     }
 
     public void launchCommand() {
@@ -158,6 +185,14 @@ public class RedTeleOp extends OpMode {
         }
     }
 
+    public void spindexerTelemetry() {
+        telemetry.addData("spindexer ", spindexer.getWrappedAngle());
+        telemetry.addData("holder 1 ", spindexer.getHolderStatus()[0]);
+        telemetry.addData("holder 2 ", spindexer.getHolderStatus()[1]);
+        telemetry.addData("holder 3", spindexer.getHolderStatus()[2]);
+        telemetry.addData("hue ", spindexer.getHSVRev()[0]);
+    }
+
     public void turret() {
         // TURRET LOGIC
         drive_roadrunner.updatePoseEstimate();
@@ -180,10 +215,10 @@ public class RedTeleOp extends OpMode {
                 if (limelight.isResulted()) {
                     if (limelight.getAprilTagID() == 24) {
                         turret.trackAprilTag(limelight.getTX());
-                        packet.put("Turret with: ", "LimeLight");
+                        packet.put("Turret Mode: ", "LimeLight");
                     }
                 } else {
-                    packet.put("Turret with: ", "PinPoint");
+                    packet.put("Turret Mode: ", "PinPoint");
                     turret.trackTargetAngle(targetangle);
                 }
                 packet.put("Turret Mode: ", "ON");
@@ -192,7 +227,9 @@ public class RedTeleOp extends OpMode {
                 packet.put("Turret Mode: ", "OFF");
             }
         }
-        packet.put("Desired Turret Angle: ", targetangle);
+        packet.put("Turret Desired Angle: ", targetangle);
+        packet.put("Turret Angle Raw: ", turret.getTurretAngleRaw());
+        packet.put("Turret Angle: ", turret.getTurretAngle());
     }
 
     public void limelight() {

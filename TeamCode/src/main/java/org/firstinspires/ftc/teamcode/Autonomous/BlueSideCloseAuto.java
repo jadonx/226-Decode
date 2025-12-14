@@ -247,9 +247,9 @@ public class BlueSideCloseAuto extends LinearOpMode {
         drive = new MecanumDrive(hardwareMap, startPose);
         TrajectoryActionBuilder getMotif = drive.actionBuilder(startPose).strafeToLinearHeading(new Vector2d(-40,-30), Math.toRadians(270));
         TrajectoryActionBuilder firstLaunch = getMotif.endTrajectory().fresh().strafeToLinearHeading(new Vector2d(-13,-40), Math.toRadians(270));
-        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-12,-40)).strafeToConstantHeading(new Vector2d(-12,-59), new TranslationalVelConstraint(6));
+        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-12,-40)).strafeToConstantHeading(new Vector2d(-12,-60), new TranslationalVelConstraint(6));
         TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-9,-35));
-        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(13.5, -40)).strafeToConstantHeading(new Vector2d(13.5,-59) , new TranslationalVelConstraint(6));
+        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(13.5, -40)).strafeToConstantHeading(new Vector2d(13.5,-60) , new TranslationalVelConstraint(6));
         TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-9,-35));
         TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(39, -40)).strafeToConstantHeading(new Vector2d(39,-59), new TranslationalVelConstraint(6));
         TrajectoryActionBuilder fourthLaunch = thirdPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-8,-35));
