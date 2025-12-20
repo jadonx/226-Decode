@@ -27,7 +27,6 @@ android {
 repositories {
     maven {
         url = 'https://maven.brott.dev/'
-        url = "https://mymaven.bylazar.com/releases"
     }
 }
 
@@ -36,13 +35,6 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.xr.runtime:runtime:1.0.0-alpha07'
 
-
-    // PedroPathing
-    implementation 'com.pedropathing:ftc:2.0.3'
-    implementation 'com.pedropathing:telemetry:1.0.0'
-    implementation 'com.bylazar:fullpanels:1.0.6'
-
-
     // RoadRunner
     implementation "com.acmerobotics.roadrunner:ftc:0.1.25"
     implementation "com.acmerobotics.roadrunner:core:1.0.1"
@@ -50,11 +42,4 @@ dependencies {
 
     // Dashboard
     implementation "com.acmerobotics.dashboard:dashboard:0.5.1"
-
-    // NextFTC
-    implementation 'dev.nextftc:ftc:1.0.1'
-    implementation 'dev.nextftc:hardware:1.0.1'
-
-    //FTCLib
-    implementation 'org.ftclib.ftclib:core:2.1.1'
 }
