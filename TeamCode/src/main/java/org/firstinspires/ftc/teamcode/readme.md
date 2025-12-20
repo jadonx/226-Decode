@@ -1,1 +1,1 @@
-THIS IS TEAM 226! THE BEST TEAM IN THE WORLD!
+we going to worlds
