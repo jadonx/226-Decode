@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
+package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -54,25 +54,6 @@ public class FieldCentricDrive {
         backLeft.setPower(backLeftPower);
         frontRight.setPower(frontRightPower);
         backRight.setPower(backRightPower);
-    }
-
-    public void driveSlow(double y, double x, double rx) {
-        double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-
-        // Rotate the movement direction counter to the bot's rotation
-        double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
-        double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
-
-        double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
-        double frontLeftPower = (rotY + rotX + rx) / denominator;
-        double backLeftPower = (rotY - rotX + rx) / denominator;
-        double frontRightPower = (rotY - rotX - rx) / denominator;
-        double backRightPower = (rotY + rotX - rx) / denominator;
-
-        frontLeft.setPower(frontLeftPower * 0.25);
-        backLeft.setPower(backLeftPower * 0.25);
-        frontRight.setPower(frontRightPower * 0.25);
-        backRight.setPower(backRightPower * 0.25);
     }
 
     public void stopDrive() {

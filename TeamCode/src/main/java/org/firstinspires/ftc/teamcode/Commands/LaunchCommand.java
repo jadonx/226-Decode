@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Subsystems.Commands;
+package org.firstinspires.ftc.teamcode.Commands;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 
-public class LaunchArtifactCommand {
+public class LaunchCommand {
     private final Spindexer spindexer;
     private final Popper popper;
     private final Launcher launcher;
@@ -49,7 +49,7 @@ public class LaunchArtifactCommand {
     private double targetVelocity;
     private double targetAngle;
 
-    public LaunchArtifactCommand(Spindexer spindexer, Popper popper, Launcher launcher, MecanumDrive drive_roadrunner) {
+    public LaunchCommand(Spindexer spindexer, Popper popper, Launcher launcher, MecanumDrive drive_roadrunner) {
         this.spindexer = spindexer;
         this.popper = popper;
         this.launcher = launcher;

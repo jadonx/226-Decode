@@ -1,10 +1,4 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
-
-import static org.firstinspires.ftc.teamcode.TeleOps.MeetOneTeleOp.xValueBot;
-import static org.firstinspires.ftc.teamcode.TeleOps.MeetOneTeleOp.xValueGoal;
-import static org.firstinspires.ftc.teamcode.TeleOps.MeetOneTeleOp.yValueBot;
-import static org.firstinspires.ftc.teamcode.TeleOps.MeetOneTeleOp.yValueGoal;
-
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -27,6 +21,7 @@ public class Launcher {
 
     // LIMELIGHT
     private Limelight3A limelight;
+    private LimeLight limelight2;
 
     private double distance = 0;
     double pinPointDistance = 0;
@@ -35,7 +30,7 @@ public class Launcher {
     private final double CAM_H = 12;
     private final double TARGET_H = 29;
 
-    Pose2d BLUE_GOALPose = new Pose2d(xValueGoal, yValueGoal, 0);
+    // Pose2d BLUE_GOALPose = new Pose2d(xValueGoal, yValueGoal, 0);
 
     public Launcher(HardwareMap hardwareMap) {
         launcher1 = hardwareMap.get(DcMotorEx.class, Constants.HMMotorShooter1);
@@ -45,117 +40,5 @@ public class Launcher {
         launcher2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         cover = hardwareMap.get(Servo.class, Constants.HMServobackSpin);
-
-        limelight = hardwareMap.get(Limelight3A.class, Constants.HMLimelight);
-        limelight.pipelineSwitch(1);
-        limelight.start();
-        Pose2d initialPose = new Pose2d(xValueBot, yValueBot, Math.toRadians(180));
-    }
-
-    // Returns [target velocity, target angle]
-    public double[] getVelocityAndAngle(Pose2d currentPose) {
-        double targetVelocity;
-        double coverPos;
-        calculateLimelightDistance();
-        calculatePinPointDistance(currentPose);
-        if(distance < 34.4 && distance > 34.3 ){
-            distance = pinPointDistance - 9;
-        }
-        if (distance > 76){
-            coverPos = 0.05;
-            if (distance > 100){
-                targetVelocity = 2300;
-            }
-            else {
-                targetVelocity = calculateTargetVelocity();
-            }
-        }
-        /*
-
-        else if (distance < 29.70772 && distance > 29.7077){
-            coverPos = 1;
-            targetVelocity = 1400;
-        }
-
-         */
-        else {
-            coverPos = calculateCoverAngle();
-            targetVelocity = calculateTargetVelocity() + 150;
-        }
-
-        return new double[] {targetVelocity , coverPos};
-    }
-
-    public void setVelocity(double targetVelocity) {
-        launcher1.setVelocity(targetVelocity);
-        launcher2.setVelocity(targetVelocity);
-    }
-
-    public void setCoverAngle(double targetAngle) {
-        cover.setPosition(targetAngle);
-    }
-
-    public double getCurrentVelocity() {
-        return launcher1.getVelocity();
-    }
-
-    public boolean atTargetVelocity(double targetVelocity) {
-        return Math.abs(getCurrentVelocity() - targetVelocity) < 150;
-    }
-
-    public void stopLauncher() {
-        // CHANGE TO VELOCITY
-        launcher1.setVelocity(0);
-        launcher2.setVelocity(0);
-    }
-
-    // CALCULATE DISTANCE USING LIMELIGHT
-    private void calculateLimelightDistance() {
-        LLResult result = limelight.getLatestResult();
-
-        if(result != null){
-            distance = getDistanceInches(result.getTy());
-        }
-    }
-
-    private void calculatePinPointDistance(Pose2d currentPose){
-        // Use currentPose instead of drive_roadrunner.localizer.getPose()
-        pinPointDistance = Math.sqrt(
-                Math.pow(BLUE_GOALPose.position.y - currentPose.position.y, 2) +
-                        Math.pow(BLUE_GOALPose.position.x - currentPose.position.x, 2)
-        );
-    }
-
-    public double getPinPointDistance(Pose2d currentPose){
-        calculatePinPointDistance(currentPose);
-        return pinPointDistance;
-    }
-
-    public double getVelocity(){
-        return launcher1.getVelocity();
-    }
-
-    // CALCULATE TARGET VELOCITY
-    private double calculateTargetVelocity() {
-        if (distance < 80){
-            return (0.0353161*(Math.pow(distance,2)))+(0.991859*distance)+1388.8866;
-        } else if(distance > 130){
-            return 2800;
-        } else{
-            return (-0.47286*Math.pow(distance,2))+(109.73693*distance)-3946.15385;
-        }
-    }
-
-    // CALCULATE TARGET ANGLE
-    private double calculateCoverAngle(){
-        return (-0.0117319 * distance) + 0.956034;
-    }
-
-    // CALCULATE DISTANCE FROM BOT TO APRIL TAG
-    private double getDistanceInches(double tyDegrees) {
-        double totalAngleDeg = CAM_DEG + tyDegrees;
-        double totalAngleRad = Math.toRadians(totalAngleDeg);
-
-        return (TARGET_H - CAM_H) / Math.tan(totalAngleRad);
     }
 }

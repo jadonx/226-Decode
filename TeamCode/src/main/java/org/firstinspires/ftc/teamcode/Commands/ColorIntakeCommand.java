@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 
-public class SpindexerColorIntakeCommand {
+public class ColorIntakeCommand {
     private final Spindexer spindexer;
 
     private ElapsedTime colorSensorTimer;
@@ -33,7 +33,7 @@ public class SpindexerColorIntakeCommand {
     }
     private State currentState;
 
-    public SpindexerColorIntakeCommand(Spindexer spindexer) {
+    public ColorIntakeCommand(Spindexer spindexer) {
         this.spindexer = spindexer;
         intakePositions = spindexer.getIntakePositions();
     }

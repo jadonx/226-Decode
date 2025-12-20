@@ -17,10 +17,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.Subsystems.FieldCentricDrive;
 
 @Config
-@TeleOp(name="Spindexer_Tester", group = "Tester")
-public class SpindexerTurretPrototype extends OpMode {
+@TeleOp(name="ManualRobotTest", group = "Test")
+public class ManualRobotTest extends OpMode {
     public static double shooterSpeed;
     public static double spinSpeed;
 
@@ -39,7 +40,7 @@ public class SpindexerTurretPrototype extends OpMode {
     Servo popperServo;
 
     // Launcher Motors
-    DcMotor shooter1, shooter2, spinner, intake;
+    DcMotorEx shooter1, shooter2, spinner, intake;
 
     // Drive Motors
     DcMotor frontLeft, frontRight, backLeft, backRight;
@@ -50,10 +51,15 @@ public class SpindexerTurretPrototype extends OpMode {
     FtcDashboard dashboard;
     TelemetryPacket packet;
 
+    FieldCentricDrive drive;
+
     @Override
     public void init() {
         shooter1 = hardwareMap.get(DcMotorEx.class, Constants.HMMotorShooter1);
         shooter2 = hardwareMap.get(DcMotorEx.class, Constants.HMMotorShooter2);
+
+        shooter1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        shooter2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
         spinner = hardwareMap.get(DcMotorEx.class, Constants.HMMotorPopper);
         spinner.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -77,14 +83,16 @@ public class SpindexerTurretPrototype extends OpMode {
         spindexerSpeed = 0;
         intakeSpeed = 0;
 
+        drive = new FieldCentricDrive(hardwareMap);
+
         dashboard = FtcDashboard.getInstance();
         packet = new TelemetryPacket();
     }
 
     @Override
     public void loop() {
-        shooter1.setPower(shooterSpeed);
-        shooter2.setPower(shooterSpeed);
+        shooter1.setVelocity(shooterSpeed);
+        shooter2.setVelocity(shooterSpeed);
 
         spinner.setPower(spinSpeed);
 
@@ -94,18 +102,10 @@ public class SpindexerTurretPrototype extends OpMode {
 
         popperServo.setPosition(popperPos);
 
-        double y = -gamepad1.left_stick_y;
-        double x = gamepad1.left_stick_x;
-        double rx = gamepad1.right_stick_x;
+        drive.drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
 
-        double frontLeftPower = (y + x + rx);
-        double backLeftPower = (y - x + rx);
-        double frontRightPower = (y - x - rx);
-        double backRightPower = (y + x - rx);
-
-        frontLeft.setPower(frontLeftPower);
-        backLeft.setPower(backLeftPower);
-        frontRight.setPower(frontRightPower);
-        backRight.setPower(backRightPower);
+        if (gamepad1.x) {
+            drive.resetIMU();
+        }
     }
 }

@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.hardware.configuration.annotations.DevicePropertie
 import com.qualcomm.robotcore.hardware.configuration.annotations.I2cDeviceType;
 
 @I2cDeviceType
-@DeviceProperties(name = "AS5600 Encoder", xmlTag = "AS5600Encoder")
-public class AS5600Encoder extends I2cDeviceSynchDevice<I2cDeviceSynch> {
+@DeviceProperties(name = "SpindexerEncoder", xmlTag = "SpindexerEncoder")
+public class SpindexerEncoder extends I2cDeviceSynchDevice<I2cDeviceSynch> {
     private static final I2cAddr ADDRESS_AS5600 = I2cAddr.create7bit(0x36);
 
     private static final int RAW_ANGLE_HIGH = 0x0C;
@@ -18,7 +18,7 @@ public class AS5600Encoder extends I2cDeviceSynchDevice<I2cDeviceSynch> {
     private double continuousAngle = 0.0;
     private boolean firstRead = true;
 
-    public AS5600Encoder(I2cDeviceSynch deviceSynch) {
+    public SpindexerEncoder(I2cDeviceSynch deviceSynch) {
         super(deviceSynch, true);
         this.deviceClient.setI2cAddress(ADDRESS_AS5600);
         this.deviceClient.engage();

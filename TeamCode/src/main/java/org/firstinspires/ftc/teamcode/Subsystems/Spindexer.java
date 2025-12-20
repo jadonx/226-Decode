@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.Constants;
 public class Spindexer {
     // HARDWARE VARIABLES
     private CRServo spindexerServo;
-    private AS5600Encoder spindexerEncoder;
+    private SpindexerEncoder spindexerEncoder;
 
     // PID VARIABLES
     private double kP = 0.002, kD = 0, kS = 0.0575;
@@ -40,7 +40,7 @@ public class Spindexer {
     public Spindexer(HardwareMap hardwareMap) {
         spindexerServo = hardwareMap.get(CRServo.class, Constants.HMServospinDexer);
         spindexerServo.setDirection(DcMotorSimple.Direction.REVERSE);
-        spindexerEncoder = hardwareMap.get(AS5600Encoder.class, Constants.HMSpindexerEncoder);
+        spindexerEncoder = hardwareMap.get(SpindexerEncoder.class, Constants.HMSpindexerEncoder);
         pidTimer = new ElapsedTime();
         colorSensorV3 = hardwareMap.get(RevColorSensorV3.class, Constants.HMFrontColorSensor);
     }
@@ -184,5 +184,4 @@ public class Spindexer {
     public double getColorDistance() {
         return colorSensorV3.getDistance(DistanceUnit.INCH);
     }
-
 }
