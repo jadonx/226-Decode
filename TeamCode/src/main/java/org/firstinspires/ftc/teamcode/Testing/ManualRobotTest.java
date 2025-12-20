@@ -22,7 +22,8 @@ import org.firstinspires.ftc.teamcode.Subsystems.FieldCentricDrive;
 @Config
 @TeleOp(name="ManualRobotTest", group = "Test")
 public class ManualRobotTest extends OpMode {
-    public static double shooterSpeed;
+    public static double shooterSpeed1;
+    public static double shooterSpeed2;
     public static double spinSpeed;
 
     public static double turretSpeed;
@@ -77,7 +78,7 @@ public class ManualRobotTest extends OpMode {
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        shooterSpeed = 0;
+        shooterSpeed1 = 0; shooterSpeed2 = 0;
         spinSpeed = 0;
         turretSpeed = 0;
         spindexerSpeed = 0;
@@ -91,8 +92,8 @@ public class ManualRobotTest extends OpMode {
 
     @Override
     public void loop() {
-        shooter1.setVelocity(shooterSpeed);
-        shooter2.setVelocity(shooterSpeed);
+        shooter1.setVelocity(shooterSpeed1);
+        shooter2.setVelocity(shooterSpeed2);
 
         spinner.setPower(spinSpeed);
 
