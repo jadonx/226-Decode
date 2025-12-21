@@ -1,14 +1,12 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
-import com.acmerobotics.roadrunner.Pose2d;
-import com.qualcomm.hardware.limelightvision.LLResult;
+
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
 
 public class Launcher {
     // LAUNCHER
@@ -41,4 +39,23 @@ public class Launcher {
 
         cover = hardwareMap.get(Servo.class, Constants.HMServobackSpin);
     }
+
+    public void setVelocity(int targetVelocity) {
+        launcher1.setVelocity(targetVelocity);
+        launcher2.setVelocity(targetVelocity);
+    }
+
+    public double getVelocity1() {
+        return launcher1.getVelocity();
+    }
+
+    public double getVelocity2() {
+        return launcher2.getVelocity();
+    }
+
+    public double getRPM() {
+        return launcher1.getVelocity(AngleUnit.RADIANS) * 60.0 / (2.0 * Math.PI);
+    }
+
+
 }

@@ -18,12 +18,15 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Subsystems.FieldCentricDrive;
+import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 
 @Config
 @TeleOp(name="ManualRobotTest", group = "Test")
 public class ManualRobotTest extends OpMode {
     public static double shooterSpeed1;
     public static double shooterSpeed2;
+    public static double shooterSpeed;
+    public static double shooterPower;
     public static double spinSpeed;
 
     public static double turretSpeed;
@@ -33,6 +36,8 @@ public class ManualRobotTest extends OpMode {
     public static double intakeSpeed;
 
     public static double popperPos;
+
+    public static double spindexerAngle;
 
     // Turret/Spindexer Servos
     CRServo leftServo, rightServo;
@@ -54,10 +59,15 @@ public class ManualRobotTest extends OpMode {
 
     FieldCentricDrive drive;
 
+    Spindexer spindexer;
+
     @Override
     public void init() {
+        spindexer = new Spindexer(hardwareMap);
         shooter1 = hardwareMap.get(DcMotorEx.class, Constants.HMMotorShooter1);
         shooter2 = hardwareMap.get(DcMotorEx.class, Constants.HMMotorShooter2);
+        shooter1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        shooter2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         shooter1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         shooter2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
@@ -92,14 +102,23 @@ public class ManualRobotTest extends OpMode {
 
     @Override
     public void loop() {
-        shooter1.setVelocity(shooterSpeed1);
-        shooter2.setVelocity(shooterSpeed2);
+        packet.put("Shooter Speed 1", shooter1.getVelocity());
+        packet.put("Shooter Speed 2", shooter2.getVelocity());
+        packet.put("RPM ", shooter1.getVelocity(AngleUnit.RADIANS) * 60.0 / (2.0 * Math.PI));
+        packet.put("Target Shooter Speed", shooterSpeed);
+
+        dashboard.sendTelemetryPacket(packet);
+
+        shooter1.setVelocity(shooterSpeed);
+        shooter2.setVelocity(shooterSpeed);
 
         spinner.setPower(spinSpeed);
 
         intake.setPower(intakeSpeed);
 
         spindexerServo.setPower(spindexerSpeed);
+
+//        spindexer.goToAngle(spindexerAngle);
 
         popperServo.setPosition(popperPos);
 

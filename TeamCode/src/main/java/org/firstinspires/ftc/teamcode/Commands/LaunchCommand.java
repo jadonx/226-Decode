@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Popper;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 
 public class LaunchCommand {
+    /*
     private final Spindexer spindexer;
     private final Popper popper;
     private final Launcher launcher;
@@ -222,4 +223,5 @@ public class LaunchCommand {
         popper.deactivatePopper();
         launcher.stopLauncher();
     }
+     */
 }
