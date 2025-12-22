@@ -18,35 +18,28 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Subsystems.FieldCentricDrive;
+import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 
 @Config
 @TeleOp(name="ManualRobotTest", group = "Test")
 public class ManualRobotTest extends OpMode {
-    public static double shooterSpeed1;
-    public static double shooterSpeed2;
-    public static double shooterSpeed;
-    public static double shooterPower;
-    public static double spinSpeed;
-
-    public static double turretSpeed;
-
+    public static int targetVelocity;
+    public static double hoodAngle;
     public static double spindexerSpeed;
-
-    public static double intakeSpeed;
-
     public static double popperPos;
-
-    public static double spindexerAngle;
+    public static double popperVelocity;
+    public static double intakeSpeed;
 
     // Turret/Spindexer Servos
     CRServo leftServo, rightServo;
     CRServo spindexerServo;
 
     Servo popperServo;
+    Servo hoodServo;
 
     // Launcher Motors
-    DcMotorEx shooter1, shooter2, spinner, intake;
+    DcMotorEx shooter1, shooter2, popper, intake;
 
     // Drive Motors
     DcMotor frontLeft, frontRight, backLeft, backRight;
@@ -61,6 +54,8 @@ public class ManualRobotTest extends OpMode {
 
     Spindexer spindexer;
 
+    Launcher launcher;
+
     @Override
     public void init() {
         spindexer = new Spindexer(hardwareMap);
@@ -72,13 +67,15 @@ public class ManualRobotTest extends OpMode {
         shooter1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         shooter2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
-        spinner = hardwareMap.get(DcMotorEx.class, Constants.HMMotorPopper);
-        spinner.setDirection(DcMotorSimple.Direction.REVERSE);
+        popper = hardwareMap.get(DcMotorEx.class, Constants.HMMotorPopper);
+        popper.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        popper.setDirection(DcMotorSimple.Direction.REVERSE);
 
         intake = hardwareMap.get(DcMotorEx.class, Constants.HMMotorIntake);
 
         spindexerServo = hardwareMap.get(CRServo.class, Constants.HMServospinDexer);
         popperServo = hardwareMap.get(Servo.class, Constants.HMServoPopper);
+        hoodServo = hardwareMap.get(Servo.class, Constants.HMServobackSpin);
 
         frontLeft = hardwareMap.get(DcMotor.class, Constants.HMMotorFrontLeft);
         frontRight = hardwareMap.get(DcMotor.class, Constants.HMMotorFrontRight);
@@ -88,11 +85,13 @@ public class ManualRobotTest extends OpMode {
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        shooterSpeed1 = 0; shooterSpeed2 = 0;
-        spinSpeed = 0;
-        turretSpeed = 0;
+        launcher = new Launcher(hardwareMap);
+
+        intakeSpeed = -0.5;
+        popperPos = 0.007;
+        popperVelocity = 2300;
         spindexerSpeed = 0;
-        intakeSpeed = 0;
+        targetVelocity = 0;
 
         drive = new FieldCentricDrive(hardwareMap);
 
@@ -102,30 +101,35 @@ public class ManualRobotTest extends OpMode {
 
     @Override
     public void loop() {
-        packet.put("Shooter Speed 1", shooter1.getVelocity());
-        packet.put("Shooter Speed 2", shooter2.getVelocity());
-        packet.put("RPM ", shooter1.getVelocity(AngleUnit.RADIANS) * 60.0 / (2.0 * Math.PI));
-        packet.put("Target Shooter Speed", shooterSpeed);
+        popper.setVelocity(popperVelocity); // 2300
 
-        dashboard.sendTelemetryPacket(packet);
+        intake.setPower(intakeSpeed); // -0.5
 
-        shooter1.setVelocity(shooterSpeed);
-        shooter2.setVelocity(shooterSpeed);
+        spindexerServo.setPower(spindexerSpeed); // 0.25 or 0.2
 
-        spinner.setPower(spinSpeed);
+        hoodServo.setPosition(hoodAngle);
 
-        intake.setPower(intakeSpeed);
-
-        spindexerServo.setPower(spindexerSpeed);
-
-//        spindexer.goToAngle(spindexerAngle);
-
-        popperServo.setPosition(popperPos);
+        popperServo.setPosition(popperPos); // 0.007
 
         drive.drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
 
         if (gamepad1.x) {
             drive.resetIMU();
         }
+
+        launcher.setTargetVelocity(targetVelocity);
+        launcher.update();
+
+        packet.put("Launcher1 Velocity ", launcher.getVelocity1());
+        packet.put("Launcher2 Velocity ", launcher.getVelocity2());
+        packet.put("Average Velocity ", launcher.getVelocity());
+        packet.put("Target Velocity ", targetVelocity);
+
+        dashboard.sendTelemetryPacket(packet);
+    }
+
+    public void setRobotDistance(double distance) {
+        targetVelocity = 0; // regression
+        hoodAngle = 0.0; // regression
     }
 }
