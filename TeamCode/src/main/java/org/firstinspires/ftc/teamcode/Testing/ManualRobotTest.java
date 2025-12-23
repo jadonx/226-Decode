@@ -136,14 +136,4 @@ public class ManualRobotTest extends OpMode {
 
         dashboard.sendTelemetryPacket(packet);
     }
-
-    public void setRobotDistance(double distance) {
-        targetVelocity = (int) ((0.0000014237*Math.pow(distance,4))-(0.000303373*Math.pow(distance,3))+(0.0297095*Math.pow(distance,2))+(1.67866*distance)+1134.53147);; // regression
-        if(distance > 75){
-            hoodAngle = 0;
-        }else{
-            hoodAngle = -0.012064*(distance)+1.25891; // regression
-        }
-
-    }
 }
