@@ -44,6 +44,17 @@ public class Launcher {
         this.targetVelocity = targetVelocity;
     }
 
+    public double calculateTargetVelocity(double distance){
+        return (0.0000014237*Math.pow(distance,4))-(0.000303373*Math.pow(distance,3))+(0.0297095*Math.pow(distance,2))+(1.67866*distance)+1134.53147;
+    }
+
+    public double calculateTargetAngle(double distance){
+        if(distance > 75){
+            return 0;
+        }
+        return -0.012064*(distance)+1.25891;
+    }
+
     public void updatePIDValues(double kS, double kV, double kP) {
         this.kS = kS;
         this.kV = kV;
