@@ -51,33 +51,6 @@ public class SpindexerEncoder extends I2cDeviceSynchDevice<I2cDeviceSynch> {
         return getRaw12() * (360.0 / 4096.0);
     }
 
-    public double getContinuousAngle() {
-        double raw = getWrappedAngle();
-
-        // First read: don't compute delta, just initialize
-        if (firstRead) {
-            lastRawAngle = raw;
-            firstRead = false;
-            continuousAngle = raw;
-            return raw;  // typically 0
-        }
-
-        double delta = raw - lastRawAngle;
-
-        // Fix discontinuity around 0/360 boundary:
-        if (delta > 180) delta -= 360;
-        if (delta < -180) delta += 360;
-
-        continuousAngle += delta;
-        lastRawAngle = raw;
-
-        return continuousAngle;
-    }
-
-    public void rebaseContinuousAngle() {
-        continuousAngle = getWrappedAngle();
-    }
-
     @Override
     public Manufacturer getManufacturer() {
         return Manufacturer.Other;

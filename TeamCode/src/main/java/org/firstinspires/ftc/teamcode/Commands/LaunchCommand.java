@@ -15,6 +15,13 @@ public class LaunchCommand {
 
     private final Launcher launcher;
 
+    private enum State {
+        GO_TO_SHOOTING_START,
+        SHOOT_BALLS,
+        FINISH
+    }
+    private State currentState;
+
     public LaunchCommand(Spindexer spindexer, Popper popper, Launcher launcher) {
         this.spindexer = spindexer;
         this.popper = popper;
@@ -22,7 +29,24 @@ public class LaunchCommand {
     }
 
     public void start() {
-        popper.pushInPopper();
+        spindexer.setTargetAngle(spindexer.getTargetAngle());
+        popper.pushOutPopper();
         popper.spinPopper();
+        currentState = State.GO_TO_SHOOTING_START;
+    }
+
+    public void update() {
+        switch (currentState) {
+            case GO_TO_SHOOTING_START:
+                if (spindexer.atTargetAngle()) {
+                    popper.pushInPopper();
+                    currentState = State.SHOOT_BALLS;
+                }
+                break;
+            case SHOOT_BALLS:
+                break;
+            case FINISH:
+                break;
+        }
     }
 }

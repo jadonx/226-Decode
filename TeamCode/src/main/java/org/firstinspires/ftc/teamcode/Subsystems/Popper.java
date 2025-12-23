@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -9,13 +10,15 @@ import org.firstinspires.ftc.teamcode.Constants;
 
 public class Popper {
     private Servo popperServo;
-    private DcMotor popperMotor;
+    private DcMotorEx popperMotor;
 
     public Popper(HardwareMap hardwareMap) {
-        popperServo = hardwareMap.get(Servo.class, Constants.HMServoPopper);
-        popperMotor = hardwareMap.get(DcMotor.class, Constants.HMMotorPopper);
-
+        popperMotor = hardwareMap.get(DcMotorEx.class, Constants.HMMotorPopper);
         popperMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        popperMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        popperMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        popperServo = hardwareMap.get(Servo.class, Constants.HMServoPopper);
     }
 
     public void pushInPopper() {
@@ -27,11 +30,11 @@ public class Popper {
     }
 
     public void spinPopper() {
-        popperMotor.setPower(1);
+        popperMotor.setVelocity(22300);
     }
 
     public void stopPopper() {
-        popperMotor.setPower(0);
+        popperMotor.setVelocity(0);
     }
 
     public void deactivatePopper() {

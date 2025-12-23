@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 import android.graphics.Color;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.qualcomm.hardware.lynx.commands.core.LynxSetMotorPIDControlLoopCoefficientsCommand;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -17,54 +18,45 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Constants;
 
 public class Spindexer {
-    // HARDWARE VARIABLES
     private CRServo spindexerServo;
     private SpindexerEncoder spindexerEncoder;
+    private RevColorSensorV3 colorSensorV3;
 
-    // PID VARIABLES
-    private double kP = 0.002, kD = 0, kS = 0.0575;
-    private int slowingThreshold = 0;
-    private double slowingMultiplier = 0;
-    private double lastError = 0;
-    private ElapsedTime pidTimer;
+    private double targetAngle;
+    private double kP = 0.002, kS = 0.0575;
 
-    // SPINDEXER ANGLE VALUES AND HOLDER STATUSES
-    private int[] launchHolderAngles = {50, 289, 175};
+    private double lastAngle = 0;
+    private double unwrappedAngle = 0;
+
+    public enum SpindexerMode {
+        SHORTEST_PATH,
+        FULL_ROTATION
+    }
+
+    SpindexerMode spindexerMode;
+
     private int[] intakePositions = {235, 112, 1};
     public enum HolderStatus { NONE, GREEN, PURPLE }
     public HolderStatus[] holderStatuses = {HolderStatus.NONE, HolderStatus.NONE, HolderStatus.NONE};
-
-    // COLOR SENSOR VARIABLES
-    private RevColorSensorV3 colorSensorV3;
 
     public Spindexer(HardwareMap hardwareMap) {
         spindexerServo = hardwareMap.get(CRServo.class, Constants.HMServospinDexer);
         spindexerServo.setDirection(DcMotorSimple.Direction.REVERSE);
         spindexerEncoder = hardwareMap.get(SpindexerEncoder.class, Constants.HMSpindexerEncoder);
-        pidTimer = new ElapsedTime();
         colorSensorV3 = hardwareMap.get(RevColorSensorV3.class, Constants.HMFrontColorSensor);
+        spindexerMode = SpindexerMode.SHORTEST_PATH;
     }
 
-    public void goToAngle(double target) {
-        double error = getError(target);
-
-        double dt = pidTimer.seconds();
-        pidTimer.reset();
-
-        if (dt < 0.001) dt = 0.001;
-
-        double derivative = (error - lastError) / dt;
+    public void update() {
+        double error = getError();
 
         // Feedforward to overcome static friction (kS = 0.095)
         double ff = kS * Math.signum(error);
 
-        double output = (kP * error) + (kD * derivative) + ff;
+        double output = (kP * error) + + ff;
 
         if (Math.abs(error) < 2) {
-            output = 0;
-        }
-        else if (Math.abs(error) < slowingThreshold) {
-            output *= slowingMultiplier;
+            output = ff * 0.3;
         }
 
         // Clipping output
@@ -72,36 +64,61 @@ public class Spindexer {
 
         spindexerServo.setPower(output);
 
-        lastError = error;
+        updateUnwrappedAngle();
     }
 
-    public double getError(double target) {
-        return AngleUnit.normalizeDegrees(target - getWrappedAngle());
+    public void setTargetAngle(double targetAngle) {
+        this.targetAngle = targetAngle;
+    }
+
+    public double getTargetAngle() {
+        return targetAngle;
+    }
+
+    public double getError() {
+        switch (spindexerMode) {
+            case SHORTEST_PATH:
+                return AngleUnit.normalizeDegrees(targetAngle - spindexerEncoder.getWrappedAngle());
+            case FULL_ROTATION:
+                return targetAngle - getUnwrappedAngle();
+            default:
+                return 0;
+        }
+    }
+
+    public void updateUnwrappedAngle() {
+        double current = spindexerEncoder.getWrappedAngle();
+        double delta = AngleUnit.normalizeDegrees(current - lastAngle);
+        unwrappedAngle += delta;
+        lastAngle = current;
+    }
+
+    public double getUnwrappedAngle() {
+        return unwrappedAngle;
     }
 
     public double getWrappedAngle() {
         return spindexerEncoder.getWrappedAngle();
     }
 
-    public boolean reachedTarget(double current, int target) {
-        return Math.abs(current - target) < 5.5;
+    public void setMode(SpindexerMode newMode) {
+        if (spindexerMode != newMode) {
+            if (newMode == SpindexerMode.FULL_ROTATION) {
+                targetAngle = getUnwrappedAngle();
+            } else {
+                targetAngle = spindexerEncoder.getWrappedAngle();
+            }
+            spindexerMode = newMode;
+        }
+    }
+
+    public boolean atTargetAngle() {
+        return Math.abs(targetAngle - spindexerEncoder.getWrappedAngle()) < 3;
     }
 
     /** Color sensing intake logic */
     public void setHolderStatus(int index, HolderStatus status) {
         holderStatuses[index] = status;
-    }
-
-    public HolderStatus[] getHolderStatus() {
-        return holderStatuses;
-    }
-
-    public void resetHolderStatuses() {
-        holderStatuses[0] = HolderStatus.NONE; holderStatuses[1] = HolderStatus.NONE; holderStatuses[2] = HolderStatus.NONE;
-    }
-
-    public int[] getLaunchPositions() {
-        return launchHolderAngles;
     }
 
     public int[] getIntakePositions() {

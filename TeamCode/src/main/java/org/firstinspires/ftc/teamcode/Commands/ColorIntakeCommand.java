@@ -42,7 +42,7 @@ public class ColorIntakeCommand {
         colorSensorTimer = new ElapsedTime();
         holdingBallTimer = new ElapsedTime();
         currentState = State.WAIT_AT_FIRST_HOLDER;
-        targetAngle = intakePositions[0];
+        spindexer.setTargetAngle(intakePositions[0]);
     }
 
     public void startAuto() {
@@ -57,8 +57,7 @@ public class ColorIntakeCommand {
             currentHue = spindexer.getHSVRev()[0];
             colorSensorTimer.reset();
         }
-
-        spindexer.goToAngle(targetAngle);
+        spindexer.update();
         currentAngle = spindexer.getWrappedAngle();
 
         if (!hasBall(currentHue)) {
@@ -69,7 +68,7 @@ public class ColorIntakeCommand {
             case WAIT_AT_FIRST_HOLDER:
                 if (withinIntakeAngle(currentAngle, 0) && holdingBallTimer.milliseconds() > holdingBallThreshold) {
                     spindexer.setHolderStatus(0, getBallColor(currentHue));
-                    targetAngle = intakePositions[1];
+                    spindexer.setTargetAngle(intakePositions[1]);
                     holdingBallTimer.reset();
                     currentState = State.WAIT_AT_SECOND_HOLDER;
                 }
@@ -77,7 +76,7 @@ public class ColorIntakeCommand {
             case WAIT_AT_SECOND_HOLDER:
                 if (withinIntakeAngle(currentAngle, 1) && holdingBallTimer.milliseconds() > holdingBallThreshold) {
                     spindexer.setHolderStatus(1, getBallColor(currentHue));
-                    targetAngle = intakePositions[2];
+                    spindexer.setTargetAngle(intakePositions[2]);
                     holdingBallTimer.reset();
                     currentState = State.WAIT_AT_THIRD_HOLDER;
                 }
@@ -85,12 +84,6 @@ public class ColorIntakeCommand {
             case WAIT_AT_THIRD_HOLDER:
                 if (withinIntakeAngle(currentAngle, 2) && holdingBallTimer.milliseconds() > holdingBallThreshold) {
                     spindexer.setHolderStatus(2, getBallColor(currentHue));
-                    targetAngle = spindexer.getLaunchPositions()[0];
-                    currentState = State.GO_TO_LAUNCH;
-                }
-                break;
-            case GO_TO_LAUNCH:
-                if (spindexer.reachedTarget(currentAngle, targetAngle)) {
                     currentState = State.FINISHED;
                 }
                 break;
