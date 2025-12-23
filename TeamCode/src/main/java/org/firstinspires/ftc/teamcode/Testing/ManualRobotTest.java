@@ -19,6 +19,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Subsystems.FieldCentricDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
+import org.firstinspires.ftc.teamcode.Subsystems.PinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 
 @Config
@@ -57,6 +58,10 @@ public class ManualRobotTest extends OpMode {
 
     Launcher launcher;
 
+    PinPoint pinpoint;
+
+    public static boolean isShooting = false;
+
     @Override
     public void init() {
         spindexer = new Spindexer(hardwareMap);
@@ -81,21 +86,21 @@ public class ManualRobotTest extends OpMode {
 
         drive = new FieldCentricDrive(hardwareMap);
 
+        pinpoint = new PinPoint(hardwareMap, PinPoint.AllianceColor.RED);
+
         dashboard = FtcDashboard.getInstance();
         packet = new TelemetryPacket();
     }
 
     @Override
     public void loop() {
-        setRobotDistance(distance);
+        pinpoint.updatePose();
 
         popper.setVelocity(popperVelocity); // 2300
 
         intake.setPower(intakeSpeed); // -0.5
 
         spindexerServo.setPower(spindexerSpeed); // 0.25 or 0.2
-
-        hoodServo.setPosition(hoodAngle);
 
         popperServo.setPosition(popperPos); // 0.007
 
@@ -105,24 +110,30 @@ public class ManualRobotTest extends OpMode {
             drive.resetIMU();
         }
 
-        launcher.setTargetVelocity(targetVelocity);
-        launcher.update();
-
-        packet.put("Launcher1 Velocity ", launcher.getVelocity1());
-        packet.put("Launcher2 Velocity ", launcher.getVelocity2());
-        packet.put("Average Velocity ", launcher.getVelocity());
-        packet.put("Target Velocity ", targetVelocity);
-
-        dashboard.sendTelemetryPacket(packet);
-    }
-
-    public void setRobotDistance(double distance) {
-        targetVelocity = (int) ((0.0000014237*Math.pow(distance,4))-(0.000303373*Math.pow(distance,3))+(0.0297095*Math.pow(distance,2))+(1.67866*distance)+1134.53147);; // regression
-        if(distance > 75){
-            hoodAngle = 0;
-        }else{
-            hoodAngle = -0.012064*(distance)+1.25891; // regression
+        if (isShooting) {
+            double targetVel = launcher.calculateTargetVelocity(pinpoint.getDistanceToGoal());
+            double targetAng = launcher.calculateTargetAngle(pinpoint.getDistanceToGoal());
+            hoodServo.setPosition(targetAng);
+            launcher.setTargetVelocity((int)targetVel);
+            launcher.update();
+        } else {
+            hoodServo.setPosition(0.0);
+            launcher.setTargetVelocity(0);
+            launcher.update();
         }
 
+        if (gamepad1.aWasPressed()) {
+            isShooting = !isShooting;
+        }
+
+        packet.put("X Position", pinpoint.getPose().position.x);
+        packet.put("Y Position", pinpoint.getPose().position.y);
+
+        packet.put("GOAL X Position", pinpoint.getPoseGoal().position.x);
+        packet.put("GOAL Y Position", pinpoint.getPoseGoal().position.y);
+
+        packet.put("Distance from bot to goal", pinpoint.getDistanceToGoal());
+
+        dashboard.sendTelemetryPacket(packet);
     }
 }

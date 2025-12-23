@@ -32,7 +32,6 @@ public class Launcher {
 
         cover = hardwareMap.get(Servo.class, Constants.HMServobackSpin);
     }
-
     public double getVelocity() {
         return (launcher1.getVelocity() + launcher2.getVelocity()) / 2.0;
     }
