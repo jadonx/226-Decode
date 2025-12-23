@@ -59,13 +59,6 @@ public class ManualRobotTest extends OpMode {
     @Override
     public void init() {
         spindexer = new Spindexer(hardwareMap);
-        shooter1 = hardwareMap.get(DcMotorEx.class, Constants.HMMotorShooter1);
-        shooter2 = hardwareMap.get(DcMotorEx.class, Constants.HMMotorShooter2);
-        shooter1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        shooter2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
-        shooter1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        shooter2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
         popper = hardwareMap.get(DcMotorEx.class, Constants.HMMotorPopper);
         popper.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
@@ -76,14 +69,6 @@ public class ManualRobotTest extends OpMode {
         spindexerServo = hardwareMap.get(CRServo.class, Constants.HMServospinDexer);
         popperServo = hardwareMap.get(Servo.class, Constants.HMServoPopper);
         hoodServo = hardwareMap.get(Servo.class, Constants.HMServobackSpin);
-
-        frontLeft = hardwareMap.get(DcMotor.class, Constants.HMMotorFrontLeft);
-        frontRight = hardwareMap.get(DcMotor.class, Constants.HMMotorFrontRight);
-        backLeft = hardwareMap.get(DcMotor.class, Constants.HMMotorBackLeft);
-        backRight = hardwareMap.get(DcMotor.class, Constants.HMMotorBackRight);
-
-        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         launcher = new Launcher(hardwareMap);
 

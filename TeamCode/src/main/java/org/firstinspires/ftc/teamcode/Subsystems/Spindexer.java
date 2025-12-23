@@ -45,24 +45,6 @@ public class Spindexer {
         colorSensorV3 = hardwareMap.get(RevColorSensorV3.class, Constants.HMFrontColorSensor);
     }
 
-    /** Intake Code (CLEAN UP UNNECESSARY METHODS)*/
-    public void runSpindexer() {
-        spindexerServo.setPower(1);
-    }
-
-    public void runSpindexer(double power) {
-        spindexerServo.setPower(power);
-    }
-
-    public void unjamSpindexer() {
-        spindexerServo.setPower(-0.5);
-    }
-
-    public void stopSpindexer() {
-        spindexerServo.setPower(0);
-    }
-
-    /** PID Code */
     public void goToAngle(double target) {
         double error = getError(target);
 
@@ -93,14 +75,6 @@ public class Spindexer {
         lastError = error;
     }
 
-    public void updatePIDValues(double kP, double kD, double kS, int slowingThreshold, double slowingMultiplier) {
-        this.kP = kP;
-        this.kD = kD;
-        this.kS = kS;
-        this.slowingThreshold = slowingThreshold;
-        this.slowingMultiplier = slowingMultiplier;
-    }
-
     public double getError(double target) {
         return AngleUnit.normalizeDegrees(target - getWrappedAngle());
     }
@@ -128,41 +102,6 @@ public class Spindexer {
 
     public int[] getLaunchPositions() {
         return launchHolderAngles;
-    }
-
-    public int[] getLaunchPositionsDyanmic() {
-        int[] launchPositions = {999, 999, 999};
-
-        if (holderStatuses[0] != HolderStatus.NONE) {
-            launchPositions[0] = launchHolderAngles[0];
-        }
-        if (holderStatuses[1] != HolderStatus.NONE) {
-            launchPositions[1] = launchHolderAngles[1];
-        }
-        if (holderStatuses[2] != HolderStatus.NONE) {
-            launchPositions[2] = launchHolderAngles[2];
-        }
-        return launchPositions;
-    }
-
-    public int[] getLaunchPositionsColor(HolderStatus[] motifPattern) {
-        int[] launchPositions = {999, 999, 999};
-        int currentPos = 0;
-
-        // Loop through motif pattern
-        for (HolderStatus status: motifPattern) {
-            // Loop through spindexer holder statuses
-            for (int i=0; i<3; i++) {
-                if (holderStatuses[i] == status) {
-                    launchPositions[currentPos] = launchHolderAngles[i];
-                    holderStatuses[i] = HolderStatus.NONE;
-                    currentPos++;
-                    break;
-                }
-            }
-        }
-
-        return launchPositions;
     }
 
     public int[] getIntakePositions() {
