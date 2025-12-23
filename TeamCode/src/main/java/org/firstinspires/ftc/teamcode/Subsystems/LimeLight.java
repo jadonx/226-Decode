@@ -15,9 +15,9 @@ public class LimeLight {
     double tX;
     double tY;
     double distance;
-    double CAM_DEG = 26.3;
-    double CAM_H = 12;
-    double TARGET_H = 29;
+    double CAM_DEG = 27.3;//25.85
+    double CAM_H = 11.5;
+    double TARGET_H = 29.5;
     int id = -1;
     int motifID = -1;
 
@@ -43,6 +43,7 @@ public class LimeLight {
     public int getMotifID() {
         return motifID;
     }
+
 
     public Spindexer.HolderStatus[] getMotif() {
         if (motifID == 21) return new Spindexer.HolderStatus[]{Spindexer.HolderStatus.GREEN, Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.PURPLE};
