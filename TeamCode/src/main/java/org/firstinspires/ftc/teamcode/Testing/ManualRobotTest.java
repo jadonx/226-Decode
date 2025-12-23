@@ -19,6 +19,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Subsystems.FieldCentricDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
+import org.firstinspires.ftc.teamcode.Subsystems.PinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 
 @Config
@@ -56,16 +57,13 @@ public class ManualRobotTest extends OpMode {
 
     Launcher launcher;
 
+    PinPoint pinpoint;
+
+    public static boolean isShooting = false;
+
     @Override
     public void init() {
         spindexer = new Spindexer(hardwareMap);
-        shooter1 = hardwareMap.get(DcMotorEx.class, Constants.HMMotorShooter1);
-        shooter2 = hardwareMap.get(DcMotorEx.class, Constants.HMMotorShooter2);
-        shooter1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        shooter2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
-        shooter1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        shooter2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
         popper = hardwareMap.get(DcMotorEx.class, Constants.HMMotorPopper);
         popper.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
@@ -77,14 +75,6 @@ public class ManualRobotTest extends OpMode {
         popperServo = hardwareMap.get(Servo.class, Constants.HMServoPopper);
         hoodServo = hardwareMap.get(Servo.class, Constants.HMServobackSpin);
 
-        frontLeft = hardwareMap.get(DcMotor.class, Constants.HMMotorFrontLeft);
-        frontRight = hardwareMap.get(DcMotor.class, Constants.HMMotorFrontRight);
-        backLeft = hardwareMap.get(DcMotor.class, Constants.HMMotorBackLeft);
-        backRight = hardwareMap.get(DcMotor.class, Constants.HMMotorBackRight);
-
-        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
-
         launcher = new Launcher(hardwareMap);
 
         intakeSpeed = -0.5;
@@ -95,19 +85,21 @@ public class ManualRobotTest extends OpMode {
 
         drive = new FieldCentricDrive(hardwareMap);
 
+        pinpoint = new PinPoint(hardwareMap, PinPoint.AllianceColor.RED);
+
         dashboard = FtcDashboard.getInstance();
         packet = new TelemetryPacket();
     }
 
     @Override
     public void loop() {
+        pinpoint.updatePose();
+
         popper.setVelocity(popperVelocity); // 2300
 
         intake.setPower(intakeSpeed); // -0.5
 
         spindexerServo.setPower(spindexerSpeed); // 0.25 or 0.2
-
-        hoodServo.setPosition(hoodAngle);
 
         popperServo.setPosition(popperPos); // 0.007
 
@@ -117,13 +109,29 @@ public class ManualRobotTest extends OpMode {
             drive.resetIMU();
         }
 
-        launcher.setTargetVelocity(targetVelocity);
-        launcher.update();
+        if (isShooting) {
+            double targetVel = launcher.calculateTargetVelocity(pinpoint.getDistanceToGoal());
+            double targetAng = launcher.calculateTargetAngle(pinpoint.getDistanceToGoal());
+            hoodServo.setPosition(targetAng);
+            launcher.setTargetVelocity((int)targetVel);
+            launcher.update();
+        } else {
+            hoodServo.setPosition(0.0);
+            launcher.setTargetVelocity(0);
+            launcher.update();
+        }
 
-        packet.put("Launcher1 Velocity ", launcher.getVelocity1());
-        packet.put("Launcher2 Velocity ", launcher.getVelocity2());
-        packet.put("Average Velocity ", launcher.getVelocity());
-        packet.put("Target Velocity ", targetVelocity);
+        if (gamepad1.aWasPressed()) {
+            isShooting = !isShooting;
+        }
+
+        packet.put("X Position", pinpoint.getPose().position.x);
+        packet.put("Y Position", pinpoint.getPose().position.y);
+
+        packet.put("GOAL X Position", pinpoint.getPoseGoal().position.x);
+        packet.put("GOAL Y Position", pinpoint.getPoseGoal().position.y);
+
+        packet.put("Distance from bot to goal", pinpoint.getDistanceToGoal());
 
         dashboard.sendTelemetryPacket(packet);
     }
