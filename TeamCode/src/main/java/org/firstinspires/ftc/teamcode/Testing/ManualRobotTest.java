@@ -31,6 +31,7 @@ public class ManualRobotTest extends OpMode {
     public static double popperPos;
     public static double popperVelocity;
     public static double intakeSpeed;
+    public static double distance = 0;
 
     // Turret/Spindexer Servos
     CRServo leftServo, rightServo;
@@ -137,7 +138,12 @@ public class ManualRobotTest extends OpMode {
     }
 
     public void setRobotDistance(double distance) {
-        targetVelocity = 0; // regression
-        hoodAngle = 0.0; // regression
+        targetVelocity = (int) ((0.0000014237*Math.pow(distance,4))-(0.000303373*Math.pow(distance,3))+(0.0297095*Math.pow(distance,2))+(1.67866*distance)+1134.53147);; // regression
+        if(distance > 75){
+            hoodAngle = 0;
+        }else{
+            hoodAngle = -0.012064*(distance)+1.25891; // regression
+        }
+
     }
 }
