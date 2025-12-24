@@ -113,8 +113,7 @@ public class ManualRobotTest extends OpMode {
         if (isShooting) {
             launcher.update(pinpoint.getDistanceToGoal());
         } else {
-            hoodServo.setPosition(0.0);
-            launcher.setTargetVelocity(0);
+            launcher.update(0.0);
         }
 
         if (gamepad1.aWasPressed()) {
@@ -128,6 +127,7 @@ public class ManualRobotTest extends OpMode {
         packet.put("GOAL Y Position", pinpoint.getPoseGoal().position.y);
 
         packet.put("Distance from bot to goal", pinpoint.getDistanceToGoal());
+        packet.put("Angle from bot to goal", pinpoint.getAngleToGoal());
 
         dashboard.sendTelemetryPacket(packet);
     }

@@ -42,4 +42,8 @@ dependencies {
 
     // Dashboard
     implementation "com.acmerobotics.dashboard:dashboard:0.5.1"
+
+    //FTC Lib
+    implementation 'org.ftclib.ftclib:core:2.1.1'
 }
+
