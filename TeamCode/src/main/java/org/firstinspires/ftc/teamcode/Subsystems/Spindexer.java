@@ -22,7 +22,7 @@ public class Spindexer {
     private SpindexerEncoder spindexerEncoder;
     private RevColorSensorV3 colorSensorV3;
 
-    private double targetAngle;
+    private double targetAngle = 0;
     private double kP = 0.002, kS = 0.0575;
 
     private double lastAngle = 0;
@@ -50,10 +50,10 @@ public class Spindexer {
     public void update() {
         double error = getError();
 
-        // Feedforward to overcome static friction (kS = 0.095)
+        // Feedforward to overcome static friction
         double ff = kS * Math.signum(error);
 
-        double output = (kP * error) + + ff;
+        double output = (kP * error) + ff;
 
         if (Math.abs(error) < 2) {
             output = ff * 0.3;
@@ -82,7 +82,7 @@ public class Spindexer {
             case FULL_ROTATION:
                 return targetAngle - getUnwrappedAngle();
             default:
-                return 0;
+                return 0.0;
         }
     }
 

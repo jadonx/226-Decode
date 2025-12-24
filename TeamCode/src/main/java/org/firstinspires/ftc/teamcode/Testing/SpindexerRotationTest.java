@@ -29,6 +29,7 @@ public class SpindexerRotationTest extends OpMode {
     @Override
     public void loop() {
         spindexer.setTargetAngle(target);
+        spindexer.update();
 
         spindexer.setMode(spindexerMode);
 
@@ -41,7 +42,8 @@ public class SpindexerRotationTest extends OpMode {
             }
         }
 
-        packet.put("current angle ", spindexer.getWrappedAngle());
+        packet.put("wrapped angle ", spindexer.getWrappedAngle());
+        packet.put("unwrapped angle ", spindexer.getUnwrappedAngle());
         packet.put("mode ", spindexerMode);
         dashboard.sendTelemetryPacket(packet);
     }

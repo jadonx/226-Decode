@@ -111,15 +111,10 @@ public class ManualRobotTest extends OpMode {
         }
 
         if (isShooting) {
-            double targetVel = launcher.calculateTargetVelocity(pinpoint.getDistanceToGoal());
-            double targetAng = launcher.calculateTargetAngle(pinpoint.getDistanceToGoal());
-            hoodServo.setPosition(targetAng);
-            launcher.setTargetVelocity((int)targetVel);
-            launcher.update();
+            launcher.update(pinpoint.getDistanceToGoal());
         } else {
             hoodServo.setPosition(0.0);
             launcher.setTargetVelocity(0);
-            launcher.update();
         }
 
         if (gamepad1.aWasPressed()) {

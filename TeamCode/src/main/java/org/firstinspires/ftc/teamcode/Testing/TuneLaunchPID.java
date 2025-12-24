@@ -34,7 +34,7 @@ public class TuneLaunchPID extends OpMode {
         launcher.setTargetVelocity(targetVelocity);
 
         launcher.updatePIDValues(kS, kV, kP);
-        launcher.update();
+        launcher.update(0);
 
         packet.put("Launcher1 Velocity ", launcher.getVelocity1());
         packet.put("Launcher2 Velocity ", launcher.getVelocity2());
