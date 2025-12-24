@@ -53,4 +53,13 @@ public class PinPoint {
     public Pose2d getPoseGoal() {
         return GOAL_POSE;
     }
+
+    public double getAngleToGoal() {
+        Pose2d currentPose = drive_roadrunner.localizer.getPose();
+        return Math.toDegrees(
+                Math.atan2
+                        (GOAL_POSE.position.y - currentPose.position.y,
+                                GOAL_POSE.position.x - currentPose.position.x)
+        );
+    }
 }
