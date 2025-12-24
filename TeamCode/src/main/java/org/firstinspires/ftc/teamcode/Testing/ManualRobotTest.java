@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Constants;
@@ -21,17 +22,20 @@ import org.firstinspires.ftc.teamcode.Subsystems.FieldCentricDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.PinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
+import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
 @Config
 @TeleOp(name="ManualRobotTest", group = "Test")
 public class ManualRobotTest extends OpMode {
     public static int targetVelocity;
     public static double hoodAngle;
-    public static double spindexerSpeed;
+    public static double spindexerSpeedShoot;
+    public static double spindexerSpeedStop;
     public static double popperPos;
     public static double popperVelocity;
     public static double intakeSpeed;
     public static double distance = 0;
+    public static double turretAngle;
 
     // Turret/Spindexer Servos
     CRServo leftServo, rightServo;
@@ -60,7 +64,11 @@ public class ManualRobotTest extends OpMode {
 
     PinPoint pinpoint;
 
+    Turret turret;
+
     public static boolean isShooting = false;
+    public static boolean spindexerShooting = false;
+    public static boolean isReadyToShoot = false;
 
     @Override
     public void init() {
@@ -77,11 +85,13 @@ public class ManualRobotTest extends OpMode {
         hoodServo = hardwareMap.get(Servo.class, Constants.HMServobackSpin);
 
         launcher = new Launcher(hardwareMap);
+        turret = new Turret(hardwareMap);
 
         intakeSpeed = -0.5;
         popperPos = 0.007;
         popperVelocity = 2300;
-        spindexerSpeed = 0;
+        spindexerSpeedShoot = 0;
+        spindexerSpeedStop = 0;
         targetVelocity = 0;
 
         drive = new FieldCentricDrive(hardwareMap);
@@ -94,17 +104,22 @@ public class ManualRobotTest extends OpMode {
 
     @Override
     public void loop() {
+        drive.drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
         pinpoint.updatePose();
 
-        popper.setVelocity(popperVelocity); // 2300
+        if (isReadyToShoot) {
+            popper.setVelocity(popperVelocity); // 2300
+            intake.setPower(intakeSpeed); // -0.5
+            popperServo.setPosition(popperPos); // 0.007
+        } else {
+            popper.setVelocity(0);
+            intake.setPower(0);
+            popperServo.setPosition(0);
+        }
+        if (gamepad1.bWasPressed()) {
+            isReadyToShoot = !isReadyToShoot;
+        }
 
-        intake.setPower(intakeSpeed); // -0.5
-
-        spindexerServo.setPower(spindexerSpeed); // 0.25 or 0.2
-
-        popperServo.setPosition(popperPos); // 0.007
-
-        drive.drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
 
         if (gamepad1.x) {
             drive.resetIMU();
@@ -115,10 +130,22 @@ public class ManualRobotTest extends OpMode {
         } else {
             launcher.update(0.0);
         }
-
         if (gamepad1.aWasPressed()) {
             isShooting = !isShooting;
         }
+
+        if (spindexerShooting) {
+            spindexerServo.setPower(spindexerSpeedShoot); // 0.25 or 0.2
+        } else {
+            spindexerServo.setPower(spindexerSpeedStop);
+        }
+        if (gamepad1.yWasPressed()) {
+            spindexerShooting = !spindexerShooting;
+        }
+
+        turret.goToAngle(turretAngle);
+
+
 
         packet.put("X Position", pinpoint.getPose().position.x);
         packet.put("Y Position", pinpoint.getPose().position.y);
