@@ -14,8 +14,9 @@ public class PinPoint {
     public static double goal_y = 66.55849186454233;
 
     public static int bot_heading = 90;
+    public static int goal_heading = 90;
 
-    Pose2d GOAL_RED = new Pose2d(goal_x, goal_y, Math.toRadians(0));
+    Pose2d GOAL_RED = new Pose2d(goal_x, goal_y, Math.toRadians(goal_heading));
     Pose2d GOAL_BLUE = new Pose2d(36, 60, Math.toRadians(0));
 
     Pose2d GOAL_POSE;
@@ -62,4 +63,9 @@ public class PinPoint {
                                 GOAL_POSE.position.x - currentPose.position.x)
         );
     }
+
+    public double getDriverHeading() {
+        return Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log());
+    }
+
 }

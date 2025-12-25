@@ -78,12 +78,13 @@ public class Launcher {
 
         double result = clamp(ff + p);
 
-        if (targetVelocity == 0) {
-            result = 0;
-        }
-
         launcher1.setPower(result);
         launcher2.setPower(result);
+    }
+
+    public void stopLauncher() {
+        launcher1.setPower(0);
+        launcher2.setPower(0);
     }
 
     private double clamp(double value) {

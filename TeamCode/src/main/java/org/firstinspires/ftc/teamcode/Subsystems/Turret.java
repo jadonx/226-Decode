@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.controller.PIDController;
+import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -15,11 +16,12 @@ public class Turret {
     //Hardware
     private CRServo turretLeft, turretRight;
     private IMU turretEncoder;
-    private PIDController turretPID;
+    private PIDFController pid;
 
-    public static double kP = 0.0; // Proportional gain on position error
+    public static double kP = 0.02; // Proportional gain on position error
     public static double kI = 0.0; // Integral gain on position error
-    public static double kD = 0.0; // Derivative gain on position error
+    public static double kD = 0.0005; // Derivative gain on position error
+    public static double kF = 0.0015; // Feedforward to overcome static friction
 
     public Turret(HardwareMap hardwareMap) {
         turretRight = hardwareMap.get(CRServo.class, Constants.HMServoTurretRight);
@@ -27,27 +29,35 @@ public class Turret {
 
         turretEncoder = hardwareMap.get(IMU.class, Constants.HMTurretEncoder);
 
-        IMU.Parameters turretParameters = new IMU.Parameters(new RevHubOrientationOnRobot( RevHubOrientationOnRobot.LogoFacingDirection.RIGHT, RevHubOrientationOnRobot.UsbFacingDirection.UP));
+        IMU.Parameters turretParameters = new IMU.Parameters(new RevHubOrientationOnRobot( RevHubOrientationOnRobot.LogoFacingDirection.UP, RevHubOrientationOnRobot.UsbFacingDirection.RIGHT));
 
         turretEncoder.initialize(turretParameters);
 
         turretEncoder.resetYaw();
 
-        turretPID = new PIDController(kP, kI, kD);
+        pid = new PIDFController(kP, kI, kD, kF);
     }
 
     public void goToAngle(double targetAngle) {
+        pid.setPIDF(kP, kI, kD, kF);
         double currentAngle = getTurretAngle();
-        double power = turretPID.calculate(currentAngle, targetAngle);
+        double power = pid.calculate(currentAngle, targetAngle);
+
+        power = Math.max(Math.min(power, 1), -1);
+
+        if (pid.atSetPoint()) {
+            setPower(0);
+            return;
+        }
         setPower(power);
     }
 
     public double getTurretAngle() {
-        return turretEncoder.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+        return -1*turretEncoder.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
     }
 
     public void setPower(double power) {
-        turretLeft.setPower(power);
-        turretRight.setPower(power);
+        turretLeft.setPower(-power);
+        turretRight.setPower(-power);
     }
 }

@@ -31,6 +31,7 @@ public class ManualRobotTest extends OpMode {
     public static double hoodAngle;
     public static double spindexerSpeedShoot;
     public static double spindexerSpeedStop;
+    public static double spindexerSpeedIntake;
     public static double popperPos;
     public static double popperVelocity;
     public static double intakeSpeed;
@@ -45,10 +46,9 @@ public class ManualRobotTest extends OpMode {
     Servo hoodServo;
 
     // Launcher Motors
-    DcMotorEx shooter1, shooter2, popper, intake;
+    DcMotorEx popper, intake;
 
     // Drive Motors
-    DcMotor frontLeft, frontRight, backLeft, backRight;
     IMU imu;
 
     float[] hsv = new float[3];
@@ -69,6 +69,7 @@ public class ManualRobotTest extends OpMode {
     public static boolean isShooting = false;
     public static boolean spindexerShooting = false;
     public static boolean isReadyToShoot = false;
+    public static boolean isUsingTurret = false;
 
     @Override
     public void init() {
@@ -90,11 +91,13 @@ public class ManualRobotTest extends OpMode {
         intakeSpeed = -0.5;
         popperPos = 0.007;
         popperVelocity = 2300;
-        spindexerSpeedShoot = 0;
+        spindexerSpeedShoot = 0.2;
+        spindexerSpeedIntake = 0.15;
         spindexerSpeedStop = 0;
         targetVelocity = 0;
 
         drive = new FieldCentricDrive(hardwareMap);
+        drive.resetIMU();
 
         pinpoint = new PinPoint(hardwareMap, PinPoint.AllianceColor.RED);
 
@@ -120,7 +123,6 @@ public class ManualRobotTest extends OpMode {
             isReadyToShoot = !isReadyToShoot;
         }
 
-
         if (gamepad1.x) {
             drive.resetIMU();
         }
@@ -128,7 +130,7 @@ public class ManualRobotTest extends OpMode {
         if (isShooting) {
             launcher.update(pinpoint.getDistanceToGoal());
         } else {
-            launcher.update(0.0);
+            launcher.stopLauncher();
         }
         if (gamepad1.aWasPressed()) {
             isShooting = !isShooting;
@@ -139,22 +141,37 @@ public class ManualRobotTest extends OpMode {
         } else {
             spindexerServo.setPower(spindexerSpeedStop);
         }
+
         if (gamepad1.yWasPressed()) {
             spindexerShooting = !spindexerShooting;
         }
 
-        turret.goToAngle(turretAngle);
+        if (isUsingTurret) {
+            turret.goToAngle(90-pinpoint.getAngleToGoal());
+        } else {
+            turret.goToAngle(-drive.getYaw());
+        }
+
+        if (gamepad1.dpadUpWasPressed()) {
+            isUsingTurret = !isUsingTurret;
+        }
+
 
 
 
         packet.put("X Position", pinpoint.getPose().position.x);
         packet.put("Y Position", pinpoint.getPose().position.y);
-
+//
         packet.put("GOAL X Position", pinpoint.getPoseGoal().position.x);
         packet.put("GOAL Y Position", pinpoint.getPoseGoal().position.y);
 
         packet.put("Distance from bot to goal", pinpoint.getDistanceToGoal());
         packet.put("Angle from bot to goal", pinpoint.getAngleToGoal());
+
+        packet.put("Turret Current Angle: ", turret.getTurretAngle());
+        packet.put("Robot Heading: ", drive.getYaw());
+        packet.put("Robot Heading roadrunner: ", pinpoint.getDriverHeading());
+
 
         dashboard.sendTelemetryPacket(packet);
     }
