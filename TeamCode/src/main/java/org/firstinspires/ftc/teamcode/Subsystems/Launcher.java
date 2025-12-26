@@ -32,39 +32,8 @@ public class Launcher {
 
         cover = hardwareMap.get(Servo.class, Constants.HMServobackSpin);
     }
-    public double getVelocity() {
-        return (launcher1.getVelocity() + launcher2.getVelocity()) / 2.0;
-    }
 
-    public double getVelocity1() { return launcher1.getVelocity(); }
-
-    public double getVelocity2() { return launcher2.getVelocity(); }
-
-    public void setTargetVelocity(int targetVelocity) {
-        this.targetVelocity = targetVelocity;
-    }
-
-    public void calculateTargetVelocity(double distance){
-        targetVelocity = (0.0000014237*Math.pow(distance,4))-(0.000303373*Math.pow(distance,3))+(0.0297095*Math.pow(distance,2))+(1.67866*distance)+1134.53147;
-    }
-
-    public void calculateTargetAngle(double distance){
-        if(distance > 75){
-            targetCoverAngle = 0;
-        }
-        targetCoverAngle = -0.012064*(distance)+1.25891;
-    }
-
-    public void updatePIDValues(double kS, double kV, double kP) {
-        this.kS = kS;
-        this.kV = kV;
-        this.kP = kP;
-    }
-
-    public void update(double distance) {
-        calculateTargetVelocity(distance);
-        calculateTargetAngle(distance);
-
+    public void update() {
         cover.setPosition(targetCoverAngle);
 
         // Velocity Control
@@ -87,7 +56,43 @@ public class Launcher {
         launcher2.setPower(0);
     }
 
+    public boolean atTargetVelocity() {
+        return Math.abs(getVelocity() - targetVelocity) < 50;
+    }
+
     private double clamp(double value) {
         return Math.max(-1.0, Math.min(1.0, value));
+    }
+
+    /** SETTER AND GETTER METHODS */
+
+    public void setCalculatedVelocityAngle(double distance) {
+        targetVelocity = calculateVelocity(distance);
+        targetCoverAngle = calculateAngle(distance);
+    }
+
+    public double calculateVelocity(double distance) {
+        return (0.0000014237*Math.pow(distance,4))-(0.000303373*Math.pow(distance,3))+(0.0297095*Math.pow(distance,2))+(1.67866*distance)+1134.53147;
+    }
+
+    public double calculateAngle(double distance) {
+        if (distance > 75) {
+            return 0;
+        }
+        else {
+            return -0.012064*(distance)+1.25891;
+        }
+    }
+
+    public double getVelocity() {
+        return (launcher1.getVelocity() + launcher2.getVelocity()) / 2.0;
+    }
+
+    public void setTargetVelocity(double targetVelocity) {
+        this.targetVelocity = targetVelocity;
+    }
+
+    public void setTargetCoverAngle(double coverAngle) {
+        this.targetCoverAngle = coverAngle;
     }
 }

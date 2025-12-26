@@ -128,7 +128,7 @@ public class ManualRobotTest extends OpMode {
         }
 
         if (isShooting) {
-            launcher.update(pinpoint.getDistanceToGoal());
+            //launcher.update(pinpoint.getDistanceToGoal());
         } else {
             launcher.stopLauncher();
         }
