@@ -32,6 +32,9 @@ public class TurretTester extends OpMode {
     TelemetryPacket packet;
     Turret turret;
     PinPoint pinpoint;
+    Launcher launcher;
+
+    public static double coverPos;
 
 
     @Override
@@ -39,14 +42,16 @@ public class TurretTester extends OpMode {
         turret = new Turret(hardwareMap);
         pinpoint = new PinPoint(hardwareMap, PinPoint.AllianceColor.RED);
         dashboard = FtcDashboard.getInstance();
+        launcher = new Launcher(hardwareMap);
         packet = new TelemetryPacket();
     }
 
     @Override
     public void loop() {
 //        turret.goToAngle(turretAngle);
-        turret.setPower(1);
+//        turret.setPower(1);
 
+        launcher.moveCover(coverPos);
         packet.put("Distance from bot to goal", pinpoint.getDistanceToGoal());
         packet.put("Angle from bot to goal", pinpoint.getAngleToGoal());
 
