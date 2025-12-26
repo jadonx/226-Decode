@@ -90,4 +90,8 @@ public class Launcher {
     private double clamp(double value) {
         return Math.max(-1.0, Math.min(1.0, value));
     }
+
+    public void moveCover(double pos) {
+        cover.setPosition(pos);
+    }
 }
