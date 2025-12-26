@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
 
 @Config
@@ -38,6 +39,7 @@ public class PinPoint {
             drive_roadrunner = new MecanumDrive(hardwareMap, BOT_BLUE);
         }
     }
+
     public double getDistanceToGoal() {
         Pose2d currentPose = drive_roadrunner.localizer.getPose();
         return Math.hypot(GOAL_POSE.position.x - currentPose.position.x, GOAL_POSE.position.y - currentPose.position.y);
