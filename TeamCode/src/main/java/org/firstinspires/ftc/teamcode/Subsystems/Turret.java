@@ -22,6 +22,9 @@ public class Turret {
     public static double kD = 0.0005; // Derivative gain on position error
     public static double kF = 0.0015; // Feedforward to overcome static friction
 
+    public static double RIGHT_LIMIT = 140;
+    public static double LEFT_LIMIT  = -220;
+
     public Turret(HardwareMap hardwareMap) {
         turretRight = hardwareMap.get(CRServo.class, Constants.HMServoTurretRight);
         turretLeft = hardwareMap.get(CRServo.class, Constants.HMServoTurretLeft);
@@ -63,6 +66,7 @@ public class Turret {
         while (angle > 180) angle -= 360;
         return angle;
     }
+
 
     public void setPower(double power) {
         turretLeft.setPower(-power);

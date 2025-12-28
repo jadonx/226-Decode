@@ -39,6 +39,7 @@ public class ManualRobotTest extends OpMode {
     public static double distance = 0;
     public static double turretAngle;
 
+
     // Turret/Spindexer Servos
     CRServo leftServo, rightServo;
     CRServo spindexerServo;
@@ -148,7 +149,8 @@ public class ManualRobotTest extends OpMode {
         }
 
         if (isUsingTurret) {
-            turret.goToAngle(90-pinpoint.getAngleToGoal());
+            double desired = 90-pinpoint.getAngleToGoal();
+            turret.goToAngle(desired);
         } else {
             turret.goToAngle(pinpoint.getHeading());
         }
@@ -159,24 +161,23 @@ public class ManualRobotTest extends OpMode {
 
 
 
-        packet.put("X Position", pinpoint.getXCoordinate(pinpoint.getPose(), DistanceUnit.INCH));
-        packet.put("Y Position", pinpoint.getYCoordinate(pinpoint.getPose(), DistanceUnit.INCH));
-//
-        packet.put("GOAL X Position", pinpoint.getXCoordinate(pinpoint.getPoseGoal(), DistanceUnit.INCH));
-        packet.put("GOAL Y Position", pinpoint.getYCoordinate(pinpoint.getPoseGoal(), DistanceUnit.INCH));
+//        packet.put("X Position", pinpoint.getXCoordinate(pinpoint.getPose(), DistanceUnit.INCH));
+//        packet.put("Y Position", pinpoint.getYCoordinate(pinpoint.getPose(), DistanceUnit.INCH));
+//        packet.put("GOAL X Position", pinpoint.getXCoordinate(pinpoint.getPoseGoal(), DistanceUnit.INCH));
+//        packet.put("GOAL Y Position", pinpoint.getYCoordinate(pinpoint.getPoseGoal(), DistanceUnit.INCH));
 
-        packet.put("Distance from bot to goal", pinpoint.getDistanceToGoal());
-        packet.put("Angle from bot to goal", pinpoint.getAngleToGoal());
-
+//        packet.put("Distance from bot to goal", pinpoint.getDistanceToGoal());
+        packet.put("bot heading - angle to goal ", pinpoint.getHeading() - pinpoint.getAngleToGoal());
+        packet.put("robot heading: ", pinpoint.getHeading());
+        packet.put("Desired Angle", pinpoint.getAngleToGoal());
         packet.put("Turret Current Angle: ", turret.getTurretAngle());
-        packet.put("Robot Heading: ", drive.getYaw());
 
-        launcher.calculateTargetVelocity(pinpoint.getDistanceToGoal());
-        launcher.calculateTargetAngle(pinpoint.getDistanceToGoal());
-
-        packet.put("Target velocity ", launcher.getTargetVelocity());
-        packet.put("Target angle ", launcher.getTargetCoverAngle());
-
+//        launcher.calculateTargetVelocity(pinpoint.getDistanceToGoal());
+//        launcher.calculateTargetAngle(pinpoint.getDistanceToGoal());
+//
+//        packet.put("Target velocity ", launcher.getTargetVelocity());
+//        packet.put("Target angle ", launcher.getTargetCoverAngle());
+//
         dashboard.sendTelemetryPacket(packet);
     }
 }

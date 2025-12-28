@@ -27,7 +27,6 @@ import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 @Config
 @TeleOp(name="TurretTester", group = "Test")
 public class TurretTester extends OpMode {
-    public static double turretAngle;
     FtcDashboard dashboard;
     TelemetryPacket packet;
     Turret turret;
@@ -35,7 +34,7 @@ public class TurretTester extends OpMode {
     Launcher launcher;
 
     public static double coverPos;
-
+    public static double turretAngle;
 
     @Override
     public void init() {
@@ -48,13 +47,13 @@ public class TurretTester extends OpMode {
 
     @Override
     public void loop() {
-//        turret.goToAngle(turretAngle);
-//        turret.setPower(1);
+        pinpoint.updatePose();
+        turret.goToAngle(turretAngle);
 
-        // launcher.moveCover(coverPos);
-        packet.put("Distance from bot to goal", pinpoint.getDistanceToGoal());
-        packet.put("Angle from bot to goal", pinpoint.getAngleToGoal());
-
+        launcher.moveCover(coverPos);
+        packet.put("bot heading - angle to goal ", pinpoint.getHeading() - pinpoint.getAngleToGoal());
+        packet.put("robot heading: ", pinpoint.getHeading());
+        packet.put("Desired Angle", pinpoint.getAngleToGoal());
         packet.put("Turret Current Angle: ", turret.getTurretAngle());
 
         dashboard.sendTelemetryPacket(packet);
