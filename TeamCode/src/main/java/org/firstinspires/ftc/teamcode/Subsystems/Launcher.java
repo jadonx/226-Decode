@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Constants;
 
@@ -32,51 +33,7 @@ public class Launcher {
 
         cover = hardwareMap.get(Servo.class, Constants.HMServobackSpin);
     }
-    public double getVelocity() {
-        return (launcher1.getVelocity() + launcher2.getVelocity()) / 2.0;
-    }
-
-    public double getVelocity1() { return launcher1.getVelocity(); }
-
-    public double getVelocity2() { return launcher2.getVelocity(); }
-
-    public void setTargetVelocity(int targetVelocity) {
-        this.targetVelocity = targetVelocity;
-    }
-
-    public void calculateTargetVelocity(double distance){
-        targetVelocity = (0.0000014237*Math.pow(distance,4))-(0.000303373*Math.pow(distance,3))+(0.0297095*Math.pow(distance,2))+(1.67866*distance)+1134.53147;
-    }
-
-    public void calculateTargetAngle(double distance){
-        if(distance > 75){
-            targetCoverAngle = 0;
-        }
-        else {
-            targetCoverAngle = -0.012064*(distance)+1.25891;
-        }
-    }
-
-    public double getTargetVelocity() {
-        return targetVelocity;
-    }
-
-    public double getTargetCoverAngle() {
-        return targetCoverAngle;
-    }
-
-    public void updatePIDValues(double kS, double kV, double kP) {
-        this.kS = kS;
-        this.kV = kV;
-        this.kP = kP;
-    }
-
-    public void update(double distance) {
-        calculateTargetVelocity(distance);
-        calculateTargetAngle(distance);
-
-        cover.setPosition(targetCoverAngle);
-
+    public void update() {
         // Velocity Control
         double error = targetVelocity - getVelocity();
 
@@ -92,16 +49,55 @@ public class Launcher {
         launcher2.setPower(result);
     }
 
+    public void calculateTargetVelocity(double distance){
+        targetVelocity = (0.0000014237*Math.pow(distance,4))-(0.000303373*Math.pow(distance,3))+(0.0297095*Math.pow(distance,2))+(1.67866*distance)+1134.53147;
+    }
+
+    public void calculateTargetAngle(double distance){
+        if(distance > 75){
+            targetCoverAngle = 0;
+        }
+        else {
+            targetCoverAngle = -0.012064*(distance)+1.25891;
+        }
+
+        targetCoverAngle = Range.clip(targetCoverAngle, 0, 0.8);
+
+        cover.setPosition(targetCoverAngle);
+    }
+
     public void stopLauncher() {
         launcher1.setPower(0);
         launcher2.setPower(0);
+    }
+
+    public boolean atTargetVelocity(int threshold) {
+        return Math.abs(getVelocity() - getTargetVelocity()) < threshold;
     }
 
     private double clamp(double value) {
         return Math.max(-1.0, Math.min(1.0, value));
     }
 
-    public void moveCover(double pos) {
-        cover.setPosition(pos);
+    /** SETTER AND GETTER METHODS */
+
+    public double getVelocity() {
+        return (launcher1.getVelocity() + launcher2.getVelocity()) / 2.0;
+    }
+
+    public double getTargetVelocity() {
+        return targetVelocity;
+    }
+
+    public double getTargetCoverAngle() {
+        return targetCoverAngle;
+    }
+
+    public void setTargetVelocity(int targetVelocity) {
+        this.targetVelocity = targetVelocity;
+    }
+
+    public void setTargetCoverAngle(double targetCoverAngle) {
+        this.targetCoverAngle = targetCoverAngle;
     }
 }

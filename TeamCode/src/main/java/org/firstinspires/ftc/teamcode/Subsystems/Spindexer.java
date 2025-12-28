@@ -112,6 +112,10 @@ public class Spindexer {
         }
     }
 
+    public SpindexerMode getMode() {
+        return spindexerMode;
+    }
+
     public void setTargetAngle(double targetAngle) {
         this.targetAngle = targetAngle;
     }

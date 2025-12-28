@@ -14,7 +14,7 @@ public class BlueTeleOp extends OpMode {
 
     @Override
     public void init() {
-        robot = new Robot(hardwareMap, PinPoint.AllianceColor.BLUE, gamepad1);
+        robot = new Robot(hardwareMap, PinPoint.AllianceColor.BLUE, gamepad1, telemetry);
         robot.start();
     }
 

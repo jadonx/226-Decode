@@ -24,7 +24,7 @@ public class ColorIntakeCommand {
 
     private int[] intakePositions;
 
-    private enum State {
+    public enum State {
         WAIT_AT_FIRST_HOLDER,
         WAIT_AT_SECOND_HOLDER,
         WAIT_AT_THIRD_HOLDER,
@@ -93,6 +93,10 @@ public class ColorIntakeCommand {
             case FINISHED:
                 break;
         }
+    }
+
+    public State getCurrentState() {
+        return currentState;
     }
 
     private Spindexer.HolderStatus getBallColor(double hue) {

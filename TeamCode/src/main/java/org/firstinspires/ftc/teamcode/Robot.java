@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Commands.ColorIntakeCommand;
 import org.firstinspires.ftc.teamcode.Commands.LaunchCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.FieldCentricDrive;
@@ -21,6 +23,7 @@ public class Robot {
     private final Spindexer spindexer;
     private final Turret turret;
     private final PinPoint pinpoint;
+    private final Telemetry telemetry;
 
     private ColorIntakeCommand colorIntakeCommand;
     private LaunchCommand launchCommand;
@@ -33,7 +36,7 @@ public class Robot {
     }
     private RobotState robotState;
 
-    public Robot(HardwareMap hardwareMap, PinPoint.AllianceColor allianceColor, Gamepad gamepad1) {
+    public Robot(HardwareMap hardwareMap, PinPoint.AllianceColor allianceColor, Gamepad gamepad1, Telemetry telemetry) {
         drive = new FieldCentricDrive(hardwareMap);
         intake = new Intake(hardwareMap);
         launcher = new Launcher(hardwareMap);
@@ -43,6 +46,7 @@ public class Robot {
         pinpoint = new PinPoint(hardwareMap, allianceColor);
 
         this.gamepad1 = gamepad1;
+        this.telemetry = telemetry;
     }
 
     public void start() {
@@ -57,13 +61,16 @@ public class Robot {
     public void update() {
         updateDrive();
         updateIntake();
+        updateLauncherCover();
+        updatePinPoint();
+        updateTelemetry();
 
         if (launchCommand == null) {
             colorIntakeCommand.update();
 
             if (gamepad1.a && launchCommand == null) {
                 launchCommand = new LaunchCommand(spindexer, popper, launcher, pinpoint);
-                launchCommand.start();
+                launchCommand.start(pinpoint.getDistanceToGoal());
             }
         }
 
@@ -76,6 +83,10 @@ public class Robot {
                 colorIntakeCommand.start();
                 stopLaunchCommand();
             }
+        }
+
+        if (gamepad1.b) {
+            spindexer.resetHolderStatuses();
         }
     }
 
@@ -99,6 +110,43 @@ public class Robot {
         else {
             intake.stopIntake();
         }
+    }
+
+    private void updateLauncherCover() {
+        launcher.calculateTargetAngle(pinpoint.getDistanceToGoal());
+    }
+
+    private void updatePinPoint() {
+        pinpoint.updatePose();
+    }
+
+    private void updateTelemetry() {
+        // Spindexer
+        telemetry.addData("Spindexer Mode ", spindexer.getMode());
+        String holderStatuses = String.format("[%s, %s, %s]", spindexer.getHolderStatus(0), spindexer.getHolderStatus(1), spindexer.getHolderStatus(2));
+        telemetry.addData("Spindexer Holders ", holderStatuses + "\n");
+
+        // Launcher
+        telemetry.addData("Target velocity ", launcher.getTargetVelocity());
+        telemetry.addData("Target cover angle ", launcher.getTargetCoverAngle() + "\n");
+
+        // Pinpoint
+        String currentPose = String.format("[%f, %f]", pinpoint.getXCoordinate(pinpoint.getPose(), DistanceUnit.INCH), pinpoint.getYCoordinate(pinpoint.getPose(), DistanceUnit.INCH));
+        telemetry.addData("Pinpoint Position ", currentPose);
+        telemetry.addData("Goal Distance ", pinpoint.getDistanceToGoal() + "\n");
+
+        // Color intake command
+        telemetry.addData("Intake Command State ", colorIntakeCommand.getCurrentState() + "\n");
+
+        // Launch command
+        if (launchCommand != null) {
+            telemetry.addData("Launch Command State ", launchCommand.getCurrentState() + "\n");
+        }
+        else {
+            telemetry.addData("Launch Command State ", "Null \n");
+        }
+
+        telemetry.update();
     }
 
     private void stopLaunchCommand() {

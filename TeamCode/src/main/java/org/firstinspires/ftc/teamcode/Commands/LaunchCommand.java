@@ -16,7 +16,7 @@ public class LaunchCommand {
     private final Launcher launcher;
     private final PinPoint pinpoint;
 
-    private enum State {
+    public enum State {
         PREPARE_TO_SHOOT,
         SHOOTING,
         FINISH
@@ -26,9 +26,6 @@ public class LaunchCommand {
     private ElapsedTime stateTimer;
     private final int coverRunTime = 500;
 
-    private double targetVelocity;
-    private double targetCoverAngle;
-
     public LaunchCommand(Spindexer spindexer, Popper popper, Launcher launcher, PinPoint pinpoint) {
         this.spindexer = spindexer;
         this.popper = popper;
@@ -36,21 +33,16 @@ public class LaunchCommand {
         this.pinpoint = pinpoint;
     }
 
-    public void start() {
+    public void start(double distance) {
         spindexer.setMode(Spindexer.SpindexerMode.INTAKE_MODE, 0.4);
         spindexer.setTargetAngle(spindexer.getTargetAngle());
 
         popper.pushInPopper();
         popper.spinPopper();
 
-//        targetVelocity = launcher.calculateVelocity(pinpoint.getDistanceToGoal());
-//        targetCoverAngle = launcher.calculateAngle(pinpoint.getDistanceToGoal());
-//        launcher.setTargetVelocity(targetVelocity);
-//        launcher.setTargetCoverAngle(targetCoverAngle);
-        launcher.setTargetVelocity(1580);
-        launcher.setTargetCoverAngle(0);
+        launcher.calculateTargetVelocity(pinpoint.getDistanceToGoal());
 
-        stateTimer.reset();
+        stateTimer = new ElapsedTime();
 
         currentState = State.PREPARE_TO_SHOOT;
     }
@@ -61,7 +53,7 @@ public class LaunchCommand {
 
         switch (currentState) {
             case PREPARE_TO_SHOOT:
-                if (spindexer.atTargetAngle(3) && launcher.atTargetVelocity(30) && stateTimer.milliseconds() > coverRunTime) {
+                if (spindexer.atTargetAngle(3) && launcher.atTargetVelocity(20) && stateTimer.milliseconds() > coverRunTime) {
                     spindexer.setMode(Spindexer.SpindexerMode.LAUNCH_MODE, 0.25);
                     spindexer.setTargetAngle(spindexer.getUnwrappedAngle() + 360);
                     currentState = State.SHOOTING;
@@ -79,5 +71,9 @@ public class LaunchCommand {
 
     public boolean isFinished() {
         return currentState == State.FINISH;
+    }
+
+    public State getCurrentState() {
+        return currentState;
     }
 }

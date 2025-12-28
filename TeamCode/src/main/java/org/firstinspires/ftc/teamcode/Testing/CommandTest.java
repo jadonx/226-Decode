@@ -56,7 +56,7 @@ public class CommandTest extends OpMode {
 
         if (gamepad1.aWasPressed() && launchCommand == null) {
             launchCommand = new LaunchCommand(spindexer, popper, launcher, pinpoint);
-            launchCommand.start();
+            launchCommand.start(0);
         }
 
         if (launchCommand != null && !launchCommand.isFinished()) {
