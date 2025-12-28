@@ -25,6 +25,8 @@ public class Robot {
     private final PinPoint pinpoint;
     private final Telemetry telemetry;
 
+    private boolean isUsingTurret;
+
     private ColorIntakeCommand colorIntakeCommand;
     private LaunchCommand launchCommand;
 
@@ -44,6 +46,8 @@ public class Robot {
     }
 
     public void start() {
+        isUsingTurret = false;
+
         colorIntakeCommand = new ColorIntakeCommand(spindexer);
         colorIntakeCommand.start();
 
@@ -55,6 +59,7 @@ public class Robot {
         updateIntake();
         updateLauncherCover();
         updatePinPoint();
+        updateTurret();
         updateTelemetry();
 
         if (launchCommand == null) {
@@ -110,6 +115,19 @@ public class Robot {
 
     private void updatePinPoint() {
         pinpoint.updatePose();
+    }
+
+    private void updateTurret() {
+        if (isUsingTurret) {
+            double desired = 90-pinpoint.getAngleToGoal();
+            turret.goToAngle(desired);
+        } else {
+            turret.goToAngle(pinpoint.getHeading());
+        }
+
+        if (gamepad1.dpadUpWasPressed()) {
+            isUsingTurret = !isUsingTurret;
+        }
     }
 
     private void updateTelemetry() {

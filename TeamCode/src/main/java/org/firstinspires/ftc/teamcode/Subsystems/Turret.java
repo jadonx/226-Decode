@@ -17,13 +17,10 @@ public class Turret {
     private IMU turretEncoder;
     private PIDFController pid;
 
-    public static double kP = 0.02; // Proportional gain on position error
+    public static double kP = 0.0065; // Proportional gain on position error
     public static double kI = 0.0; // Integral gain on position error
-    public static double kD = 0.0005; // Derivative gain on position error
-    public static double kF = 0.0015; // Feedforward to overcome static friction
-
-    public static double RIGHT_LIMIT = 140;
-    public static double LEFT_LIMIT  = -220;
+    public static double kD = 0.0; // Derivative gain on position error
+    public static double kF = 0.002; // Feedforward to overcome static friction
 
     public Turret(HardwareMap hardwareMap) {
         turretRight = hardwareMap.get(CRServo.class, Constants.HMServoTurretRight);
