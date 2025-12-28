@@ -51,7 +51,7 @@ public class TurretTester extends OpMode {
 //        turret.goToAngle(turretAngle);
 //        turret.setPower(1);
 
-        launcher.moveCover(coverPos);
+        // launcher.moveCover(coverPos);
         packet.put("Distance from bot to goal", pinpoint.getDistanceToGoal());
         packet.put("Angle from bot to goal", pinpoint.getAngleToGoal());
 
