@@ -30,12 +30,6 @@ public class Robot {
 
     private Gamepad gamepad1;
 
-    private enum RobotState {
-        INTAKE_STATE,
-        LAUNCH_STATE
-    }
-    private RobotState robotState;
-
     public Robot(HardwareMap hardwareMap, PinPoint.AllianceColor allianceColor, Gamepad gamepad1, Telemetry telemetry) {
         drive = new FieldCentricDrive(hardwareMap);
         intake = new Intake(hardwareMap);
@@ -50,8 +44,6 @@ public class Robot {
     }
 
     public void start() {
-        robotState = RobotState.INTAKE_STATE;
-
         colorIntakeCommand = new ColorIntakeCommand(spindexer);
         colorIntakeCommand.start();
 
@@ -85,7 +77,7 @@ public class Robot {
             }
         }
 
-        if (gamepad1.b) {
+        if (gamepad1.bWasPressed()) {
             spindexer.resetHolderStatuses();
         }
     }

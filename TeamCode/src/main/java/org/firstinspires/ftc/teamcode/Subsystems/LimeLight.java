@@ -52,7 +52,6 @@ public class LimeLight {
         else return new Spindexer.HolderStatus[]{Spindexer.HolderStatus.NONE, Spindexer.HolderStatus.NONE, Spindexer.HolderStatus.NONE};
     }
 
-
     public void stopLimeLight() {
         limelight.stop();
         limelight.shutdown();
