@@ -40,7 +40,10 @@ public class Turret {
     public void goToAngle(double targetAngle) {
         pid.setPIDF(kP, kI, kD, kF);
         double currentAngle = getTurretAngle();
-        double power = pid.calculate(currentAngle, targetAngle);
+
+        double error = wrapDegrees(targetAngle - currentAngle);
+
+        double power = pid.calculate(0, error);
 
         power = Math.max(Math.min(power, 1), -1);
 
@@ -53,6 +56,12 @@ public class Turret {
 
     public double getTurretAngle() {
         return -1*turretEncoder.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+    }
+
+    private double wrapDegrees(double angle) {
+        while (angle <= -180) angle += 360;
+        while (angle > 180) angle -= 360;
+        return angle;
     }
 
     public void setPower(double power) {

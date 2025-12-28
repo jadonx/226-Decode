@@ -17,6 +17,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Subsystems.FieldCentricDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
@@ -149,7 +150,7 @@ public class ManualRobotTest extends OpMode {
         if (isUsingTurret) {
             turret.goToAngle(90-pinpoint.getAngleToGoal());
         } else {
-            turret.goToAngle(-drive.getYaw());
+            turret.goToAngle(pinpoint.getHeading());
         }
 
         if (gamepad1.dpadUpWasPressed()) {
@@ -158,20 +159,23 @@ public class ManualRobotTest extends OpMode {
 
 
 
-
-        packet.put("X Position", pinpoint.getPose().position.x);
-        packet.put("Y Position", pinpoint.getPose().position.y);
+        packet.put("X Position", pinpoint.getXCoordinate(pinpoint.getPose(), DistanceUnit.INCH));
+        packet.put("Y Position", pinpoint.getYCoordinate(pinpoint.getPose(), DistanceUnit.INCH));
 //
-        packet.put("GOAL X Position", pinpoint.getPoseGoal().position.x);
-        packet.put("GOAL Y Position", pinpoint.getPoseGoal().position.y);
+        packet.put("GOAL X Position", pinpoint.getXCoordinate(pinpoint.getPoseGoal(), DistanceUnit.INCH));
+        packet.put("GOAL Y Position", pinpoint.getYCoordinate(pinpoint.getPoseGoal(), DistanceUnit.INCH));
 
         packet.put("Distance from bot to goal", pinpoint.getDistanceToGoal());
         packet.put("Angle from bot to goal", pinpoint.getAngleToGoal());
 
         packet.put("Turret Current Angle: ", turret.getTurretAngle());
         packet.put("Robot Heading: ", drive.getYaw());
-        packet.put("Robot Heading roadrunner: ", pinpoint.getDriverHeading());
 
+        launcher.calculateTargetVelocity(pinpoint.getDistanceToGoal());
+        launcher.calculateTargetAngle(pinpoint.getDistanceToGoal());
+
+        packet.put("Target velocity ", launcher.getTargetVelocity());
+        packet.put("Target angle ", launcher.getTargetCoverAngle());
 
         dashboard.sendTelemetryPacket(packet);
     }

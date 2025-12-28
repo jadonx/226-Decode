@@ -48,7 +48,6 @@ import org.firstinspires.ftc.teamcode.Subsystems.FieldCentricDrive;
 public class PinPointTest extends OpMode {
     // Create an instance of the sensor
     GoBildaPinpointDriver pinpoint;
-
     FieldCentricDrive drive;
 
     @Override
