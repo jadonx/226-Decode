@@ -56,8 +56,8 @@ public class Launcher {
         launcher2.setPower(0);
     }
 
-    public boolean atTargetVelocity() {
-        return Math.abs(getVelocity() - targetVelocity) < 50;
+    public boolean atTargetVelocity(int threshold) {
+        return Math.abs(getVelocity() - targetVelocity) < threshold;
     }
 
     private double clamp(double value) {
