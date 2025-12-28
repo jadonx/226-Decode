@@ -20,11 +20,11 @@ public class ColorIntakeCommand {
     private int targetAngle;
 
     private ElapsedTime holdingBallTimer;
-    private int holdingBallThreshold = 50; // Must hold ball for 800ms to move to next holder
+    private int holdingBallThreshold = 50;
 
     private int[] intakePositions;
 
-    private enum State {
+    public enum State {
         WAIT_AT_FIRST_HOLDER,
         WAIT_AT_SECOND_HOLDER,
         WAIT_AT_THIRD_HOLDER,
@@ -41,8 +41,11 @@ public class ColorIntakeCommand {
     public void start() {
         colorSensorTimer = new ElapsedTime();
         holdingBallTimer = new ElapsedTime();
-        currentState = State.WAIT_AT_FIRST_HOLDER;
+
+        spindexer.resetHolderStatuses();
+        spindexer.setMode(Spindexer.SpindexerMode.INTAKE_MODE, 0.4);
         spindexer.setTargetAngle(intakePositions[0]);
+        currentState = State.WAIT_AT_FIRST_HOLDER;
     }
 
     public void startAuto() {
@@ -90,6 +93,10 @@ public class ColorIntakeCommand {
             case FINISHED:
                 break;
         }
+    }
+
+    public State getCurrentState() {
+        return currentState;
     }
 
     private Spindexer.HolderStatus getBallColor(double hue) {
