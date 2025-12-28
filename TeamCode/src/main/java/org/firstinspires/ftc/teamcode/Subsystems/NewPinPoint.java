@@ -18,7 +18,7 @@ public class NewPinPoint {
     }
 
     public void configurePinPoint() {
-        pinpoint.setOffsets(-7.55, 0.25, DistanceUnit.INCH);
+        pinpoint.setOffsets(-195.325, 2.671, DistanceUnit.MM);
 
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
 

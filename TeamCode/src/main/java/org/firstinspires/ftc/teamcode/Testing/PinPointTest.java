@@ -32,6 +32,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.Subsystems.FieldCentricDrive;
 
 /*
  * This OpMode illustrates how to use the GoBildaPinpoint
@@ -48,19 +49,13 @@ public class PinPointTest extends OpMode {
     // Create an instance of the sensor
     GoBildaPinpointDriver pinpoint;
 
-    IMU imu;
+    FieldCentricDrive drive;
 
     @Override
     public void init() {
         // Get a reference to the sensor
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, Constants.HMPinPointer);
-        imu = hardwareMap.get(IMU.class, Constants.HMimu);
-
-        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-                RevHubOrientationOnRobot.UsbFacingDirection.UP));
-
-        imu.initialize(parameters);
+        drive = new FieldCentricDrive(hardwareMap);
 
         // Configure the sensor
         configurePinpoint();
@@ -71,6 +66,12 @@ public class PinPointTest extends OpMode {
 
     @Override
     public void loop() {
+        drive.drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+
+        if (gamepad1.x) {
+            drive.resetIMU();
+        }
+
         telemetry.addLine("Push your robot around to see it track");
         telemetry.addLine("Press A to reset the position");
         if(gamepad1.a){
@@ -114,7 +115,7 @@ public class PinPointTest extends OpMode {
          * increase when you move the robot forward. And the Y (strafe) pod should increase when
          * you move the robot to the left.
          */
-        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD,
+        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED,
                 GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
         /*
