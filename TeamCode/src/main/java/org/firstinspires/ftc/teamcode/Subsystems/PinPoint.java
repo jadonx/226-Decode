@@ -2,70 +2,98 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
 
 @Config
 public class PinPoint {
-    MecanumDrive drive_roadrunner;
+    GoBildaPinpointDriver pinpoint;
 
-    public static double goal_x = 62.883723702017726;
-    public static double goal_y = 66.55849186454233;
+    public static double goal_x = 63.950425996555126;
+    public static double goal_y = -62.60601854699804;
 
     public static int bot_heading = 90;
-    public static int goal_heading = 90;
 
-    Pose2d GOAL_RED = new Pose2d(goal_x, goal_y, Math.toRadians(goal_heading));
-    Pose2d GOAL_BLUE = new Pose2d(36, 60, Math.toRadians(0));
+    Pose2D GOAL_RED = new Pose2D(DistanceUnit.INCH, goal_x, goal_y, AngleUnit.DEGREES, 0);
+    Pose2D GOAL_BLUE = new Pose2D(DistanceUnit.INCH, goal_x, goal_y, AngleUnit.DEGREES, 0);
 
-    Pose2d GOAL_POSE;
+    Pose2D GOAL_POSE;
 
-    Pose2d BOT_RED = new Pose2d(0, 0, Math.toRadians(bot_heading));
-    Pose2d BOT_BLUE = new Pose2d(0, 0, Math.toRadians(180));
+    Pose2D BOT_RED = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, bot_heading);
+    Pose2D BOT_BLUE = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
 
     public enum AllianceColor {
         RED,
         BLUE,
     }
 
+    public void configurePinPoint() {
+        pinpoint.setOffsets(-195.325, 2.671, DistanceUnit.MM);
+
+        pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+
+        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED,
+                GoBildaPinpointDriver.EncoderDirection.FORWARD);
+
+        pinpoint.resetPosAndIMU();
+    }
+
     public PinPoint(HardwareMap hardwareMap, AllianceColor allianceColor) {
+        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, Constants.HMPinPointer);
+        configurePinPoint();
+
         if (allianceColor == AllianceColor.RED) {
             GOAL_POSE = GOAL_RED;
-            drive_roadrunner = new MecanumDrive(hardwareMap, BOT_RED);
+            pinpoint.setPosition(BOT_RED);
         } else {
             GOAL_POSE = GOAL_BLUE;
-            drive_roadrunner = new MecanumDrive(hardwareMap, BOT_BLUE);
+            pinpoint.setPosition(BOT_BLUE);
         }
     }
+
     public double getDistanceToGoal() {
-        Pose2d currentPose = drive_roadrunner.localizer.getPose();
-        return Math.hypot(GOAL_POSE.position.x - currentPose.position.x, GOAL_POSE.position.y - currentPose.position.y);
+        Pose2D currentPose = getPose();
+        return Math.hypot(getXCoordinate(GOAL_POSE, DistanceUnit.INCH) - getXCoordinate(currentPose, DistanceUnit.INCH),
+                getYCoordinate(GOAL_POSE, DistanceUnit.INCH) - getYCoordinate(currentPose, DistanceUnit.INCH));
     }
 
-    public Pose2d getPose() {
-        return drive_roadrunner.localizer.getPose();
-    }
 
-    public void updatePose() {
-        drive_roadrunner.updatePoseEstimate();
-    }
-
-    public Pose2d getPoseGoal() {
+    public Pose2D getPoseGoal() {
         return GOAL_POSE;
     }
 
     public double getAngleToGoal() {
-        Pose2d currentPose = drive_roadrunner.localizer.getPose();
+        Pose2D currentPose = getPose();
         return Math.toDegrees(
                 Math.atan2
-                        (GOAL_POSE.position.y - currentPose.position.y,
-                                GOAL_POSE.position.x - currentPose.position.x)
+                        (getYCoordinate(GOAL_POSE, DistanceUnit.INCH) - getYCoordinate(currentPose, DistanceUnit.INCH),
+                                getXCoordinate(GOAL_POSE, DistanceUnit.INCH) - getXCoordinate(currentPose, DistanceUnit.INCH))
         );
     }
 
-    public double getDriverHeading() {
-        return Math.toDegrees(drive_roadrunner.localizer.getPose().heading.log());
+    public void updatePose() {
+        pinpoint.update();
     }
 
+    public Pose2D getPose() {
+        return pinpoint.getPosition();
+    }
+
+    public double getHeading() {
+        return -1*getPose().getHeading(AngleUnit.DEGREES);
+    }
+
+    public double getXCoordinate(Pose2D pose, DistanceUnit unit) {
+        return -1*pose.getY(unit);
+    }
+
+    public double getYCoordinate(Pose2D pose, DistanceUnit unit) {
+        return pose.getX(unit);
+    }
 }

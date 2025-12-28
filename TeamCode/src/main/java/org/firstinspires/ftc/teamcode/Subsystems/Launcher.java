@@ -52,7 +52,17 @@ public class Launcher {
         if(distance > 75){
             targetCoverAngle = 0;
         }
-        targetCoverAngle = -0.012064*(distance)+1.25891;
+        else {
+            targetCoverAngle = -0.012064*(distance)+1.25891;
+        }
+    }
+
+    public double getTargetVelocity() {
+        return targetVelocity;
+    }
+
+    public double getTargetCoverAngle() {
+        return targetCoverAngle;
     }
 
     public void updatePIDValues(double kS, double kV, double kP) {
