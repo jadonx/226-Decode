@@ -34,8 +34,6 @@ public class Launcher {
     }
 
     public void update() {
-        cover.setPosition(targetCoverAngle);
-
         // Velocity Control
         double error = targetVelocity - getVelocity();
 
@@ -64,13 +62,6 @@ public class Launcher {
         return Math.max(-1.0, Math.min(1.0, value));
     }
 
-    /** SETTER AND GETTER METHODS */
-
-    public void setCalculatedVelocityAngle(double distance) {
-        targetVelocity = calculateVelocity(distance);
-        targetCoverAngle = calculateAngle(distance);
-    }
-
     public double calculateVelocity(double distance) {
         return (0.0000014237*Math.pow(distance,4))-(0.000303373*Math.pow(distance,3))+(0.0297095*Math.pow(distance,2))+(1.67866*distance)+1134.53147;
     }
@@ -84,6 +75,8 @@ public class Launcher {
         }
     }
 
+    /** SETTER AND GETTER METHODS */
+
     public double getVelocity() {
         return (launcher1.getVelocity() + launcher2.getVelocity()) / 2.0;
     }
@@ -94,5 +87,14 @@ public class Launcher {
 
     public void setTargetCoverAngle(double coverAngle) {
         this.targetCoverAngle = coverAngle;
+        cover.setPosition(targetCoverAngle);
+    }
+
+    public double getTargetVelocity() {
+        return targetVelocity;
+    }
+
+    public double getTargetCoverAngle() {
+        return targetCoverAngle;
     }
 }

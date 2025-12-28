@@ -26,6 +26,9 @@ public class LaunchCommand {
     private ElapsedTime stateTimer;
     private final int coverRunTime = 500;
 
+    private double targetVelocity;
+    private double targetCoverAngle;
+
     public LaunchCommand(Spindexer spindexer, Popper popper, Launcher launcher, PinPoint pinpoint) {
         this.spindexer = spindexer;
         this.popper = popper;
@@ -39,7 +42,11 @@ public class LaunchCommand {
 
         popper.pushInPopper();
         popper.spinPopper();
-        // launcher.setTargetVelocity(pinpoint.getDistanceToGoal());
+
+//        targetVelocity = launcher.calculateVelocity(pinpoint.getDistanceToGoal());
+//        targetCoverAngle = launcher.calculateAngle(pinpoint.getDistanceToGoal());
+//        launcher.setTargetVelocity(targetVelocity);
+//        launcher.setTargetCoverAngle(targetCoverAngle);
         launcher.setTargetVelocity(1580);
         launcher.setTargetCoverAngle(0);
 

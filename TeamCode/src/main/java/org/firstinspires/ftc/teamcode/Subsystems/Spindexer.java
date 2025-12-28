@@ -137,6 +137,10 @@ public class Spindexer {
         holderStatuses[0] = HolderStatus.NONE; holderStatuses[1] = HolderStatus.NONE; holderStatuses[2] = HolderStatus.NONE;
     }
 
+    public HolderStatus getHolderStatus(int index) {
+        return holderStatuses[index];
+    }
+
     public int[] getIntakePositions() {
         return intakePositions;
     }

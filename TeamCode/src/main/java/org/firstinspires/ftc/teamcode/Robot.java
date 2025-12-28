@@ -55,21 +55,45 @@ public class Robot {
     }
 
     public void update() {
+        updateDrive();
         updateIntake();
 
-        switch (robotState) {
-            case INTAKE_STATE:
-                break;
-            case LAUNCH_STATE:
-                break;
+        if (launchCommand == null) {
+            colorIntakeCommand.update();
+
+            if (gamepad1.a && launchCommand == null) {
+                launchCommand = new LaunchCommand(spindexer, popper, launcher, pinpoint);
+                launchCommand.start();
+            }
+        }
+
+        if (launchCommand != null) {
+            if (!launchCommand.isFinished()) {
+                launchCommand.update();
+            }
+
+            if (launchCommand.isFinished()) {
+                colorIntakeCommand.start();
+                stopLaunchCommand();
+            }
+        }
+    }
+
+    private void updateDrive() {
+        drive.drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+
+        if (gamepad1.x) {
+            drive.resetIMU();
         }
     }
 
     private void updateIntake() {
         if (gamepad1.right_trigger > 0.1) {
+            stopLaunchCommand();
             intake.runIntake(gamepad1.right_trigger);
         }
         else if (gamepad1.left_trigger > 0.1) {
+            stopLaunchCommand();
             intake.reverseIntake(gamepad1.left_trigger);
         }
         else {
@@ -80,6 +104,7 @@ public class Robot {
     private void stopLaunchCommand() {
         launchCommand = null;
         launcher.stopLauncher();
+        launcher.setTargetCoverAngle(0.5);
         popper.deactivatePopper();
     }
 }
