@@ -99,5 +99,6 @@ public class Launcher {
 
     public void setTargetCoverAngle(double targetCoverAngle) {
         this.targetCoverAngle = targetCoverAngle;
+        cover.setPosition(targetCoverAngle);
     }
 }

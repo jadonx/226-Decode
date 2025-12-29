@@ -15,6 +15,7 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Commands.ColorIntakeCommand;
 import org.firstinspires.ftc.teamcode.Commands.LaunchCommand;
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
@@ -68,7 +69,7 @@ public class RedClose extends LinearOpMode {
     public class TurretTrackingGoal implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            turret.goToAngle(pinpoint.getAngleToGoal());
+            turret.goToAngle(90-pinpoint.getAngleToGoal());
             return true;
         }
     }
@@ -95,7 +96,6 @@ public class RedClose extends LinearOpMode {
             if (launchCommand != null && launchCommand.isFinished()) {
                 launchCommand = null;
                 launcher.stopLauncher();
-                launcher.setTargetCoverAngle(0.5);
                 popper.deactivatePopper();
                 return false;
             }
@@ -107,15 +107,44 @@ public class RedClose extends LinearOpMode {
         return new ShootArtifacts();
     }
 
+    public class MoveCover implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            launcher.setTargetCoverAngle(0.1);
+            return false;
+        }
+    }
+    public Action moveCover() {
+        return new MoveCover();
+    }
+
+    public class Telemetry implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            String currentPose = String.format("[%f, %f]", pinpoint.getXCoordinate(pinpoint.getPose(), DistanceUnit.INCH), pinpoint.getYCoordinate(pinpoint.getPose(), DistanceUnit.INCH));
+            telemetry.addData("Pinpoint Position ", currentPose);
+
+            telemetry.addData("Desired Angle", (90 - pinpoint.getAngleToGoal()));
+            telemetry.addData("Actual Angle", (turret.getTurretAngle()));
+
+            telemetry.update();
+
+            return true;
+        }
+    }
+    public Action telemetry() {
+        return new Telemetry();
+    }
+
     @Override
     public void runOpMode() throws InterruptedException {
         double botPosX = -60;
         double botPosY = 50;
-        double botHeading = 0;
+        double botHeading = 90;
         Pose2d initialPose = new Pose2d(botPosX, botPosY, Math.toRadians(botHeading));
         drive = new MecanumDrive(hardwareMap, initialPose);
         turret = new Turret(hardwareMap);
-        pinpoint = new PinPoint(hardwareMap, PinPoint.AllianceColor.RED, botPosX, botPosY, botHeading);
+        pinpoint = new PinPoint(hardwareMap, PinPoint.AllianceColor.RED, botPosX, botPosY, 0);
         spindexer = new Spindexer(hardwareMap);
         launcher = new Launcher(hardwareMap);
         popper = new Popper(hardwareMap);
@@ -140,9 +169,9 @@ public class RedClose extends LinearOpMode {
         Actions.runBlocking(
                 new ParallelAction(
                         updatePinPoint(),
-                        turretTrackingGoal(),
+                        turretTrackingAngle(-60),
                         new SequentialAction(
-                                // turretTrackingAngle(0)
+                                moveCover(),
                                 getMotif.build(),
                                 firstLaunch.build(),
                                 shootArtifacts(),

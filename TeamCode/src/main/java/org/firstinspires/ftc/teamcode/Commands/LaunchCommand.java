@@ -53,8 +53,7 @@ public class LaunchCommand {
         popper.pushInPopper();
         popper.setTargetVelocity(1800);
 
-        launcher.setTargetVelocity(1300);
-        launcher.setTargetCoverAngle(0.35);
+        launcher.setTargetVelocity(1250);
 
         currentState = State.PREPARE_TO_SHOOT;
     }
