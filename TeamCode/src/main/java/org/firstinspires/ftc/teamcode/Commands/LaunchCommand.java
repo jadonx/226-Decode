@@ -54,7 +54,7 @@ public class LaunchCommand {
         switch (currentState) {
             case PREPARE_TO_SHOOT:
                 if (spindexer.atTargetAngle(3) && launcher.atTargetVelocity(20) && stateTimer.milliseconds() > coverRunTime) {
-                    spindexer.setMode(Spindexer.SpindexerMode.LAUNCH_MODE, 0.25);
+                    spindexer.setMode(Spindexer.SpindexerMode.LAUNCH_MODE, 0.2);
                     spindexer.setTargetAngle(spindexer.getUnwrappedAngle() + 360);
                     currentState = State.SHOOTING;
                 }

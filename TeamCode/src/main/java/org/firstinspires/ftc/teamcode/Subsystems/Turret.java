@@ -20,7 +20,7 @@ public class Turret {
     public static double kP = 0.0065; // Proportional gain on position error
     public static double kI = 0.0; // Integral gain on position error
     public static double kD = 0.0; // Derivative gain on position error
-    public static double kF = 0.002; // Feedforward to overcome static friction
+    public static double kF = 0.003; // Feedforward to overcome static friction
 
     public Turret(HardwareMap hardwareMap) {
         turretRight = hardwareMap.get(CRServo.class, Constants.HMServoTurretRight);
