@@ -69,8 +69,12 @@ public class Turret {
 
         lastError = error;
         lastTime = currentTime;
+    }
 
-
+    public boolean atTargetAngle(double targetAngle) {
+        double currentAngle = getTurretAngle();
+        double error = wrapDegrees(targetAngle - currentAngle);
+        return (Math.abs(error) < 0.5);
     }
 
     public double getTurretAngle() {
