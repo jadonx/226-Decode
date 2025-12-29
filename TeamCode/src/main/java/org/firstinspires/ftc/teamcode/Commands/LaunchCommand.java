@@ -23,9 +23,6 @@ public class LaunchCommand {
     }
     private State currentState;
 
-    private ElapsedTime stateTimer;
-    private final int coverRunTime = 500;
-
     public LaunchCommand(Spindexer spindexer, Popper popper, Launcher launcher, PinPoint pinpoint) {
         this.spindexer = spindexer;
         this.popper = popper;
@@ -38,11 +35,9 @@ public class LaunchCommand {
         spindexer.setTargetAngle(spindexer.getTargetAngle());
 
         popper.pushInPopper();
-        popper.spinPopper();
+        popper.setTargetVelocity(1800);
 
         launcher.calculateTargetVelocity(pinpoint.getDistanceToGoal());
-
-        stateTimer = new ElapsedTime();
 
         currentState = State.PREPARE_TO_SHOOT;
     }
@@ -50,12 +45,13 @@ public class LaunchCommand {
     public void update() {
         launcher.update();
         spindexer.update();
+        popper.update();
 
         switch (currentState) {
             case PREPARE_TO_SHOOT:
-                if (spindexer.atTargetAngle(3) && launcher.atTargetVelocity(20) && stateTimer.milliseconds() > coverRunTime) {
+                if (launcher.atTargetVelocity(20) && popper.atTargetVelocity(100)) {
                     spindexer.setMode(Spindexer.SpindexerMode.LAUNCH_MODE, 0.2);
-                    spindexer.setTargetAngle(spindexer.getUnwrappedAngle() + 360);
+                    spindexer.setTargetAngle(spindexer.getUnwrappedAngle() + 370);
                     currentState = State.SHOOTING;
                 }
                 break;

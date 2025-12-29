@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -23,6 +25,9 @@ public class Robot {
     private final Spindexer spindexer;
     private final Turret turret;
     private final PinPoint pinpoint;
+
+    private final TelemetryPacket packet;
+    private final FtcDashboard dashboard;
     private final Telemetry telemetry;
 
     private boolean isUsingTurret;
@@ -32,7 +37,7 @@ public class Robot {
 
     private Gamepad gamepad1;
 
-    public Robot(HardwareMap hardwareMap, PinPoint.AllianceColor allianceColor, Gamepad gamepad1, Telemetry telemetry) {
+    public Robot(HardwareMap hardwareMap, PinPoint.AllianceColor allianceColor, Gamepad gamepad1, Telemetry telemetry, TelemetryPacket packet, FtcDashboard dashboard) {
         drive = new FieldCentricDrive(hardwareMap);
         intake = new Intake(hardwareMap);
         launcher = new Launcher(hardwareMap);
@@ -43,6 +48,8 @@ public class Robot {
 
         this.gamepad1 = gamepad1;
         this.telemetry = telemetry;
+        this.packet = packet;
+        this.dashboard = dashboard;
     }
 
     public void start() {
@@ -132,18 +139,22 @@ public class Robot {
 
     private void updateTelemetry() {
         // Spindexer
-        telemetry.addData("Spindexer Mode ", spindexer.getMode());
-        String holderStatuses = String.format("[%s, %s, %s]", spindexer.getHolderStatus(0), spindexer.getHolderStatus(1), spindexer.getHolderStatus(2));
-        telemetry.addData("Spindexer Holders ", holderStatuses + "\n");
+//        telemetry.addData("Spindexer Mode ", spindexer.getMode());
+//        String holderStatuses = String.format("[%s, %s, %s]", spindexer.getHolderStatus(0), spindexer.getHolderStatus(1), spindexer.getHolderStatus(2));
+//        telemetry.addData("Spindexer Holders ", holderStatuses + "\n");
 
         // Launcher
         telemetry.addData("Target velocity ", launcher.getTargetVelocity());
+        telemetry.addData("Current velocity ", launcher.getVelocity());
         telemetry.addData("Target cover angle ", launcher.getTargetCoverAngle() + "\n");
 
         // Pinpoint
-        String currentPose = String.format("[%f, %f]", pinpoint.getXCoordinate(pinpoint.getPose(), DistanceUnit.INCH), pinpoint.getYCoordinate(pinpoint.getPose(), DistanceUnit.INCH));
-        telemetry.addData("Pinpoint Position ", currentPose);
+        // String currentPose = String.format("[%f, %f]", pinpoint.getXCoordinate(pinpoint.getPose(), DistanceUnit.INCH), pinpoint.getYCoordinate(pinpoint.getPose(), DistanceUnit.INCH));
+        // telemetry.addData("Pinpoint Position ", currentPose);
         telemetry.addData("Goal Distance ", pinpoint.getDistanceToGoal() + "\n");
+
+        telemetry.addData("Desired Angle", (90 - pinpoint.getAngleToGoal()));
+        telemetry.addData("Actual Angle", (turret.getTurretAngle()));
 
         // Color intake command
         telemetry.addData("Intake Command State ", colorIntakeCommand.getCurrentState() + "\n");

@@ -15,8 +15,8 @@ import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
 public class PinPoint {
     GoBildaPinpointDriver pinpoint;
 
-    public static double goal_x = 61.950425996555126;
-    public static double goal_y = -62.60601854699804;
+    public static double goal_x = 60.950425996555126;
+    public static double goal_y = -65.60601854699804;
 
     public static int bot_heading = 90;
 
