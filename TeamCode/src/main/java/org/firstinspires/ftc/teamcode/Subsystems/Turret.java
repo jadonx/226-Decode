@@ -19,8 +19,11 @@ public class Turret {
 
     public static double kP = 0.0065; // Proportional gain on position error
     public static double kI = 0.0; // Integral gain on position error
-    public static double kD = 0.0; // Derivative gain on position error
-    public static double kF = 0.002; // Feedforward to overcome static friction
+    public static double kD = 0.0006; // Derivative gain on position error
+    public static double kF = 0.05; // Feedforward to overcome static friction
+
+    double lastError = 0;
+    long lastTime = System.nanoTime();
 
     public Turret(HardwareMap hardwareMap) {
         turretRight = hardwareMap.get(CRServo.class, Constants.HMServoTurretRight);
@@ -38,20 +41,36 @@ public class Turret {
     }
 
     public void goToAngle(double targetAngle) {
-        pid.setPIDF(kP, kI, kD, kF);
-        double currentAngle = getTurretAngle();
 
+        double currentAngle = getTurretAngle();
         double error = wrapDegrees(targetAngle - currentAngle);
 
-        double power = pid.calculate(0, error);
+        long currentTime = System.nanoTime();
+        double deltaTime = (currentTime - lastTime) / 1.0e9;
+        double derivative = 0;
+        if (deltaTime > 0) {
+            derivative = (error - lastError) / deltaTime;
+        }
+        double pTerm = kP * error;
+        double dTerm = kD * derivative;
+        double fTerm = Math.signum(error) * kF; // Static friction boooost!!!!
+        double power = pTerm + dTerm + fTerm;
+
 
         power = Math.max(Math.min(power, 1), -1);
 
-        if (pid.atSetPoint()) {
+
+        if (Math.abs(error) < 0.5) {
             setPower(0);
-            return;
+        } else {
+            setPower(power);
         }
-        setPower(power);
+
+
+        lastError = error;
+        lastTime = currentTime;
+
+
     }
 
     public double getTurretAngle() {
