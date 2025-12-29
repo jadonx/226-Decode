@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Testing;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -11,6 +12,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.PinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 
+@Disabled
 @TeleOp(name="CommandTest", group="Test")
 public class CommandTest extends OpMode {
     ColorIntakeCommand colorIntakeCommand;
@@ -27,7 +29,7 @@ public class CommandTest extends OpMode {
         spindexer = new Spindexer(hardwareMap);
         popper = new Popper(hardwareMap);
         launcher = new Launcher(hardwareMap);
-        pinpoint = new PinPoint(hardwareMap, PinPoint.AllianceColor.RED);
+        pinpoint = new PinPoint(hardwareMap, PinPoint.AllianceColor.RED, 0, 0, 0);
         intake = new Intake(hardwareMap);
 
         colorIntakeCommand = new ColorIntakeCommand(spindexer);

@@ -70,7 +70,7 @@ public class Robot {
 
             if (gamepad1.a && launchCommand == null) {
                 launchCommand = new LaunchCommand(spindexer, popper, launcher, pinpoint);
-                launchCommand.start(pinpoint.getDistanceToGoal());
+                launchCommand.start(0.2);
             }
         }
 

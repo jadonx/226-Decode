@@ -39,7 +39,7 @@ public class TurretTester extends OpMode {
     @Override
     public void init() {
         turret = new Turret(hardwareMap);
-        pinpoint = new PinPoint(hardwareMap, PinPoint.AllianceColor.RED);
+        pinpoint = new PinPoint(hardwareMap, PinPoint.AllianceColor.RED, 0, 0, 0);
         dashboard = FtcDashboard.getInstance();
         launcher = new Launcher(hardwareMap);
         packet = new TelemetryPacket();
