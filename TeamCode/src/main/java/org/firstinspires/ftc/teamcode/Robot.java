@@ -145,6 +145,9 @@ public class Robot {
         telemetry.addData("Pinpoint Position ", currentPose);
         telemetry.addData("Goal Distance ", pinpoint.getDistanceToGoal() + "\n");
 
+        telemetry.addData("Desired Angle", (90 - pinpoint.getAngleToGoal()));
+        telemetry.addData("Actual Angle", (turret.getTurretAngle()));
+
         // Color intake command
         telemetry.addData("Intake Command State ", colorIntakeCommand.getCurrentState() + "\n");
 
