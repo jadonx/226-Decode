@@ -26,8 +26,6 @@ public class Robot {
     private final Turret turret;
     private final PinPoint pinpoint;
 
-    private final TelemetryPacket packet;
-    private final FtcDashboard dashboard;
     private final Telemetry telemetry;
 
     private boolean isUsingTurret;
@@ -37,19 +35,17 @@ public class Robot {
 
     private Gamepad gamepad1;
 
-    public Robot(HardwareMap hardwareMap, PinPoint.AllianceColor allianceColor, Gamepad gamepad1, Telemetry telemetry, TelemetryPacket packet, FtcDashboard dashboard) {
+    public Robot(HardwareMap hardwareMap, PinPoint.AllianceColor allianceColor, Gamepad gamepad1, Telemetry telemetry, double botPosX, double botPosY, double heading) {
         drive = new FieldCentricDrive(hardwareMap);
         intake = new Intake(hardwareMap);
         launcher = new Launcher(hardwareMap);
         popper = new Popper(hardwareMap);
         spindexer = new Spindexer(hardwareMap);
         turret = new Turret(hardwareMap);
-        pinpoint = new PinPoint(hardwareMap, allianceColor);
+        pinpoint = new PinPoint(hardwareMap, allianceColor, botPosX, botPosY, heading);
 
         this.gamepad1 = gamepad1;
         this.telemetry = telemetry;
-        this.packet = packet;
-        this.dashboard = dashboard;
     }
 
     public void start() {

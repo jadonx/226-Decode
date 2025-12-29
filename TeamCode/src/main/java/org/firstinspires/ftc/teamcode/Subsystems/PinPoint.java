@@ -15,22 +15,30 @@ import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
 public class PinPoint {
     GoBildaPinpointDriver pinpoint;
 
-    public static double goal_x = 60.950425996555126;
-    public static double goal_y = -65.60601854699804;
-
     public static int bot_heading = 90;
 
-    Pose2D GOAL_RED = new Pose2D(DistanceUnit.INCH, goal_x, goal_y, AngleUnit.DEGREES, 0);
-    Pose2D GOAL_BLUE = new Pose2D(DistanceUnit.INCH, goal_x, goal_y, AngleUnit.DEGREES, 0);
+    //Remember to put X value to Y and Y value to X for Pose2D to work.
+    Pose2D GOAL_RED = new Pose2D(DistanceUnit.INCH, 61.950425996555126, -62.60601854699804, AngleUnit.DEGREES, 0);
+    Pose2D GOAL_BLUE = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
 
     Pose2D GOAL_POSE;
-
-    Pose2D BOT_RED = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, bot_heading);
-    Pose2D BOT_BLUE = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
 
     public enum AllianceColor {
         RED,
         BLUE,
+    }
+
+    public PinPoint(HardwareMap hardwareMap, AllianceColor allianceColor, double botPosX, double botPosY, double botHeading) {
+        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, Constants.HMPinPointer);
+        configurePinPoint();
+
+        if (allianceColor == AllianceColor.RED) {
+            GOAL_POSE = GOAL_RED;
+            pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, botPosY, botPosX, AngleUnit.DEGREES, botHeading));
+        } else {
+            GOAL_POSE = GOAL_BLUE;
+            pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, botPosY, botPosX, AngleUnit.DEGREES, botHeading));
+        }
     }
 
     public void configurePinPoint() {
@@ -42,19 +50,6 @@ public class PinPoint {
                 GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
         pinpoint.resetPosAndIMU();
-    }
-
-    public PinPoint(HardwareMap hardwareMap, AllianceColor allianceColor) {
-        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, Constants.HMPinPointer);
-        configurePinPoint();
-
-        if (allianceColor == AllianceColor.RED) {
-            GOAL_POSE = GOAL_RED;
-            pinpoint.setPosition(BOT_RED);
-        } else {
-            GOAL_POSE = GOAL_BLUE;
-            pinpoint.setPosition(BOT_BLUE);
-        }
     }
 
     public double getDistanceToGoal() {
