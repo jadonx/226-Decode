@@ -28,7 +28,7 @@ public class LimeLight {
         limelight.start();
     }
 
-    public int getAprilTagID() {
+    public void getAprilTagID() {
         if (result != null) {
             List<LLResultTypes.FiducialResult> fiducialResult = result.getFiducialResults();
             for(LLResultTypes.FiducialResult fid : fiducialResult){
@@ -38,7 +38,10 @@ public class LimeLight {
                 }
             }
         }
-        return id;
+    }
+
+    public boolean hasMotif() {
+        return motifID != -1;
     }
 
     public int getMotifID() {
