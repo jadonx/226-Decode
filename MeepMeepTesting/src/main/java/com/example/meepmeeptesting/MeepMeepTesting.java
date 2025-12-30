@@ -3,6 +3,8 @@ package com.example.meepmeeptesting;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
+import com.acmerobotics.roadrunner.TranslationalVelConstraint;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.noahbres.meepmeep.MeepMeep;
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
@@ -15,7 +17,7 @@ public class MeepMeepTesting {
         MeepMeep meepMeep = new MeepMeep(800);
 
         // new starting pose
-        Pose2d startPose = new Pose2d(-48, 48, Math.toRadians(54));
+        Pose2d startPose = new Pose2d(60, 22, Math.toRadians(90));
 
         RoadRunnerBotEntity bot = new DefaultBotBuilder(meepMeep)
                 .setConstraints(90, 90, Math.toRadians(180), Math.toRadians(180), 15)
@@ -25,105 +27,22 @@ public class MeepMeepTesting {
         bot.setPose(startPose);
 
         // Trajectory Variables
-        TrajectoryActionBuilder shiftForward = bot.getDrive().actionBuilder(startPose)
-                .setTangent(Math.toRadians(90))
-                .lineToYLinearHeading(44, Math.toRadians(90))
-                ;
-        TrajectoryActionBuilder shootZone = shiftForward.endTrajectory().fresh()
-                .setReversed(false)
-                .splineToLinearHeading(new Pose2d( -20, 20, Math.toRadians(270)), Math.toRadians(0.00))
-                .waitSeconds(2)
-                ;
-        TrajectoryActionBuilder collectSample1 = shootZone.endTrajectory().fresh()
-                .setReversed(false)
-                .splineToLinearHeading(new Pose2d(-11.5, 28, Math.toRadians(270)), Math.toRadians(0.00))
-                ;
-
-        TrajectoryActionBuilder collectSample10 = collectSample1.endTrajectory().fresh()
-                .setReversed(false)
-                .lineToY(35.5)
-                ;
-        TrajectoryActionBuilder collectSample11 = collectSample10.endTrajectory().fresh()
-                .setReversed(false)
-                .lineToY(40.5)
-                ;
-        TrajectoryActionBuilder collectSample12 = collectSample11.endTrajectory().fresh()
-                .setReversed(false)
-                .lineToY(45.5)
-                ;
-        TrajectoryActionBuilder shootZone2 = collectSample12.endTrajectory().fresh()
-                .setReversed(false)
-                .splineToLinearHeading(new Pose2d(-20, 20, Math.toRadians(270)), Math.toRadians(0.00))
-                .waitSeconds(2)
-                ;
-        TrajectoryActionBuilder collectSample2 = shootZone2.endTrajectory().fresh()
-                .setReversed(false)
-                .splineToLinearHeading(new Pose2d(11.5, 28, Math.toRadians(270)), Math.toRadians(0.00));
-        ;
-
-        TrajectoryActionBuilder collectSample20 = collectSample2.endTrajectory().fresh()
-                .setReversed(false)
-                .lineToY(35.5)
-                ;
-        TrajectoryActionBuilder collectSample21 = collectSample20.endTrajectory().fresh()
-                .setReversed(false)
-                .lineToY(40.5)
-                ;
-        TrajectoryActionBuilder collectSample22 = collectSample21.endTrajectory().fresh()
-                .setReversed(false)
-                .lineToY(45.5)
-                ;
-        TrajectoryActionBuilder shootZone3 = collectSample22.endTrajectory().fresh()
-                .setReversed(false)
-                .splineToLinearHeading(new Pose2d(-20, 20, Math.toRadians(270)), Math.toRadians(0.00))
-                .waitSeconds(2)
-                ;
-        TrajectoryActionBuilder collectSample3 = shootZone3.endTrajectory().fresh()
-                .setReversed(false)
-                .splineToLinearHeading(new Pose2d(36, 28, Math.toRadians(270)), Math.toRadians(0.00));
-        ;
-        TrajectoryActionBuilder collectSample30 = collectSample3.endTrajectory().fresh()
-                .setReversed(false)
-                .lineToY(35.5)
-                ;
-        TrajectoryActionBuilder collectSample31 = collectSample30.endTrajectory().fresh()
-                .setReversed(false)
-                .lineToY(40.5)
-                ;
-        TrajectoryActionBuilder collectSample32 = collectSample31.endTrajectory().fresh()
-                .setReversed(false)
-                .lineToY(45.5)
-                ;
-
-        TrajectoryActionBuilder shootZone4 = collectSample32.endTrajectory().fresh()
-                .setReversed(false)
-                .splineToLinearHeading(new Pose2d(-20, 20, Math.toRadians(270)), Math.toRadians(0.00))
-                .waitSeconds(2)
-                ;
+        TrajectoryActionBuilder firstLaunch = bot.getDrive().actionBuilder(startPose).strafeToLinearHeading(new Vector2d(55,13), Math.toRadians(90));
+        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(36,40)).strafeToConstantHeading(new Vector2d(36,60), new TranslationalVelConstraint(6));
+        TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(55,13));
+        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(13.5, 40)).strafeToConstantHeading(new Vector2d(13.5,60) , new TranslationalVelConstraint(6));
+        TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(55,13));
+        TrajectoryActionBuilder park = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-2,40));
 
         // run in order
         bot.runAction(
                 new SequentialAction(
-
-                        shiftForward.build(),
-                        shootZone.build(),
-                        collectSample1.build(),
-                        collectSample10.build(),
-                        collectSample11.build(),
-                        collectSample12.build(),
-                        shootZone2.build(),
-                        collectSample2.build(),
-                        collectSample20.build(),
-                        collectSample21.build(),
-                        collectSample22.build(),
-                        shootZone3.build(),
-                        collectSample3.build(),
-                        collectSample30.build(),
-                        collectSample31.build(),
-                        collectSample32.build(),
-
-                        shootZone4.build()
-
+                        firstLaunch.build(),
+                        firstPickup.build(),
+                        secondLaunch.build(),
+                        secondPickup.build(),
+                        thirdLaunch.build(),
+                        park.build()
                 )
         );
 

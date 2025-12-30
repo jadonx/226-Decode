@@ -48,13 +48,10 @@ public class LaunchCommand {
     public void startAuto() {
         spindexer.setMode(Spindexer.SpindexerMode.INTAKE_MODE, 0.4);
         spindexer.setTargetAngle(spindexer.getIntakePositions()[0]);
-        this.spindexerSpeed = 0.2;
-
+        this.spindexerSpeed = 0.15;
         popper.pushInPopper();
         popper.setTargetVelocity(1800);
-
-        launcher.setTargetVelocity(1250);
-
+        launcher.setTargetVelocity(1300);
         currentState = State.PREPARE_TO_SHOOT;
     }
 

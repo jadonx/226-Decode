@@ -15,7 +15,6 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Commands.ColorIntakeCommand;
 import org.firstinspires.ftc.teamcode.Commands.LaunchCommand;
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
@@ -26,8 +25,8 @@ import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
 
-@Autonomous (name="RedClose", group="Autonomous")
-public class RedClose extends LinearOpMode {
+@Autonomous (name="RedFar", group="Autonomous")
+public class RedFar extends LinearOpMode {
     Turret turret;
     MecanumDrive drive;
     PinPoint pinpoint;
@@ -59,7 +58,7 @@ public class RedClose extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             turret.goToAngle(targetAngle);
-            return true;
+            return !turret.atTargetAngle(targetAngle);
         }
     }
     public Action turretTrackingAngle(double tA) {
@@ -69,7 +68,7 @@ public class RedClose extends LinearOpMode {
     public class TurretTrackingGoal implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            turret.goToAngle(90-pinpoint.getAngleToGoal());
+            turret.goToAngle(pinpoint.getAngleToGoal());
             return true;
         }
     }
@@ -96,6 +95,7 @@ public class RedClose extends LinearOpMode {
             if (launchCommand != null && launchCommand.isFinished()) {
                 launchCommand = null;
                 launcher.stopLauncher();
+                launcher.setTargetCoverAngle(0.5);
                 popper.deactivatePopper();
                 return false;
             }
@@ -107,57 +107,26 @@ public class RedClose extends LinearOpMode {
         return new ShootArtifacts();
     }
 
-    public class MoveCover implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            launcher.setTargetCoverAngle(0.1);
-            return false;
-        }
-    }
-    public Action moveCover() {
-        return new MoveCover();
-    }
-
-    public class Telemetry implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            String currentPose = String.format("[%f, %f]", pinpoint.getXCoordinate(pinpoint.getPose(), DistanceUnit.INCH), pinpoint.getYCoordinate(pinpoint.getPose(), DistanceUnit.INCH));
-            telemetry.addData("Pinpoint Position ", currentPose);
-
-            telemetry.addData("Desired Angle", (90 - pinpoint.getAngleToGoal()));
-            telemetry.addData("Actual Angle", (turret.getTurretAngle()));
-
-            telemetry.update();
-
-            return true;
-        }
-    }
-    public Action telemetry() {
-        return new Telemetry();
-    }
-
     @Override
     public void runOpMode() throws InterruptedException {
-        double botPosX = -60;
-        double botPosY = 50;
-        double botHeading = 90;
-        Pose2d initialPose = new Pose2d(botPosX, botPosY, Math.toRadians(botHeading));
+        double botPosX = 60;
+        double botPosY = 22;
+        double botHeadingRR = 90;
+        double botHeadingPP = 0;
+        Pose2d initialPose = new Pose2d(botPosX, botPosY, Math.toRadians(botHeadingRR));
         drive = new MecanumDrive(hardwareMap, initialPose);
         turret = new Turret(hardwareMap);
-        pinpoint = new PinPoint(hardwareMap, PinPoint.AllianceColor.RED, botPosX, botPosY, 0);
+        pinpoint = new PinPoint(hardwareMap, PinPoint.AllianceColor.RED, botPosX, botPosY, botHeadingPP);
         spindexer = new Spindexer(hardwareMap);
         launcher = new Launcher(hardwareMap);
         popper = new Popper(hardwareMap);
 
-        TrajectoryActionBuilder getMotif = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(-40,30), Math.toRadians(90));
-        TrajectoryActionBuilder firstLaunch = getMotif.endTrajectory().fresh().strafeToLinearHeading(new Vector2d(-13,40), Math.toRadians(90));
-        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-11,40)).strafeToConstantHeading(new Vector2d(-12,60), new TranslationalVelConstraint(6));
-        TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-9,35));
+        TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(55,13), Math.toRadians(90));
+        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(36,40)).strafeToConstantHeading(new Vector2d(36,60), new TranslationalVelConstraint(6));
+        TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(55,13));
         TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(13.5, 40)).strafeToConstantHeading(new Vector2d(13.5,60) , new TranslationalVelConstraint(6));
-        TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-9,35));
-        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(39, 40)).strafeToConstantHeading(new Vector2d(39,59), new TranslationalVelConstraint(6));
-        TrajectoryActionBuilder fourthLaunch = thirdPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-8,35));
-        TrajectoryActionBuilder park = fourthLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-2,40));
+        TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(55,13));
+        TrajectoryActionBuilder park = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-2,40));
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -169,10 +138,8 @@ public class RedClose extends LinearOpMode {
         Actions.runBlocking(
                 new ParallelAction(
                         updatePinPoint(),
-                        turretTrackingAngle(-50),
+                        turretTrackingGoal(),
                         new SequentialAction(
-                                moveCover(),
-                                getMotif.build(),
                                 firstLaunch.build(),
                                 shootArtifacts(),
                                 firstPickup.build()
