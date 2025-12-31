@@ -30,7 +30,7 @@ public class Spindexer {
         LAUNCH_MODE
     }
     SpindexerMode spindexerMode;
-    private double maxPower = 0.4;
+    private double spindexerSpeed = 0.4;
 
     private double lastAngle = 0;
     private double unwrappedAngle = 0;
@@ -50,6 +50,15 @@ public class Spindexer {
     public void update() {
         updateUnwrappedAngle();
 
+        if (spindexerMode == SpindexerMode.INTAKE_MODE) {
+            updateIntakeMode();
+        }
+        else if (spindexerMode == SpindexerMode.LAUNCH_MODE) {
+            updateLaunchMode();
+        }
+    }
+
+    private void updateIntakeMode() {
         double error = calculateError();
 
         // Feedforward to overcome static friction
@@ -62,11 +71,12 @@ public class Spindexer {
         }
 
         // Clipping output
-        output = Range.clip(output, -maxPower, maxPower);
+        output = Range.clip(output, -0.4, 0.4);
 
         spindexerServo.setPower(output);
+    }
 
-        updateUnwrappedAngle();
+    private void updateLaunchMode() {
     }
 
     public boolean atTargetAngle(double threshold) {
@@ -100,7 +110,7 @@ public class Spindexer {
     }
 
     /** SETTER AND GETTER METHODS */
-    public void setMode(SpindexerMode newMode, double maxPower) {
+    public void setMode(SpindexerMode newMode) {
         if (spindexerMode != newMode) {
             if (newMode == SpindexerMode.LAUNCH_MODE) {
                 targetAngle = getUnwrappedAngle();
@@ -108,8 +118,11 @@ public class Spindexer {
                 targetAngle = spindexerEncoder.getWrappedAngle();
             }
             spindexerMode = newMode;
-            this.maxPower = maxPower;
         }
+    }
+
+    public void setLaunchSpeed(double speed) {
+        this.spindexerSpeed = speed;
     }
 
     public SpindexerMode getMode() {
