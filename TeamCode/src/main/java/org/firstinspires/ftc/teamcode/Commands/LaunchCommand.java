@@ -32,10 +32,11 @@ public class LaunchCommand {
         this.pinpoint = pinpoint;
     }
 
-    public void start(double spindexerSpeed) {
-        spindexer.setMode(Spindexer.SpindexerMode.INTAKE_MODE, 0.4);
+    public void start() {
+        spindexer.setMode(Spindexer.SpindexerMode.INTAKE_MODE);
         spindexer.setTargetAngle(spindexer.getTargetAngle());
-        this.spindexerSpeed = spindexerSpeed;
+
+        this.spindexerSpeed = 0.2; // Speed of spindexer while launching
 
         popper.pushInPopper();
         popper.setTargetVelocity(1800);
@@ -46,9 +47,9 @@ public class LaunchCommand {
     }
 
     public void startAuto() {
-        spindexer.setMode(Spindexer.SpindexerMode.INTAKE_MODE, 0.4);
+        spindexer.setMode(Spindexer.SpindexerMode.INTAKE_MODE);
         spindexer.setTargetAngle(spindexer.getIntakePositions()[0]);
-        this.spindexerSpeed = 0.15;
+        this.spindexerSpeed = 0.15; // Speed of spindexer while launching
         popper.pushInPopper();
         popper.setTargetVelocity(1800);
         launcher.setTargetVelocity(1300);
@@ -62,14 +63,15 @@ public class LaunchCommand {
 
         switch (currentState) {
             case PREPARE_TO_SHOOT:
-                if (launcher.atTargetVelocity(20) && popper.atTargetVelocity(100)) {
-                    spindexer.setMode(Spindexer.SpindexerMode.LAUNCH_MODE, spindexerSpeed);
-                    spindexer.setTargetAngle(spindexer.getUnwrappedAngle() + 370);
+                if (launcher.atTargetVelocity(20) && popper.atTargetVelocity(50)) {
+                    spindexer.setSpeed(spindexerSpeed);
+                    spindexer.setMode(Spindexer.SpindexerMode.LAUNCH_MODE);
                     currentState = State.SHOOTING;
                 }
                 break;
             case SHOOTING:
-                if (spindexer.atTargetAngle(10)) {
+                if (spindexer.atTargetAngle(0)) {
+                    // ^Threshold doesn't matter because we only check if we've passed 360 degrees
                     currentState = State.FINISH;
                 }
                 break;

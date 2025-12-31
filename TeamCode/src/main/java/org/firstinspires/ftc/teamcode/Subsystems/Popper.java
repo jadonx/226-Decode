@@ -43,20 +43,12 @@ public class Popper {
         return Math.abs(getPopperVelocity() - getTargetVelocity()) < threshold;
     }
 
-    public void stopPopper() {
-        popperMotor.setVelocity(0);
-    }
-
     public void deactivatePopper() {
-        pushOutPopper();
-        stopPopper();
+        popperServo.setPosition(0);
+        popperMotor.setVelocity(0);
     }
 
     public void pushInPopper() {
         popperServo.setPosition(0.007);
-    }
-
-    public void pushOutPopper() {
-        popperServo.setPosition(0.0);
     }
 }

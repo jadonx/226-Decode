@@ -18,7 +18,7 @@ public class PinPoint {
     public static int bot_heading = 90;
 
     //Remember to put X value to Y and Y value to X for Pose2D to work.
-    Pose2D GOAL_RED = new Pose2D(DistanceUnit.INCH, 61.950425996555126, -62.60601854699804, AngleUnit.DEGREES, 0);
+    Pose2D GOAL_RED = new Pose2D(DistanceUnit.INCH, 66.950425996555126, -67.60601854699804, AngleUnit.DEGREES, 0);
     Pose2D GOAL_BLUE = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
 
     Pose2D GOAL_POSE;

@@ -43,7 +43,8 @@ public class ColorIntakeCommand {
         holdingBallTimer = new ElapsedTime();
 
         spindexer.resetHolderStatuses();
-        spindexer.setMode(Spindexer.SpindexerMode.INTAKE_MODE, 0.4);
+        spindexer.setMode(Spindexer.SpindexerMode.INTAKE_MODE);
+        spindexer.setSpeed(0.4);
         spindexer.setTargetAngle(intakePositions[0]);
         currentState = State.WAIT_AT_FIRST_HOLDER;
     }
