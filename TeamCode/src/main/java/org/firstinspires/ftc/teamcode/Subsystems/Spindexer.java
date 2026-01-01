@@ -23,14 +23,14 @@ public class Spindexer {
     private RevColorSensorV3 colorSensorV3;
 
     private double targetAngle = 0;
-    private double kP = 0.002, kS = 0.0575;
+    private double kP = 0.002, kS = 0.05;
 
     public enum SpindexerMode {
         INTAKE_MODE,
         LAUNCH_MODE
     }
     SpindexerMode spindexerMode;
-    private double maxPower = 0.4;
+    private double spindexerSpeed = 0.4;
 
     private double lastAngle = 0;
     private double unwrappedAngle = 0;
@@ -50,6 +50,15 @@ public class Spindexer {
     public void update() {
         updateUnwrappedAngle();
 
+        if (spindexerMode == SpindexerMode.INTAKE_MODE) {
+            updateIntakeMode();
+        }
+        else if (spindexerMode == SpindexerMode.LAUNCH_MODE) {
+            updateLaunchMode();
+        }
+    }
+
+    private void updateIntakeMode() {
         double error = calculateError();
 
         // Feedforward to overcome static friction
@@ -58,15 +67,22 @@ public class Spindexer {
         double output = (kP * error) + ff;
 
         if (Math.abs(error) < 2) {
-            output = ff * 0.3;
+            output = ff * 0.2;
         }
 
         // Clipping output
-        output = Range.clip(output, -maxPower, maxPower);
+        output = Range.clip(output, -spindexerSpeed, spindexerSpeed);
 
         spindexerServo.setPower(output);
+    }
 
-        updateUnwrappedAngle();
+    private void updateLaunchMode() {
+        if (getUnwrappedAngle() < targetAngle) {
+            spindexerServo.setPower(spindexerSpeed);
+        }
+        else {
+            spindexerServo.setPower(0);
+        }
     }
 
     public boolean atTargetAngle(double threshold) {
@@ -74,7 +90,7 @@ public class Spindexer {
             return Math.abs(targetAngle - getWrappedAngle()) < threshold;
         }
         else if (spindexerMode == SpindexerMode.LAUNCH_MODE) {
-            return Math.abs(targetAngle - getUnwrappedAngle()) < threshold;
+            return getUnwrappedAngle() > targetAngle;
         }
 
         return false;
@@ -83,9 +99,6 @@ public class Spindexer {
     private double calculateError() {
         if (spindexerMode == SpindexerMode.INTAKE_MODE) {
             return AngleUnit.normalizeDegrees(targetAngle - spindexerEncoder.getWrappedAngle());
-        }
-        else if (spindexerMode == SpindexerMode.LAUNCH_MODE) {
-            return targetAngle - getUnwrappedAngle();
         }
         else {
             return 0;
@@ -100,16 +113,20 @@ public class Spindexer {
     }
 
     /** SETTER AND GETTER METHODS */
-    public void setMode(SpindexerMode newMode, double maxPower) {
+    public void setMode(SpindexerMode newMode) {
         if (spindexerMode != newMode) {
             if (newMode == SpindexerMode.LAUNCH_MODE) {
                 targetAngle = getUnwrappedAngle();
+                targetAngle += 360;
             } else {
                 targetAngle = spindexerEncoder.getWrappedAngle();
             }
             spindexerMode = newMode;
-            this.maxPower = maxPower;
         }
+    }
+
+    public void setSpeed(double speed) {
+        this.spindexerSpeed = speed;
     }
 
     public SpindexerMode getMode() {
@@ -130,6 +147,10 @@ public class Spindexer {
 
     public double getWrappedAngle() {
         return spindexerEncoder.getWrappedAngle();
+    }
+
+    public void setPower(double power) {
+        spindexerServo.setPower(power);
     }
 
     /** Color sensing intake logic */

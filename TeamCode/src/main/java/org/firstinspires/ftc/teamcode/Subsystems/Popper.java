@@ -23,12 +23,9 @@ public class Popper {
         targetVelocity = 0;
     }
 
-    public void update() {
-        popperMotor.setVelocity(targetVelocity);
-    }
-
     public void setTargetVelocity(int targetVelocity) {
         this.targetVelocity = targetVelocity;
+        popperMotor.setVelocity(targetVelocity);
     }
 
     public int getTargetVelocity() {
@@ -43,20 +40,16 @@ public class Popper {
         return Math.abs(getPopperVelocity() - getTargetVelocity()) < threshold;
     }
 
-    public void stopPopper() {
-        popperMotor.setVelocity(0);
-    }
-
     public void deactivatePopper() {
-        pushOutPopper();
-        stopPopper();
+        pullOutPopper();
+        popperMotor.setVelocity(0);
     }
 
     public void pushInPopper() {
         popperServo.setPosition(0.007);
     }
 
-    public void pushOutPopper() {
-        popperServo.setPosition(0.0);
+    public void pullOutPopper() {
+        popperServo.setPosition(0);
     }
 }

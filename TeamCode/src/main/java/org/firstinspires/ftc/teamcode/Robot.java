@@ -70,7 +70,7 @@ public class Robot {
 
             if (gamepad1.a && launchCommand == null) {
                 launchCommand = new LaunchCommand(spindexer, popper, launcher, pinpoint);
-                launchCommand.start(0.2);
+                launchCommand.start();
             }
         }
 
@@ -169,7 +169,6 @@ public class Robot {
     private void stopLaunchCommand() {
         launchCommand = null;
         launcher.stopLauncher();
-        launcher.setTargetCoverAngle(0.5);
         popper.deactivatePopper();
     }
 }

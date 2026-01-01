@@ -21,6 +21,8 @@ public class Launcher {
     private double targetVelocity = 0;
     private double targetCoverAngle = 0;
 
+    private final double EULERS_NUMBER = 2.7183;
+
     public Launcher(HardwareMap hardwareMap) {
         launcher1 = hardwareMap.get(DcMotorEx.class, Constants.HMMotorShooter1);
         launcher2 = hardwareMap.get(DcMotorEx.class, Constants.HMMotorShooter2);
@@ -50,7 +52,7 @@ public class Launcher {
     }
 
     public void calculateTargetVelocity(double distance){
-        targetVelocity = (-0.0000148653*Math.pow(distance,4))+(0.00577072*Math.pow(distance,3))-(0.755974*Math.pow(distance,2))+(44.05664*distance)+324.60555;
+        targetVelocity = (-0.00000421375*Math.pow(distance,4))+(0.00198395*Math.pow(distance,3))-(0.295745*Math.pow(distance,2))+(20.90651*distance)+736.53062;
     }
 
     public void calculateTargetAngle(double distance){
@@ -58,10 +60,10 @@ public class Launcher {
             targetCoverAngle = 0;
         }
         else {
-            targetCoverAngle = -0.012064*(distance)+1.25891;
+            targetCoverAngle = (0.745037) / (1 + Math.pow(EULERS_NUMBER, -(-0.131811 * distance + 8.27127)));
         }
 
-        targetCoverAngle = Range.clip(targetCoverAngle, 0, 0.8);
+        targetCoverAngle = Range.clip(targetCoverAngle, 0, 0.7);
 
         cover.setPosition(targetCoverAngle);
     }
