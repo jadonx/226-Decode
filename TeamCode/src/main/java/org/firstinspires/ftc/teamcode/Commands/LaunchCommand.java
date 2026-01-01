@@ -59,7 +59,6 @@ public class LaunchCommand {
     public void update() {
         launcher.update();
         spindexer.update();
-        popper.update();
 
         switch (currentState) {
             case PREPARE_TO_SHOOT:

@@ -149,6 +149,10 @@ public class Spindexer {
         return spindexerEncoder.getWrappedAngle();
     }
 
+    public void setPower(double power) {
+        spindexerServo.setPower(power);
+    }
+
     /** Color sensing intake logic */
     public void setHolderStatus(int index, HolderStatus status) {
         holderStatuses[index] = status;

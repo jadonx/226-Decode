@@ -56,7 +56,6 @@ public class ManualShootingTest extends OpMode {
 
             if (popperIsEngaged) {
                 popper.setTargetVelocity(1800);
-                popper.update();
                 popper.pushInPopper();
             }
             else {

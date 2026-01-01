@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Autonomous;
 
+import android.graphics.Color;
+
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
@@ -7,6 +9,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
@@ -19,6 +22,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Commands.ColorIntakeCommand;
 import org.firstinspires.ftc.teamcode.Commands.LaunchCommand;
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
+import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.PinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
@@ -32,14 +36,13 @@ public class RedClose extends LinearOpMode {
     MecanumDrive drive;
     PinPoint pinpoint;
 
+    Intake intake;
     Spindexer spindexer;
     Launcher launcher;
     Popper popper;
 
-    LaunchCommand launchCommand;
     ColorIntakeCommand colorIntakeCommand;
 
-    /** Turret Actions */
     public class UpdatePinPoint implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
@@ -66,51 +69,10 @@ public class RedClose extends LinearOpMode {
         return new TurretTrackingAngle(tA);
     }
 
-    public class TurretTrackingGoal implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            turret.goToAngle(90-pinpoint.getAngleToGoal());
-            return true;
-        }
-    }
-    public Action turretTrackingGoal() {
-        return new TurretTrackingGoal();
-    }
-
-    /** Shoot Artifact Actions */
-    public class ShootArtifacts implements Action {
-        private boolean initialized = false;
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if (!initialized) {
-                launchCommand = new LaunchCommand(spindexer, popper, launcher, pinpoint);
-                launchCommand.startAuto();
-                initialized = true;
-            }
-
-            if (launchCommand != null && !launchCommand.isFinished()) {
-                launchCommand.update();
-            }
-
-            if (launchCommand != null && launchCommand.isFinished()) {
-                launchCommand = null;
-                launcher.stopLauncher();
-                popper.deactivatePopper();
-                return false;
-            }
-
-            return true;
-        }
-    }
-    public Action shootArtifacts() {
-        return new ShootArtifacts();
-    }
-
     public class MoveCover implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            launcher.setTargetCoverAngle(0.1);
+            launcher.setTargetCoverAngle(0.05);
             return false;
         }
     }
@@ -118,22 +80,116 @@ public class RedClose extends LinearOpMode {
         return new MoveCover();
     }
 
-    public class Telemetry implements Action {
+    public class UpdateLauncher implements Action {
+        private boolean initialized = false;
+
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            String currentPose = String.format("[%f, %f]", pinpoint.getXCoordinate(pinpoint.getPose(), DistanceUnit.INCH), pinpoint.getYCoordinate(pinpoint.getPose(), DistanceUnit.INCH));
-            telemetry.addData("Pinpoint Position ", currentPose);
+            if (!initialized) {
+                launcher.setTargetVelocity(1350);
+                initialized = true;
+            }
 
-            telemetry.addData("Desired Angle", (90 - pinpoint.getAngleToGoal()));
-            telemetry.addData("Actual Angle", (turret.getTurretAngle()));
-
-            telemetry.update();
+            launcher.update();
 
             return true;
         }
     }
-    public Action telemetry() {
-        return new Telemetry();
+    public Action updateLauncher() {
+        return new UpdateLauncher();
+    }
+
+    public class ActivatePopper implements Action {
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            popper.setTargetVelocity(1800);
+            popper.pushInPopper();
+            return false;
+        }
+    }
+    public Action activatePopper() {
+        return new ActivatePopper();
+    }
+
+    public class DeactivatePopper implements Action {
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            popper.deactivatePopper();
+            return false;
+        }
+    }
+    public Action deactivatePopper() {
+        return new DeactivatePopper();
+    }
+
+    public class SpindexerFullRotation implements Action {
+        private boolean initialized = false;
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (!initialized) {
+                spindexer.setMode(Spindexer.SpindexerMode.LAUNCH_MODE);
+                spindexer.setSpeed(0.2);
+                initialized = true;
+            }
+
+            spindexer.update();
+
+            return !spindexer.atTargetAngle(0);
+        }
+    }
+    public Action spindexerFullRotation() {
+        return new SpindexerFullRotation();
+    }
+
+    public class AutoColorIntakeCommand implements Action {
+        private final ColorIntakeCommand colorIntakeCommand;
+
+        private boolean initialized = false;
+
+        public AutoColorIntakeCommand(ColorIntakeCommand colorIntakeCommand) {
+            this.colorIntakeCommand = colorIntakeCommand;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (!initialized) {
+                colorIntakeCommand.start();
+                initialized = true;
+            }
+            colorIntakeCommand.update();
+
+            return true;
+        }
+    }
+    public Action autoColorIntakeCommand(ColorIntakeCommand colorIntakeCommand) {
+        return new AutoColorIntakeCommand(colorIntakeCommand);
+    }
+
+    public class RunIntake implements Action {
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            intake.runIntake(1);
+            return false;
+        }
+    }
+    public Action runIntake() {
+        return new RunIntake();
+    }
+
+    public class StopIntakeSpindexer implements Action {
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            intake.stopIntake();
+            spindexer.setPower(0);
+            return false;
+        }
+    }
+    public Action stopIntakeSpindexer() {
+        return new StopIntakeSpindexer();
     }
 
     @Override
@@ -143,15 +199,18 @@ public class RedClose extends LinearOpMode {
         double botHeading = 90;
         Pose2d initialPose = new Pose2d(botPosX, botPosY, Math.toRadians(botHeading));
         drive = new MecanumDrive(hardwareMap, initialPose);
+        intake = new Intake(hardwareMap);
         turret = new Turret(hardwareMap);
         pinpoint = new PinPoint(hardwareMap, PinPoint.AllianceColor.RED, botPosX, botPosY, 0);
         spindexer = new Spindexer(hardwareMap);
         launcher = new Launcher(hardwareMap);
         popper = new Popper(hardwareMap);
 
-        TrajectoryActionBuilder getMotif = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(-40,30), Math.toRadians(90));
-        TrajectoryActionBuilder firstLaunch = getMotif.endTrajectory().fresh().strafeToLinearHeading(new Vector2d(-13,40), Math.toRadians(90));
-        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-11,40)).strafeToConstantHeading(new Vector2d(-12,60), new TranslationalVelConstraint(6));
+        colorIntakeCommand = new ColorIntakeCommand(spindexer);
+
+        // TrajectoryActionBuilder getMotif = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(-40,30), Math.toRadians(90));
+        TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(-9,35), Math.toRadians(90));
+        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-11,40)).strafeToConstantHeading(new Vector2d(-10,60), new TranslationalVelConstraint(6));
         TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-9,35));
         TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(13.5, 40)).strafeToConstantHeading(new Vector2d(13.5,60) , new TranslationalVelConstraint(6));
         TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-9,35));
@@ -169,13 +228,33 @@ public class RedClose extends LinearOpMode {
         Actions.runBlocking(
                 new ParallelAction(
                         updatePinPoint(),
-                        turretTrackingAngle(-50),
+                        turretTrackingAngle(-53),
+                        updateLauncher(),
                         new SequentialAction(
                                 moveCover(),
-                                getMotif.build(),
+                                activatePopper(),
                                 firstLaunch.build(),
-                                shootArtifacts(),
-                                firstPickup.build()
+                                spindexerFullRotation(),
+                                deactivatePopper(),
+                                runIntake(),
+                                new RaceAction(
+                                        firstPickup.build(),
+                                        autoColorIntakeCommand(colorIntakeCommand)
+                                ),
+                                stopIntakeSpindexer(),
+                                activatePopper(),
+                                secondLaunch.build(),
+                                spindexerFullRotation(),
+                                deactivatePopper(),
+                                runIntake(),
+                                new RaceAction(
+                                        secondPickup.build(),
+                                        autoColorIntakeCommand(colorIntakeCommand)
+                                ),
+                                stopIntakeSpindexer(),
+                                activatePopper(),
+                                thirdLaunch.build(),
+                                spindexerFullRotation()
                         )
                 )
         );
