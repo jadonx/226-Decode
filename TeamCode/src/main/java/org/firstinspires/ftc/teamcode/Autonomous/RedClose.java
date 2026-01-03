@@ -38,6 +38,7 @@ public class RedClose extends LinearOpMode {
     LimeLight limelight;
 
     Intake intake;
+    Turret turret;
     Spindexer spindexer;
     Launcher launcher;
     Popper popper;

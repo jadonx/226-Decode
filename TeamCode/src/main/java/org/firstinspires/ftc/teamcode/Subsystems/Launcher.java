@@ -1,5 +1,7 @@
+
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -7,16 +9,16 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Constants;
-
+@Config
 public class Launcher {
     // Hardware
     private DcMotorEx launcher1, launcher2;
     private Servo cover;
 
     // Launcher PID Values
-    private double kS = 0.12;     // Static friction feedforward
-    private double kV = 0.000395;  // Velocity feedforward (power per RPM)
-    private double kP = 0.005;   // Proportional gain on velocity error
+    public static double kS = 0.12;     // Static friction feedforward
+    public static double kV = 0.000395;  // Velocity feedforward (power per RPM)
+    public static double kP = 0.005;   // Proportional gain on velocity error
 
     private double targetVelocity = 0;
     private double targetCoverAngle = 0;
@@ -38,17 +40,22 @@ public class Launcher {
     public void update() {
         // Velocity Control
         double error = targetVelocity - getVelocity();
+        if(error > 100){
+            launcher1.setPower(2);
+            launcher2.setPower(2);
+        }else{
+            // Feedforward
+            double ff = kS * Math.signum(targetVelocity) + kV * targetVelocity;
 
-        // Feedforward
-        double ff = kS * Math.signum(targetVelocity) + kV * targetVelocity;
+            // Proportional correction
+            double p = kP * error;
 
-        // Proportional correction
-        double p = kP * error;
+            double result = clamp(ff + p);
 
-        double result = clamp(ff + p);
+            launcher1.setPower(result);
+            launcher2.setPower(result);
+        }
 
-        launcher1.setPower(result);
-        launcher2.setPower(result);
     }
 
     public void calculateTargetVelocity(double distance){
@@ -85,6 +92,10 @@ public class Launcher {
 
     public double getVelocity() {
         return (launcher1.getVelocity() + launcher2.getVelocity()) / 2.0;
+    }
+
+    public double getPower(){
+        return (launcher1.getPower() + launcher2.getPower())/ 2.0;
     }
 
     public double getTargetVelocity() {
