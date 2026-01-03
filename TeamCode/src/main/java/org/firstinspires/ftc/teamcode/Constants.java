@@ -19,7 +19,7 @@ public class Constants {
     public static String HMMotorPopper = "popper";
 
     public static String HMFrontColorSensor = "colorSensorFront";
-    public static String HMSideColorSensor = "colorSensorBack";
+    public static String HMBackColorSensor = "colorSensorBack";
     public static String HMServoPopper = "popperServo";
     public static String HMServoTurretLeft = "turretLeft";
     public static String HMServoTurretRight = "turretRight";

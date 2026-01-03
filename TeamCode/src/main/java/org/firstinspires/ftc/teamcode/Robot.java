@@ -142,6 +142,7 @@ public class Robot {
         // Launcher
         telemetry.addData("Target velocity ", launcher.getTargetVelocity());
         telemetry.addData("Current velocity ", launcher.getVelocity());
+        telemetry.addData("Current Power ", launcher.getPower());
         telemetry.addData("Target cover angle ", launcher.getTargetCoverAngle() + "\n");
 
         // Pinpoint
