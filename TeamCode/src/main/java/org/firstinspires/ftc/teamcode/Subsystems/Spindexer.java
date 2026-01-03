@@ -182,6 +182,7 @@ public class Spindexer {
         Color.RGBToHSV(r, g, b, hsv);
 
         return hsv;
+
     }
 
     public double getColorDistance() {
