@@ -24,6 +24,7 @@ import org.firstinspires.ftc.teamcode.Commands.LaunchCommand;
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
+import org.firstinspires.ftc.teamcode.Subsystems.LimeLight;
 import org.firstinspires.ftc.teamcode.Subsystems.PinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
@@ -32,9 +33,9 @@ import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
 @Autonomous (name="RedClose", group="Autonomous")
 public class RedClose extends LinearOpMode {
-    Turret turret;
     MecanumDrive drive;
     PinPoint pinpoint;
+    LimeLight limelight;
 
     Intake intake;
     Spindexer spindexer;
@@ -194,6 +195,9 @@ public class RedClose extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        telemetry.addData("Status:", "Initializing");
+        telemetry.update();
+
         double botPosX = -60;
         double botPosY = 50;
         double botHeading = 90;
@@ -205,6 +209,7 @@ public class RedClose extends LinearOpMode {
         spindexer = new Spindexer(hardwareMap);
         launcher = new Launcher(hardwareMap);
         popper = new Popper(hardwareMap);
+        limelight = new LimeLight(hardwareMap);
 
         colorIntakeCommand = new ColorIntakeCommand(spindexer);
 
@@ -218,7 +223,27 @@ public class RedClose extends LinearOpMode {
         TrajectoryActionBuilder fourthLaunch = thirdPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-8,35));
         TrajectoryActionBuilder park = fourthLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-2,40));
 
-        telemetry.addData("Status", "Initialized");
+        telemetry.addData("Status:", "Subsystems Initialized");
+        telemetry.addData("Status:", "Path Built");
+        telemetry.update();
+        telemetry.addData("Status:", "Getting Motif");
+        Spindexer.HolderStatus[] motif;
+        while (opModeInInit() && !limelight.hasMotif()) {
+            turret.goToAngle(-80);
+            limelight.getResult();
+            limelight.getAprilTagID();
+        }
+
+        if (limelight.hasMotif()) {
+            telemetry.addData("Status:", "Motif Detected: " + limelight.getMotifID());
+            motif = limelight.getMotif();
+            telemetry.addData("Motif: ", motif[0] + ", " + motif[1] + ", " + motif[2]);
+            telemetry.update();
+        } else {
+            telemetry.addData("Motif: ", "Defaulting to PPG");
+            telemetry.update();
+        }
+
         telemetry.update();
 
         waitForStart();
