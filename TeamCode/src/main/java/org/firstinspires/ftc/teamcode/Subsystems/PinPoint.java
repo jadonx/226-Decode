@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -9,7 +8,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
 
 @Config
 public class PinPoint {
@@ -19,7 +17,7 @@ public class PinPoint {
 
     //Remember to put X value to Y and Y value to X for Pose2D to work.
     Pose2D GOAL_RED = new Pose2D(DistanceUnit.INCH, 66.950425996555126, -67.60601854699804, AngleUnit.DEGREES, 0);
-    Pose2D GOAL_BLUE = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
+    Pose2D GOAL_BLUE = new Pose2D(DistanceUnit.INCH, -66.950425996555126, -67.60601854699804, AngleUnit.DEGREES, 0);
 
     Pose2D GOAL_POSE;
 
