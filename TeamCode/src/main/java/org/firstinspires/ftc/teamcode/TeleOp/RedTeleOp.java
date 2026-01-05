@@ -10,19 +10,21 @@ import org.firstinspires.ftc.teamcode.Robot;
 import org.firstinspires.ftc.teamcode.Subsystems.FieldCentricDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.PinPoint;
+import org.firstinspires.ftc.teamcode.Subsystems.Supporters.PoseStorage;
 
 @TeleOp(name="RedTeleOp", group="!TeleOp")
 public class RedTeleOp extends OpMode {
     Robot robot;
     FtcDashboard dashboard;
     TelemetryPacket packet;
+    PoseStorage poseStorage;
 
     @Override
     public void init() {
         packet = new TelemetryPacket();
         dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
-        robot = new Robot(hardwareMap, PinPoint.AllianceColor.RED, gamepad1, telemetry, 0, 0, 0);
+        robot = new Robot(hardwareMap, PinPoint.AllianceColor.RED, gamepad1, telemetry, poseStorage.getX(), poseStorage.getY(), poseStorage.getHeading());
         robot.start();
     }
 
