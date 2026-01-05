@@ -199,14 +199,12 @@ public class RedClose extends LinearOpMode {
         telemetry.addData("Status:", "Initializing");
         telemetry.update();
 
-        double botPosX = -60;
-        double botPosY = 50;
-        double botHeading = 90;
-        Pose2d initialPose = new Pose2d(botPosX, botPosY, Math.toRadians(botHeading));
+        Pose2d initialPose = new Pose2d(-63, 35, Math.toRadians(90));
         drive = new MecanumDrive(hardwareMap, initialPose);
+
         intake = new Intake(hardwareMap);
         turret = new Turret(hardwareMap);
-        pinpoint = new PinPoint(hardwareMap, PinPoint.AllianceColor.RED, botPosX, botPosY, 0);
+        pinpoint = new PinPoint(hardwareMap, PinPoint.AllianceColor.RED, 40, 61, 0);
         spindexer = new Spindexer(hardwareMap);
         launcher = new Launcher(hardwareMap);
         popper = new Popper(hardwareMap);

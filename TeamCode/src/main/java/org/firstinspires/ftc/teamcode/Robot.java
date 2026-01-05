@@ -69,7 +69,7 @@ public class Robot {
             colorIntakeCommand.update();
 
             if (gamepad1.a && launchCommand == null) {
-                launchCommand = new LaunchCommand(spindexer, popper, launcher, pinpoint);
+                launchCommand = new LaunchCommand(spindexer, popper, launcher, pinpoint, intake);
                 launchCommand.start();
             }
         }
@@ -146,8 +146,8 @@ public class Robot {
         telemetry.addData("Target cover angle ", launcher.getTargetCoverAngle() + "\n");
 
         // Pinpoint
-        // String currentPose = String.format("[%f, %f]", pinpoint.getXCoordinate(pinpoint.getPose(), DistanceUnit.INCH), pinpoint.getYCoordinate(pinpoint.getPose(), DistanceUnit.INCH));
-        // telemetry.addData("Pinpoint Position ", currentPose);
+         String currentPose = String.format("[%f, %f]", pinpoint.getXCoordinate(pinpoint.getPose(), DistanceUnit.INCH), pinpoint.getYCoordinate(pinpoint.getPose(), DistanceUnit.INCH));
+         telemetry.addData("Pinpoint Position ", currentPose);
         telemetry.addData("Goal Distance ", pinpoint.getDistanceToGoal() + "\n");
 
         telemetry.addData("Desired Angle", (90 - pinpoint.getAngleToGoal()));
@@ -171,5 +171,6 @@ public class Robot {
         launchCommand = null;
         launcher.stopLauncher();
         popper.deactivatePopper();
+        intake.stopIntake();
     }
 }
