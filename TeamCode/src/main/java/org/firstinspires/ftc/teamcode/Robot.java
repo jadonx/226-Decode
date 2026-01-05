@@ -59,14 +59,18 @@ public class Robot {
 
     public void update() {
         updateDrive();
-        updateIntake();
         updateLauncherCover();
         updatePinPoint();
         updateTurret();
         updateTelemetry();
 
+        if (gamepad1.right_trigger > 0.1) {
+            stopLaunchCommand();
+        }
+
         if (launchCommand == null) {
             colorIntakeCommand.update();
+            updateIntake();
 
             if (gamepad1.a && launchCommand == null) {
                 launchCommand = new LaunchCommand(spindexer, popper, launcher, pinpoint, intake);
@@ -100,11 +104,9 @@ public class Robot {
 
     private void updateIntake() {
         if (gamepad1.right_trigger > 0.1) {
-            stopLaunchCommand();
             intake.runIntake(gamepad1.right_trigger);
         }
         else if (gamepad1.left_trigger > 0.1) {
-            stopLaunchCommand();
             intake.reverseIntake(gamepad1.left_trigger);
         }
         else {
@@ -171,6 +173,5 @@ public class Robot {
         launchCommand = null;
         launcher.stopLauncher();
         popper.deactivatePopper();
-        intake.stopIntake();
     }
 }

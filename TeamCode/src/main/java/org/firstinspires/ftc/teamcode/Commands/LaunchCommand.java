@@ -62,7 +62,7 @@ public class LaunchCommand {
     public void update() {
         launcher.update();
         spindexer.update();
-        intake.runIntake(0.5F);
+        intake.runIntake(0.15F);
 
         switch (currentState) {
             case PREPARE_TO_SHOOT:
