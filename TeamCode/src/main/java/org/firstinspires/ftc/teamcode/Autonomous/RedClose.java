@@ -44,8 +44,6 @@ public class RedClose extends LinearOpMode {
     Launcher launcher;
     Popper popper;
 
-    PoseStorage poseStorage;
-
     ColorIntakeCommand colorIntakeCommand;
 
     public class UpdateBotPosition implements Action {
@@ -59,7 +57,7 @@ public class RedClose extends LinearOpMode {
             telemetryPacket.put("PinPoint Y", botYCoord);
             telemetryPacket.put("PinPoint Heading", botHead);
 
-            poseStorage.updatePose(botXCoord, botYCoord, botHead);
+            PoseStorage.updatePose(botXCoord, botYCoord, botHead);
 
             telemetryPacket.put("Bot X", currentPoseRR.position.x);
             telemetryPacket.put("Bot Y", currentPoseRR.position.y);
@@ -233,19 +231,17 @@ public class RedClose extends LinearOpMode {
         launcher = new Launcher(hardwareMap);
         popper = new Popper(hardwareMap);
         limelight = new LimeLight(hardwareMap);
-        poseStorage = new PoseStorage(botPosX, botPosY, 0);
 
         colorIntakeCommand = new ColorIntakeCommand(spindexer);
 
-        // TrajectoryActionBuilder getMotif = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(-40,30), Math.toRadians(90));
-        TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(-9,35), Math.toRadians(90));
-        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-11,40)).strafeToConstantHeading(new Vector2d(-10,60), new TranslationalVelConstraint(6));
-        TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-9,35));
-        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(13.5, 40)).strafeToConstantHeading(new Vector2d(13.5,60) , new TranslationalVelConstraint(6));
-        TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-9,35));
-        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(39, 40)).strafeToConstantHeading(new Vector2d(39,59), new TranslationalVelConstraint(6));
-        TrajectoryActionBuilder fourthLaunch = thirdPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-8,35));
-        TrajectoryActionBuilder park = fourthLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-2,40));
+        TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(-16,26), Math.toRadians(90));
+        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-11,40)).strafeToConstantHeading(new Vector2d(-11,48), new TranslationalVelConstraint(6));
+        TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-16,26));
+        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(12, 28)).strafeToConstantHeading(new Vector2d(12,48) , new TranslationalVelConstraint(6));
+        TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-16,26));
+        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(36, 28)).strafeToConstantHeading(new Vector2d(36,48), new TranslationalVelConstraint(6));
+        TrajectoryActionBuilder fourthLaunch = thirdPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-16,26));
+        TrajectoryActionBuilder park = fourthLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-7,34));
 
         telemetry.addData("Status:", "Subsystems Initialized");
         telemetry.addData("Status:", "Path Built");
@@ -264,6 +260,7 @@ public class RedClose extends LinearOpMode {
             telemetry.addData("Motif: ", motif[0] + ", " + motif[1] + ", " + motif[2]);
             telemetry.update();
         } else {
+            motif = new Spindexer.HolderStatus[]{Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.GREEN};
             telemetry.addData("Motif: ", "Defaulting to PPG");
             telemetry.update();
         }

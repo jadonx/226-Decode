@@ -17,14 +17,13 @@ public class RedTeleOp extends OpMode {
     Robot robot;
     FtcDashboard dashboard;
     TelemetryPacket packet;
-    PoseStorage poseStorage;
 
     @Override
     public void init() {
         packet = new TelemetryPacket();
         dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
-        robot = new Robot(hardwareMap, PinPoint.AllianceColor.RED, gamepad1, telemetry, poseStorage.getX(), poseStorage.getY(), poseStorage.getHeading());
+        robot = new Robot(hardwareMap, PinPoint.AllianceColor.RED, gamepad1, telemetry, PoseStorage.getX(), PoseStorage.getY(), PoseStorage.getHeading());
         robot.start();
     }
 

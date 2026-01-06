@@ -114,6 +114,36 @@ public class Spindexer {
         lastAngle = current;
     }
 
+    /** AUTO SORTING METHOD */
+    public double getSortedPosition(HolderStatus[] motifPattern) {
+        // Determine the green ball in motif pattern to get offset
+        int holderOffset;
+
+        if (motifPattern[0] == HolderStatus.GREEN) {
+            holderOffset = 0;
+        }
+        else if (motifPattern[1] == HolderStatus.GREEN) {
+            holderOffset = 1;
+        }
+        else {
+            holderOffset = 2;
+        }
+
+        // Determine the green ball in current holders and return desired position
+        if (holderStatuses[0] == HolderStatus.GREEN) {
+            return intakePositions[(2 + holderOffset) % 3];
+        }
+        else if (holderStatuses[1] == HolderStatus.GREEN) {
+            return intakePositions[holderOffset % 3];
+        }
+        else if (holderStatuses[2] == HolderStatus.GREEN) {
+            return intakePositions[(1 + holderOffset) % 3];
+        }
+        else {
+            return intakePositions[2];
+        }
+    }
+
     /** SETTER AND GETTER METHODS */
     public void setMode(SpindexerMode newMode) {
         if (spindexerMode != newMode) {
@@ -182,7 +212,6 @@ public class Spindexer {
         Color.RGBToHSV(r, g, b, hsv);
 
         return hsv;
-
     }
 
     public double getColorDistance() {

@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.PinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
+import org.firstinspires.ftc.teamcode.Subsystems.Supporters.PoseStorage;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
 public class Robot {
@@ -165,6 +166,8 @@ public class Robot {
         else {
             telemetry.addData("Launch Command State ", "Null \n");
         }
+
+        telemetry.addData("Stored position ", PoseStorage.getX() + ", " + PoseStorage.getY() + ", " + PoseStorage.getHeading());
 
         telemetry.update();
     }

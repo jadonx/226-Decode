@@ -47,7 +47,7 @@ public class PinPoint {
         pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED,
                 GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
-        pinpoint.resetPosAndIMU();
+        // pinpoint.resetPosAndIMU();
     }
 
     public double getDistanceToGoal() {
