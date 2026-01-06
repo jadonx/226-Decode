@@ -37,25 +37,21 @@ public class Launcher {
 
         cover = hardwareMap.get(Servo.class, Constants.HMServobackSpin);
     }
+
     public void update() {
         // Velocity Control
         double error = targetVelocity - getVelocity();
-        if(error > 100){
-            launcher1.setPower(2);
-            launcher2.setPower(2);
-        }else{
-            // Feedforward
-            double ff = kS * Math.signum(targetVelocity) + kV * targetVelocity;
 
-            // Proportional correction
-            double p = kP * error;
+        // Feedforward
+        double ff = kS * Math.signum(targetVelocity) + kV * targetVelocity;
 
-            double result = clamp(ff + p);
+        // Proportional correction
+        double p = kP * error;
 
-            launcher1.setPower(result);
-            launcher2.setPower(result);
-        }
+        double result = clamp(ff + p);
 
+        launcher1.setPower(result);
+        launcher2.setPower(result);
     }
 
     public void calculateTargetVelocity(double distance){

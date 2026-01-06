@@ -18,9 +18,10 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.Commands.ColorIntakeCommand;
-import org.firstinspires.ftc.teamcode.Commands.LaunchCommand;
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
@@ -28,6 +29,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.LimeLight;
 import org.firstinspires.ftc.teamcode.Subsystems.PinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
+import org.firstinspires.ftc.teamcode.Subsystems.Supporters.PoseStorage;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
 
@@ -36,7 +38,6 @@ public class RedClose extends LinearOpMode {
     MecanumDrive drive;
     PinPoint pinpoint;
     LimeLight limelight;
-
     Intake intake;
     Turret turret;
     Spindexer spindexer;
@@ -44,6 +45,27 @@ public class RedClose extends LinearOpMode {
     Popper popper;
 
     ColorIntakeCommand colorIntakeCommand;
+
+    public class UpdateBotPosition implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            Pose2d currentPoseRR = drive.localizer.getPose();
+            double botXCoord = pinpoint.getXCoordinate(pinpoint.getPose(), DistanceUnit.INCH);
+            double botYCoord = pinpoint.getYCoordinate(pinpoint.getPose(), DistanceUnit.INCH);
+            double botHead = pinpoint.getHeading();
+            telemetryPacket.put("PinPoint X", botXCoord);
+            telemetryPacket.put("PinPoint Y", botYCoord);
+            telemetryPacket.put("PinPoint Heading", botHead);
+
+            PoseStorage.updatePose(botXCoord, botYCoord, botHead);
+
+            telemetryPacket.put("Bot X", currentPoseRR.position.x);
+            telemetryPacket.put("Bot Y", currentPoseRR.position.y);
+            telemetryPacket.put("Bot Heading", Math.toDegrees(currentPoseRR.heading.log()));
+            return true;
+        }
+    }
+    public Action updateBotPosition() {return new UpdateBotPosition();}
 
     public class UpdatePinPoint implements Action {
         @Override
@@ -199,14 +221,12 @@ public class RedClose extends LinearOpMode {
         telemetry.addData("Status:", "Initializing");
         telemetry.update();
 
-        double botPosX = -60;
-        double botPosY = 50;
-        double botHeading = 90;
-        Pose2d initialPose = new Pose2d(botPosX, botPosY, Math.toRadians(botHeading));
+        Pose2d initialPose = new Pose2d(-63, 35, Math.toRadians(90));
         drive = new MecanumDrive(hardwareMap, initialPose);
+
         intake = new Intake(hardwareMap);
         turret = new Turret(hardwareMap);
-        pinpoint = new PinPoint(hardwareMap, PinPoint.AllianceColor.RED, botPosX, botPosY, 0);
+        pinpoint = new PinPoint(hardwareMap, PinPoint.AllianceColor.RED, 40, 61, 0);
         spindexer = new Spindexer(hardwareMap);
         launcher = new Launcher(hardwareMap);
         popper = new Popper(hardwareMap);
@@ -214,15 +234,14 @@ public class RedClose extends LinearOpMode {
 
         colorIntakeCommand = new ColorIntakeCommand(spindexer);
 
-        // TrajectoryActionBuilder getMotif = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(-40,30), Math.toRadians(90));
-        TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(-9,35), Math.toRadians(90));
-        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-11,40)).strafeToConstantHeading(new Vector2d(-10,60), new TranslationalVelConstraint(6));
-        TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-9,35));
-        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(13.5, 40)).strafeToConstantHeading(new Vector2d(13.5,60) , new TranslationalVelConstraint(6));
-        TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-9,35));
-        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(39, 40)).strafeToConstantHeading(new Vector2d(39,59), new TranslationalVelConstraint(6));
-        TrajectoryActionBuilder fourthLaunch = thirdPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-8,35));
-        TrajectoryActionBuilder park = fourthLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-2,40));
+        TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(-16,26), Math.toRadians(90));
+        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-11,40)).strafeToConstantHeading(new Vector2d(-11,48), new TranslationalVelConstraint(6));
+        TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-16,26));
+        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(12, 28)).strafeToConstantHeading(new Vector2d(12,48) , new TranslationalVelConstraint(6));
+        TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-16,26));
+        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(36, 28)).strafeToConstantHeading(new Vector2d(36,48), new TranslationalVelConstraint(6));
+        TrajectoryActionBuilder fourthLaunch = thirdPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-16,26));
+        TrajectoryActionBuilder park = fourthLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-7,34));
 
         telemetry.addData("Status:", "Subsystems Initialized");
         telemetry.addData("Status:", "Path Built");
@@ -241,6 +260,7 @@ public class RedClose extends LinearOpMode {
             telemetry.addData("Motif: ", motif[0] + ", " + motif[1] + ", " + motif[2]);
             telemetry.update();
         } else {
+            motif = new Spindexer.HolderStatus[]{Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.GREEN};
             telemetry.addData("Motif: ", "Defaulting to PPG");
             telemetry.update();
         }
@@ -254,6 +274,7 @@ public class RedClose extends LinearOpMode {
         Actions.runBlocking(
                 new ParallelAction(
                         updatePinPoint(),
+                        updateBotPosition(),
                         turretTrackingAngle(-53),
                         updateLauncher(),
                         new SequentialAction(

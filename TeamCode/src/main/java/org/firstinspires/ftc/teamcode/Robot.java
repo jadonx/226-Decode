@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.PinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
+import org.firstinspires.ftc.teamcode.Subsystems.Supporters.PoseStorage;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
 public class Robot {
@@ -59,17 +60,21 @@ public class Robot {
 
     public void update() {
         updateDrive();
-        updateIntake();
         updateLauncherCover();
         updatePinPoint();
         updateTurret();
         updateTelemetry();
 
+        if (gamepad1.right_trigger > 0.1) {
+            stopLaunchCommand();
+        }
+
         if (launchCommand == null) {
             colorIntakeCommand.update();
+            updateIntake();
 
             if (gamepad1.a && launchCommand == null) {
-                launchCommand = new LaunchCommand(spindexer, popper, launcher, pinpoint);
+                launchCommand = new LaunchCommand(spindexer, popper, launcher, pinpoint, intake);
                 launchCommand.start();
             }
         }
@@ -100,11 +105,9 @@ public class Robot {
 
     private void updateIntake() {
         if (gamepad1.right_trigger > 0.1) {
-            stopLaunchCommand();
             intake.runIntake(gamepad1.right_trigger);
         }
         else if (gamepad1.left_trigger > 0.1) {
-            stopLaunchCommand();
             intake.reverseIntake(gamepad1.left_trigger);
         }
         else {
@@ -146,8 +149,8 @@ public class Robot {
         telemetry.addData("Target cover angle ", launcher.getTargetCoverAngle() + "\n");
 
         // Pinpoint
-        // String currentPose = String.format("[%f, %f]", pinpoint.getXCoordinate(pinpoint.getPose(), DistanceUnit.INCH), pinpoint.getYCoordinate(pinpoint.getPose(), DistanceUnit.INCH));
-        // telemetry.addData("Pinpoint Position ", currentPose);
+         String currentPose = String.format("[%f, %f]", pinpoint.getXCoordinate(pinpoint.getPose(), DistanceUnit.INCH), pinpoint.getYCoordinate(pinpoint.getPose(), DistanceUnit.INCH));
+         telemetry.addData("Pinpoint Position ", currentPose);
         telemetry.addData("Goal Distance ", pinpoint.getDistanceToGoal() + "\n");
 
         telemetry.addData("Desired Angle", (90 - pinpoint.getAngleToGoal()));
@@ -163,6 +166,8 @@ public class Robot {
         else {
             telemetry.addData("Launch Command State ", "Null \n");
         }
+
+        telemetry.addData("Stored position ", PoseStorage.getX() + ", " + PoseStorage.getY() + ", " + PoseStorage.getHeading());
 
         telemetry.update();
     }

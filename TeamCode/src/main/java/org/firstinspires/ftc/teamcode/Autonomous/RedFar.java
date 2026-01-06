@@ -83,7 +83,7 @@ public class RedFar extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (!initialized) {
-                launchCommand = new LaunchCommand(spindexer, popper, launcher, pinpoint);
+                // launchCommand = new LaunchCommand(spindexer, popper, launcher, pinpoint);
                 launchCommand.startAuto();
                 initialized = true;
             }

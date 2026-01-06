@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
+import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.PinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
@@ -15,6 +16,7 @@ public class LaunchCommand {
     private final Popper popper;
     private final Launcher launcher;
     private final PinPoint pinpoint;
+    private final Intake intake;
 
     public enum State {
         PREPARE_TO_SHOOT,
@@ -25,11 +27,12 @@ public class LaunchCommand {
 
     private double spindexerSpeed;
 
-    public LaunchCommand(Spindexer spindexer, Popper popper, Launcher launcher, PinPoint pinpoint) {
+    public LaunchCommand(Spindexer spindexer, Popper popper, Launcher launcher, PinPoint pinpoint, Intake intake) {
         this.spindexer = spindexer;
         this.popper = popper;
         this.launcher = launcher;
         this.pinpoint = pinpoint;
+        this.intake = intake;
     }
 
     public void start() {
@@ -59,6 +62,7 @@ public class LaunchCommand {
     public void update() {
         launcher.update();
         spindexer.update();
+        // intake.runIntake(0.15F);
 
         switch (currentState) {
             case PREPARE_TO_SHOOT:
