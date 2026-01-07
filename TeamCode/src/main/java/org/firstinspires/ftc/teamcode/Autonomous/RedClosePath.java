@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
+import org.firstinspires.ftc.teamcode.Subsystems.BetterPinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.PinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Supporters.PoseStorage;
 
@@ -23,45 +24,31 @@ import org.firstinspires.ftc.teamcode.Subsystems.Supporters.PoseStorage;
 public class RedClosePath extends LinearOpMode {
     MecanumDrive drive;
     PinPoint pinpoint;
+    BetterPinPoint betterPinPoint;
 
     public class UpdateBotPosition implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            Pose2d currentPoseRR = drive.localizer.getPose();
-            double botXCoord = pinpoint.getXCoordinate(pinpoint.getPose(), DistanceUnit.INCH);
-            double botYCoord = pinpoint.getYCoordinate(pinpoint.getPose(), DistanceUnit.INCH);
-            double botHead = pinpoint.getHeading();
-            telemetryPacket.put("PinPoint X", botXCoord);
-            telemetryPacket.put("PinPoint Y", botYCoord);
-            telemetryPacket.put("PinPoint Heading", botHead);
+            betterPinPoint.update();
+            PoseStorage.updatePose(betterPinPoint.getCorrectX(), betterPinPoint.getCorrectY(), betterPinPoint.getCorrectHeading());
 
-            PoseStorage.updatePose(botXCoord, botYCoord, botHead);
+            telemetry.addData("Storage x ", PoseStorage.getX());
+            telemetry.addData("Storage y ", PoseStorage.getY());
+            telemetry.addData("Storage heading ", PoseStorage.getHeading());
 
-            telemetryPacket.put("Bot X", currentPoseRR.position.x);
-            telemetryPacket.put("Bot Y", currentPoseRR.position.y);
-            telemetryPacket.put("Bot Heading", Math.toDegrees(currentPoseRR.heading.log()));
+            telemetry.update();
+
             return true;
         }
     }
     public Action updateBotPosition() {return new UpdateBotPosition();}
-
-    public class UpdatePinPoint implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            pinpoint.updatePose();
-            return true;
-        }
-    }
-    public Action updatePinPoint( ) {
-        return new UpdatePinPoint();
-    }
 
     @Override
     public void runOpMode() throws InterruptedException {
         Pose2d initialPose = new Pose2d(-63, 35, Math.toRadians(90));
         drive = new MecanumDrive(hardwareMap, initialPose);
 
-        pinpoint = new PinPoint(hardwareMap, PinPoint.AllianceColor.RED, 40, 61, 0);
+        betterPinPoint = new BetterPinPoint(hardwareMap, BetterPinPoint.AllianceColor.RED);
 
         TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(-16,26), Math.toRadians(90));
         TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,28)).strafeToConstantHeading(new Vector2d(-14,48), new TranslationalVelConstraint(6));
@@ -78,7 +65,6 @@ public class RedClosePath extends LinearOpMode {
 
         Actions.runBlocking(
                 new ParallelAction(
-                        updatePinPoint(),
                         updateBotPosition(),
                         new SequentialAction(
                                 firstLaunch.build(),

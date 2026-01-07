@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Constants;
 
-@TeleOp(name="Color Sensors Test")
+@TeleOp(name="Color Sensors Test", group="Test")
 public class ColorSensorsTest extends OpMode {
     RevColorSensorV3 colorSensorFront, colorSensorBack;
 

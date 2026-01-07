@@ -59,7 +59,7 @@ public class PinPointTest extends OpMode {
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, Constants.HMPinPointer);
         drive = new FieldCentricDrive(hardwareMap);
 
-        betterPinPoint = new BetterPinPoint(hardwareMap);
+        betterPinPoint = new BetterPinPoint(hardwareMap, BetterPinPoint.AllianceColor.RED);
 
         // Configure the sensor
         configurePinpoint();
