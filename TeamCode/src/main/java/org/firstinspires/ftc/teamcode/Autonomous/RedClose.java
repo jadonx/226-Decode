@@ -96,7 +96,7 @@ public class RedClose extends LinearOpMode {
     public class MoveCover implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            launcher.setTargetCoverAngle(0.05);
+            launcher.setTargetCoverAngle(0);
             return false;
         }
     }
@@ -110,7 +110,7 @@ public class RedClose extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (!initialized) {
-                launcher.setTargetVelocity(1350);
+                launcher.setTargetVelocity(1330);
                 initialized = true;
             }
 
@@ -191,6 +191,30 @@ public class RedClose extends LinearOpMode {
         return new AutoColorIntakeCommand(colorIntakeCommand);
     }
 
+    public class MoveToSortedPosition implements Action {
+        private final Spindexer.HolderStatus[] motifPattern;
+        private boolean initialized = false;
+
+        public MoveToSortedPosition(Spindexer.HolderStatus[] motifPattern) {
+            this.motifPattern = motifPattern;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (!initialized) {
+                spindexer.setMode(Spindexer.SpindexerMode.INTAKE_MODE);
+                spindexer.setTargetAngle(spindexer.getSortedPosition(motifPattern));
+                initialized = true;
+            }
+
+            spindexer.update();
+            return true;
+        }
+    }
+    public Action moveToSortedPosition(Spindexer.HolderStatus[] motifPattern) {
+        return new MoveToSortedPosition(motifPattern);
+    }
+
     public class RunIntake implements Action {
 
         @Override
@@ -218,15 +242,21 @@ public class RedClose extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        telemetry.addData("Status:", "Initializing");
-        telemetry.update();
-
         Pose2d initialPose = new Pose2d(-63, 35, Math.toRadians(90));
         drive = new MecanumDrive(hardwareMap, initialPose);
+        pinpoint = new PinPoint(hardwareMap, PinPoint.AllianceColor.RED, 40, 61, 0);
+
+        TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(-14,22), Math.toRadians(90));
+        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,25)).strafeToConstantHeading(new Vector2d(-14,42), new TranslationalVelConstraint(5.5));
+        TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,22));
+        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(11, 25)).strafeToConstantHeading(new Vector2d(11,42) , new TranslationalVelConstraint(5.5));
+        TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,22));
+        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(34, 25)).strafeToConstantHeading(new Vector2d(34,42), new TranslationalVelConstraint(5.5));
+        TrajectoryActionBuilder fourthLaunch = thirdPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,22));
+        TrajectoryActionBuilder park = fourthLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-7,34));
 
         intake = new Intake(hardwareMap);
         turret = new Turret(hardwareMap);
-        pinpoint = new PinPoint(hardwareMap, PinPoint.AllianceColor.RED, 40, 61, 0);
         spindexer = new Spindexer(hardwareMap);
         launcher = new Launcher(hardwareMap);
         popper = new Popper(hardwareMap);
@@ -234,38 +264,7 @@ public class RedClose extends LinearOpMode {
 
         colorIntakeCommand = new ColorIntakeCommand(spindexer);
 
-        TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(-16,26), Math.toRadians(90));
-        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-11,40)).strafeToConstantHeading(new Vector2d(-11,48), new TranslationalVelConstraint(6));
-        TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-16,26));
-        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(12, 28)).strafeToConstantHeading(new Vector2d(12,48) , new TranslationalVelConstraint(6));
-        TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-16,26));
-        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(36, 28)).strafeToConstantHeading(new Vector2d(36,48), new TranslationalVelConstraint(6));
-        TrajectoryActionBuilder fourthLaunch = thirdPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-16,26));
-        TrajectoryActionBuilder park = fourthLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-7,34));
-
-        telemetry.addData("Status:", "Subsystems Initialized");
-        telemetry.addData("Status:", "Path Built");
-        telemetry.update();
-        telemetry.addData("Status:", "Getting Motif");
-        Spindexer.HolderStatus[] motif;
-        while (opModeInInit() && !limelight.hasMotif()) {
-            turret.goToAngle(-80);
-            limelight.getResult();
-            limelight.getAprilTagID();
-        }
-
-        if (limelight.hasMotif()) {
-            telemetry.addData("Status:", "Motif Detected: " + limelight.getMotifID());
-            motif = limelight.getMotif();
-            telemetry.addData("Motif: ", motif[0] + ", " + motif[1] + ", " + motif[2]);
-            telemetry.update();
-        } else {
-            motif = new Spindexer.HolderStatus[]{Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.GREEN};
-            telemetry.addData("Motif: ", "Defaulting to PPG");
-            telemetry.update();
-        }
-
-        telemetry.update();
+        Spindexer.HolderStatus[] motifPattern = new Spindexer.HolderStatus[]{Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.GREEN};
 
         waitForStart();
 
@@ -301,10 +300,20 @@ public class RedClose extends LinearOpMode {
                                 stopIntakeSpindexer(),
                                 activatePopper(),
                                 thirdLaunch.build(),
-                                spindexerFullRotation()
+                                spindexerFullRotation(),
+                                deactivatePopper(),
+                                runIntake(),
+                                new RaceAction(
+                                        thirdPickup.build(),
+                                        autoColorIntakeCommand(colorIntakeCommand)
+                                ),
+                                stopIntakeSpindexer(),
+                                activatePopper(),
+                                fourthLaunch.build(),
+                                spindexerFullRotation(),
+                                deactivatePopper()
                         )
                 )
         );
-
     }
 }

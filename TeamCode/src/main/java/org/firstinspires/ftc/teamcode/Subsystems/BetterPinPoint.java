@@ -25,18 +25,21 @@ public class BetterPinPoint {
         pinpoint.update();
     }
 
-    /** getFilteredPos returns the position (x, y, heading)
-     * Pos-Y points towards the goals
-     * Pos-X points towards the red goal
+    /**
+     * Correct X points towards the goals
+     * Correct-Y points towards the red goal
      * Pos-90 degrees points towards the red goal side
      * */
-    public Pose2D getFilteredPos() {
-        Pose2D pose2D = getRawPos();
-        double filteredX = -pose2D.getY(DistanceUnit.INCH);
-        double filteredY = pose2D.getX(DistanceUnit.INCH);
-        double filteredAngle = -pose2D.getHeading(AngleUnit.DEGREES);
+    public double getCorrectX() {
+        return -getRawPos().getY(DistanceUnit.INCH);
+    }
 
-        return new Pose2D(DistanceUnit.INCH, filteredX, filteredY, AngleUnit.DEGREES, filteredAngle);
+    public double getCorrectY() {
+        return getRawPos().getX(DistanceUnit.INCH);
+    }
+
+    public double getCorrectHeading() {
+        return -getRawPos().getHeading(AngleUnit.DEGREES);
     }
 
     public void setPosition(double x, double y, double heading) {
