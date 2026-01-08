@@ -20,6 +20,7 @@ public class SpindexerSortingTest extends OpMode {
         spindexer = new Spindexer(hardwareMap);
         colorIntakeCommand = new ColorIntakeCommand(spindexer);
         colorIntakeCommand.start();
+        intake = new Intake(hardwareMap);
         motifPattern = new Spindexer.HolderStatus[] {Spindexer.HolderStatus.NONE, Spindexer.HolderStatus.NONE, Spindexer.HolderStatus.NONE};
     }
 

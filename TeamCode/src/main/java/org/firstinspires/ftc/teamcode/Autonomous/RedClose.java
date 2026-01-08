@@ -123,17 +123,26 @@ public class RedClose extends LinearOpMode {
         return new UpdateLauncher();
     }
 
-    public class ActivatePopper implements Action {
-
+    public class RunPopper implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             popper.setTargetVelocity(1800);
+            return false;
+        }
+    }
+    public Action runPopper() {
+        return new RunPopper();
+    }
+
+    public class PushInPopper implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             popper.pushInPopper();
             return false;
         }
     }
-    public Action activatePopper() {
-        return new ActivatePopper();
+    public Action pushInPopper() {
+        return new PushInPopper();
     }
 
     public class DeactivatePopper implements Action {
@@ -208,7 +217,7 @@ public class RedClose extends LinearOpMode {
             }
 
             spindexer.update();
-            return true;
+            return !spindexer.atTargetAngle(10);
         }
     }
     public Action moveToSortedPosition(Spindexer.HolderStatus[] motifPattern) {
@@ -227,17 +236,28 @@ public class RedClose extends LinearOpMode {
         return new RunIntake();
     }
 
-    public class StopIntakeSpindexer implements Action {
+    public class StopSpindexer implements Action {
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            intake.stopIntake();
             spindexer.setPower(0);
             return false;
         }
     }
-    public Action stopIntakeSpindexer() {
-        return new StopIntakeSpindexer();
+    public Action stopSpindexer() {
+        return new StopSpindexer();
+    }
+
+    public class StopIntake implements Action {
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            intake.stopIntake();
+            return false;
+        }
+    }
+    public Action stopIntake() {
+        return new StopIntake();
     }
 
     @Override
@@ -264,7 +284,20 @@ public class RedClose extends LinearOpMode {
 
         colorIntakeCommand = new ColorIntakeCommand(spindexer);
 
-        Spindexer.HolderStatus[] motifPattern = new Spindexer.HolderStatus[]{Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.GREEN};
+        Spindexer.HolderStatus[] motif = new Spindexer.HolderStatus[]{Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.GREEN};
+
+//        while (opModeInInit()) {
+//            turret.goToAngle(-80);
+//            limelight.getResult();
+//            limelight.getAprilTagID();
+//
+//            if (limelight.hasMotif()) {
+//                telemetry.addData("Status:", "Motif Detected: " + limelight.getMotifID());
+//                motif = limelight.getMotif();
+//                telemetry.addData("Motif: ", motif[0] + ", " + motif[1] + ", " + motif[2]);
+//                telemetry.update();
+//            }
+//        }
 
         waitForStart();
 
@@ -278,7 +311,8 @@ public class RedClose extends LinearOpMode {
                         updateLauncher(),
                         new SequentialAction(
                                 moveCover(),
-                                activatePopper(),
+                                runPopper(),
+                                pushInPopper(),
                                 firstLaunch.build(),
                                 spindexerFullRotation(),
                                 deactivatePopper(),
@@ -287,9 +321,17 @@ public class RedClose extends LinearOpMode {
                                         firstPickup.build(),
                                         autoColorIntakeCommand(colorIntakeCommand)
                                 ),
-                                stopIntakeSpindexer(),
-                                activatePopper(),
-                                secondLaunch.build(),
+                                stopSpindexer(),
+                                runPopper(),
+                                new ParallelAction(
+                                        secondLaunch.build(),
+                                        new SequentialAction(
+                                                moveToSortedPosition(motif),
+                                                stopSpindexer()
+                                        )
+                                ),
+                                pushInPopper(),
+                                stopIntake(),
                                 spindexerFullRotation(),
                                 deactivatePopper(),
                                 runIntake(),
@@ -297,21 +339,20 @@ public class RedClose extends LinearOpMode {
                                         secondPickup.build(),
                                         autoColorIntakeCommand(colorIntakeCommand)
                                 ),
-                                stopIntakeSpindexer(),
-                                activatePopper(),
-                                thirdLaunch.build(),
+                                stopSpindexer(),
+                                runPopper(),
+                                new ParallelAction(
+                                        thirdLaunch.build(),
+                                        new SequentialAction(
+                                                moveToSortedPosition(motif),
+                                                stopSpindexer()
+                                        )
+                                ),
+                                pushInPopper(),
+                                stopIntake(),
                                 spindexerFullRotation(),
                                 deactivatePopper(),
-                                runIntake(),
-                                new RaceAction(
-                                        thirdPickup.build(),
-                                        autoColorIntakeCommand(colorIntakeCommand)
-                                ),
-                                stopIntakeSpindexer(),
-                                activatePopper(),
-                                fourthLaunch.build(),
-                                spindexerFullRotation(),
-                                deactivatePopper()
+                                runIntake()
                         )
                 )
         );

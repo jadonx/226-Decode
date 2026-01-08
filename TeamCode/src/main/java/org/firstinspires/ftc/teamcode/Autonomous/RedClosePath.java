@@ -27,11 +27,19 @@ public class RedClosePath extends LinearOpMode {
     BetterPinPoint betterPinPoint;
 
     public class UpdateBotPosition implements Action {
+        private boolean initialized = false;
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            betterPinPoint.update();
-            PoseStorage.updatePose(betterPinPoint.getCorrectX(), betterPinPoint.getCorrectY(), betterPinPoint.getCorrectHeading());
+            if (!initialized) {
+                PoseStorage.updatePose(40, 61, 90);
+            }
 
+            betterPinPoint.update();
+            PoseStorage.updatePose(PoseStorage.getX()+betterPinPoint.getCorrectX(), PoseStorage.getY()+betterPinPoint.getCorrectY(), PoseStorage.getHeading()+betterPinPoint.getCorrectHeading());
+
+            telemetry.addData("Pinpoint x ", betterPinPoint.getCorrectX());
+            telemetry.addData("Pinpoint y ", betterPinPoint.getCorrectY());
+            telemetry.addData("Pinpoint heading ", betterPinPoint.getCorrectHeading());
             telemetry.addData("Storage x ", PoseStorage.getX());
             telemetry.addData("Storage y ", PoseStorage.getY());
             telemetry.addData("Storage heading ", PoseStorage.getHeading());
@@ -50,14 +58,19 @@ public class RedClosePath extends LinearOpMode {
 
         betterPinPoint = new BetterPinPoint(hardwareMap, BetterPinPoint.AllianceColor.RED);
 
-        TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(-16,26), Math.toRadians(90));
-        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,28)).strafeToConstantHeading(new Vector2d(-14,48), new TranslationalVelConstraint(6));
-        TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-16,26));
-        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(12, 28)).strafeToConstantHeading(new Vector2d(12,48) , new TranslationalVelConstraint(6));
-        TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-16,26));
-        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(34, 28)).strafeToConstantHeading(new Vector2d(34,48), new TranslationalVelConstraint(6));
-        TrajectoryActionBuilder fourthLaunch = thirdPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-16,26));
+        TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(-14,22), Math.toRadians(90));
+        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,25)).strafeToConstantHeading(new Vector2d(-14,42), new TranslationalVelConstraint(5.5));
+        TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,22));
+        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(11, 25)).strafeToConstantHeading(new Vector2d(11,42) , new TranslationalVelConstraint(5.5));
+        TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,22));
+        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(34, 25)).strafeToConstantHeading(new Vector2d(34,42), new TranslationalVelConstraint(5.5));
+        TrajectoryActionBuilder fourthLaunch = thirdPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,22));
         TrajectoryActionBuilder park = fourthLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-7,34));
+
+        telemetry.addData("Pinpoint x (init) ", betterPinPoint.getCorrectX());
+        telemetry.addData("Pinpoint y (init) ", betterPinPoint.getCorrectY());
+        telemetry.addData("Pinpoint heading (init) ", betterPinPoint.getCorrectHeading());
+        telemetry.update();
 
         waitForStart();
 

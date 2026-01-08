@@ -71,7 +71,8 @@ public class BetterPinPoint {
     }
 
     public double getAngleToGoal() {
-        return Math.toDegrees(
+        // We do 90 minus because we found that it had to be flipped
+        return 90 - Math.toDegrees(
                 Math.atan2(
                         GOAL_POS_Y - getCorrectY(),
                         GOAL_POS_X - getCorrectX()
