@@ -32,6 +32,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.Subsystems.BetterPinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.FieldCentricDrive;
 
 /*
@@ -50,11 +51,15 @@ public class PinPointTest extends OpMode {
     GoBildaPinpointDriver pinpoint;
     FieldCentricDrive drive;
 
+    BetterPinPoint betterPinPoint;
+
     @Override
     public void init() {
         // Get a reference to the sensor
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, Constants.HMPinPointer);
         drive = new FieldCentricDrive(hardwareMap);
+
+        betterPinPoint = new BetterPinPoint(hardwareMap);
 
         // Configure the sensor
         configurePinpoint();
@@ -81,9 +86,19 @@ public class PinPointTest extends OpMode {
         pinpoint.update();
         Pose2D pose2D = pinpoint.getPosition();
 
-        telemetry.addData("X coordinate (IN)", pose2D.getX(DistanceUnit.INCH));
-        telemetry.addData("Y coordinate (IN)", pose2D.getY(DistanceUnit.INCH));
+        telemetry.addData("X coordinate (IN)", -pose2D.getY(DistanceUnit.INCH));
+        telemetry.addData("Y coordinate (IN)", pose2D.getX(DistanceUnit.INCH));
         telemetry.addData("Heading angle (DEGREES)", pose2D.getHeading(AngleUnit.DEGREES));
+
+        // Better pinpoint test
+        betterPinPoint.update();
+        telemetry.addData("Better pinpoint X ", betterPinPoint.getFilteredPos().getX(DistanceUnit.INCH));
+        telemetry.addData("Better pinpoint Y ", betterPinPoint.getFilteredPos().getY(DistanceUnit.INCH));
+        telemetry.addData("Better pinpoint heading ", betterPinPoint.getFilteredPos().getHeading(AngleUnit.DEGREES));
+
+        if (gamepad1.b) {
+            betterPinPoint.setPosition(6, 7, 67);
+        }
 
         telemetry.update();
     }

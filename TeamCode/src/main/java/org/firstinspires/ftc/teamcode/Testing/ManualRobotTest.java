@@ -73,6 +73,8 @@ public class ManualRobotTest extends OpMode {
     public static boolean isReadyToShoot = false;
     public static boolean isUsingTurret = false;
 
+
+
     @Override
     public void init() {
         spindexer = new Spindexer(hardwareMap);
@@ -160,7 +162,6 @@ public class ManualRobotTest extends OpMode {
         }
 
 
-
 //        packet.put("X Position", pinpoint.getXCoordinate(pinpoint.getPose(), DistanceUnit.INCH));
 //        packet.put("Y Position", pinpoint.getYCoordinate(pinpoint.getPose(), DistanceUnit.INCH));
 //        packet.put("GOAL X Position", pinpoint.getXCoordinate(pinpoint.getPoseGoal(), DistanceUnit.INCH));
@@ -171,6 +172,7 @@ public class ManualRobotTest extends OpMode {
         packet.put("robot heading: ", pinpoint.getHeading());
         packet.put("Desired Angle", pinpoint.getAngleToGoal());
         packet.put("Turret Current Angle: ", turret.getTurretAngle());
+
 
 //        launcher.calculateTargetVelocity(pinpoint.getDistanceToGoal());
 //        launcher.calculateTargetAngle(pinpoint.getDistanceToGoal());

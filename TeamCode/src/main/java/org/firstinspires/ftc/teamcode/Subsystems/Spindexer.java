@@ -20,7 +20,8 @@ import org.firstinspires.ftc.teamcode.Constants;
 public class Spindexer {
     private CRServo spindexerServo;
     private SpindexerEncoder spindexerEncoder;
-    private RevColorSensorV3 colorSensorV3;
+    private RevColorSensorV3 colorSensorFront;
+    private RevColorSensorV3 colorSensorBack;
 
     private double targetAngle = 0;
     private double kP = 0.002, kS = 0.05;
@@ -43,7 +44,8 @@ public class Spindexer {
         spindexerServo = hardwareMap.get(CRServo.class, Constants.HMServospinDexer);
         spindexerServo.setDirection(DcMotorSimple.Direction.REVERSE);
         spindexerEncoder = hardwareMap.get(SpindexerEncoder.class, Constants.HMSpindexerEncoder);
-        colorSensorV3 = hardwareMap.get(RevColorSensorV3.class, Constants.HMFrontColorSensor);
+        colorSensorFront = hardwareMap.get(RevColorSensorV3.class, Constants.HMFrontColorSensor);
+        colorSensorBack = hardwareMap.get(RevColorSensorV3.class, Constants.HMBackColorSensor);
         spindexerMode = SpindexerMode.INTAKE_MODE;
     }
 
@@ -112,6 +114,36 @@ public class Spindexer {
         lastAngle = current;
     }
 
+    /** AUTO SORTING METHOD */
+    public double getSortedPosition(HolderStatus[] motifPattern) {
+        // Determine the green ball in motif pattern to get offset
+        int holderOffset;
+
+        if (motifPattern[0] == HolderStatus.GREEN) {
+            holderOffset = 0;
+        }
+        else if (motifPattern[1] == HolderStatus.GREEN) {
+            holderOffset = 1;
+        }
+        else {
+            holderOffset = 2;
+        }
+
+        // Determine the green ball in current holders and return desired position
+        if (holderStatuses[0] == HolderStatus.GREEN) {
+            return intakePositions[(2 + holderOffset) % 3];
+        }
+        else if (holderStatuses[1] == HolderStatus.GREEN) {
+            return intakePositions[holderOffset % 3];
+        }
+        else if (holderStatuses[2] == HolderStatus.GREEN) {
+            return intakePositions[(1 + holderOffset) % 3];
+        }
+        else {
+            return intakePositions[2];
+        }
+    }
+
     /** SETTER AND GETTER METHODS */
     public void setMode(SpindexerMode newMode) {
         if (spindexerMode != newMode) {
@@ -172,9 +204,9 @@ public class Spindexer {
 
     /** Color sensor code */
     public float[] getHSVRev() {
-        int r = colorSensorV3.red();
-        int g = colorSensorV3.green();
-        int b = colorSensorV3.blue();
+        int r = Math.max(colorSensorFront.red(), colorSensorBack.red());
+        int g = Math.max(colorSensorFront.green(), colorSensorBack.green());;
+        int b = Math.max(colorSensorFront.blue(), colorSensorBack.blue());;
 
         float[] hsv = new float[3];
         Color.RGBToHSV(r, g, b, hsv);
@@ -183,6 +215,6 @@ public class Spindexer {
     }
 
     public double getColorDistance() {
-        return colorSensorV3.getDistance(DistanceUnit.INCH);
+        return colorSensorFront.getDistance(DistanceUnit.INCH);
     }
 }

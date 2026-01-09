@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -7,10 +8,11 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.Constants;
-
+@Config
 public class Popper {
     private Servo popperServo;
     private DcMotorEx popperMotor;
+    public static double popperPos = 0.008;
 
     private int targetVelocity;
 
@@ -46,7 +48,7 @@ public class Popper {
     }
 
     public void pushInPopper() {
-        popperServo.setPosition(0.007);
+        popperServo.setPosition(popperPos);
     }
 
     public void pullOutPopper() {
