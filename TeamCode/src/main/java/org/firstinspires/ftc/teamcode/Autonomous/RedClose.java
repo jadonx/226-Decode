@@ -36,6 +36,7 @@ public class RedClose extends LinearOpMode {
     MecanumDrive drive;
     PinPoint pinpoint;
     LimeLight limelight;
+    Turret turret;
 
     Intake intake;
     Spindexer spindexer;
