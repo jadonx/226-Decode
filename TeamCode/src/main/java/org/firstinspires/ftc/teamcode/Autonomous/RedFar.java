@@ -230,12 +230,14 @@ public class RedFar extends LinearOpMode {
         colorIntakeCommand = new ColorIntakeCommand(spindexer);
 
 
-        TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(55,13), Math.toRadians(90));
-        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(36,40)).strafeToConstantHeading(new Vector2d(36,60), new TranslationalVelConstraint(6));
-        TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(55,13));
-        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(13.5, 40)).strafeToConstantHeading(new Vector2d(13.5,60) , new TranslationalVelConstraint(6));
-        TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(55,13));
-        TrajectoryActionBuilder park = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-2,40));
+        TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(55,26), Math.toRadians(90));
+        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(36, 28)).strafeToConstantHeading(new Vector2d(36,48), new TranslationalVelConstraint(6));
+        TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(55,26));
+        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(12, 28)).strafeToConstantHeading(new Vector2d(12,48) , new TranslationalVelConstraint(6));
+        TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(55,26));
+        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-11,28)).strafeToConstantHeading(new Vector2d(-11,48), new TranslationalVelConstraint(6));
+        TrajectoryActionBuilder fourthLaunch = thirdPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(55,26));
+        TrajectoryActionBuilder park = fourthLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-7,34));
 
         telemetry.addData("Status:", "Subsystems Initialized");
         telemetry.addData("Status:", "Path Built");
@@ -266,38 +268,48 @@ public class RedFar extends LinearOpMode {
         if (isStopRequested()) return;
 
         Actions.runBlocking(
-                new ParallelAction(
-                        updatePinPoint(),
-                        updateBotPosition(),
-                        turretTrackingAngle(-53), // Modify for far zone
-                        updateLauncher(),
-                        new SequentialAction(
-                                moveCover(),
-                                activatePopper(),
-                                firstLaunch.build(),
-                                spindexerFullRotation(),
-                                deactivatePopper(),
-                                runIntake(),
-                                new RaceAction(
-                                        firstPickup.build(),
-                                        autoColorIntakeCommand(colorIntakeCommand)
-                                ),
-                                stopIntakeSpindexer(),
-                                activatePopper(),
-                                secondLaunch.build(),
-                                spindexerFullRotation(),
-                                deactivatePopper(),
-                                runIntake(),
-                                new RaceAction(
-                                        secondPickup.build(),
-                                        autoColorIntakeCommand(colorIntakeCommand)
-                                ),
-                                stopIntakeSpindexer(),
-                                activatePopper(),
-                                thirdLaunch.build(),
-                                spindexerFullRotation()
-                        )
+                new SequentialAction(
+                        firstLaunch.build(),
+                        firstPickup.build(),
+                        secondLaunch.build(),
+                        secondPickup.build(),
+                        thirdLaunch.build(),
+                        thirdPickup.build(),
+                        fourthLaunch.build(),
+                        park.build()
                 )
+//                new ParallelAction(
+//                        updatePinPoint(),
+//                        updateBotPosition(),
+//                        turretTrackingAngle(-53), // Modify for far zone
+//                        updateLauncher(),
+//                        new SequentialAction(
+//                                moveCover(),
+//                                activatePopper(),
+//                                firstLaunch.build(),
+//                                spindexerFullRotation(),
+//                                deactivatePopper(),
+//                                runIntake(),
+//                                new RaceAction(
+//                                        firstPickup.build(),
+//                                        autoColorIntakeCommand(colorIntakeCommand)
+//                                ),
+//                                stopIntakeSpindexer(),
+//                                activatePopper(),
+//                                secondLaunch.build(),
+//                                spindexerFullRotation(),
+//                                deactivatePopper(),
+//                                runIntake(),
+//                                new RaceAction(
+//                                        secondPickup.build(),
+//                                        autoColorIntakeCommand(colorIntakeCommand)
+//                                ),
+//                                stopIntakeSpindexer(),
+//                                activatePopper(),
+//                                thirdLaunch.build(),
+//                                spindexerFullRotation()
+//                        )
+//                )
         );
 
     }

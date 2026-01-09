@@ -41,8 +41,8 @@ public class Turret {
     }
 
     public void goToAngle(double targetAngle) {
-
         double currentAngle = getTurretAngle();
+
         double error = wrapDegrees(targetAngle - currentAngle);
 
         long currentTime = System.nanoTime();
@@ -56,16 +56,13 @@ public class Turret {
         double fTerm = Math.signum(error) * kF; // Static friction boooost!!!!
         double power = pTerm + dTerm + fTerm;
 
-
         power = Math.max(Math.min(power, 1), -1);
-
 
         if (Math.abs(error) < 0.5) {
             setPower(0);
         } else {
             setPower(power);
         }
-
 
         lastError = error;
         lastTime = currentTime;
@@ -87,9 +84,22 @@ public class Turret {
         return angle;
     }
 
-
     public void setPower(double power) {
         turretLeft.setPower(-power);
         turretRight.setPower(-power);
+    }
+
+    public double wrapDegRobot(double a) {
+        a = (a + 180.0) % 360.0;
+        if (a < 0) a += 360.0;
+        return a - 180.0;
+    }
+
+    public double deltaDeg(double to, double from) {
+        return wrapDegRobot(to - from);
+    }
+
+    public double clamp(double x, double lo, double hi) {
+        return Math.max(lo, Math.min(hi, x));
     }
 }

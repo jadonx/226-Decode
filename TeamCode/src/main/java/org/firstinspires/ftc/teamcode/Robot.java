@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Commands.ColorIntakeCommand;
 import org.firstinspires.ftc.teamcode.Commands.LaunchCommand;
@@ -123,20 +124,40 @@ public class Robot {
         pinpoint.updatePose();
     }
 
-    private void updateTurret() {
-        if (isUsingTurret) {
-            double desired = 90-pinpoint.getAngleToGoal();
-            turret.goToAngle(desired);
-        } else {
-            turret.goToAngle(pinpoint.getHeading());
-        }
 
+
+
+    private void updateTurret() {
+        double TURRET_MIN = -160.0;
+        double TURRET_MAX = 160.0;
+        double heading = turret.wrapDegRobot(pinpoint.getHeading());
+        double desired = turret.wrapDegRobot(90.0 - pinpoint.getAngleToGoal());
+        double turretRel = turret.deltaDeg(turret.getTurretAngle(), heading);
+        double desiredRel = turret.deltaDeg(desired, heading);
+        desiredRel = turret.clamp(desiredRel, TURRET_MIN, TURRET_MAX);
+        double target = turret.wrapDegRobot(heading + desiredRel);
+
+        if (isUsingTurret) {
+            if (Math.abs(turretRel) > 135) {
+                turret.goToAngle(heading);
+                isUsingTurret = false;
+            } else {
+                turret.goToAngle(target);
+            }
+        } else {
+            turret.goToAngle(heading);
+        }
         if (gamepad1.dpadUpWasPressed()) {
-            isUsingTurret = !isUsingTurret;
+            isUsingTurret = true;
+        } else if (gamepad1.dpadUpWasPressed() && isUsingTurret) {
+            isUsingTurret = false;
         }
     }
 
     private void updateTelemetry() {
+        telemetry.addData("Desired Angle", (90 - pinpoint.getAngleToGoal()));
+        telemetry.addData("Actual Angle", (turret.getTurretAngle()));
+        telemetry.addData("Robot Angle", (Math.abs(pinpoint.getPose().getHeading(AngleUnit.DEGREES))) - turret.getTurretAngle());
         // Spindexer
 //        telemetry.addData("Spindexer Mode ", spindexer.getMode());
 //        String holderStatuses = String.format("[%s, %s, %s]", spindexer.getHolderStatus(0), spindexer.getHolderStatus(1), spindexer.getHolderStatus(2));
@@ -152,9 +173,6 @@ public class Robot {
          String currentPose = String.format("[%f, %f]", pinpoint.getXCoordinate(pinpoint.getPose(), DistanceUnit.INCH), pinpoint.getYCoordinate(pinpoint.getPose(), DistanceUnit.INCH));
          telemetry.addData("Pinpoint Position ", currentPose);
         telemetry.addData("Goal Distance ", pinpoint.getDistanceToGoal() + "\n");
-
-        telemetry.addData("Desired Angle", (90 - pinpoint.getAngleToGoal()));
-        telemetry.addData("Actual Angle", (turret.getTurretAngle()));
 
         // Color intake command
         telemetry.addData("Intake Command State ", colorIntakeCommand.getCurrentState() + "\n");
