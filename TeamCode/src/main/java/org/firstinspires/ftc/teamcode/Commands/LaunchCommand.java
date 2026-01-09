@@ -20,6 +20,7 @@ public class LaunchCommand {
     private final Intake intake;
 
     public enum State {
+        PRIME_SHOOTER,
         PREPARE_TO_SHOOT,
         SHOOTING,
         FINISH
@@ -47,7 +48,7 @@ public class LaunchCommand {
 
         launcher.calculateTargetVelocity(pinpoint.getDistanceToGoal());
 
-        currentState = State.PREPARE_TO_SHOOT;
+        currentState = State.PRIME_SHOOTER;
     }
 
     public void startAuto() {
@@ -66,8 +67,10 @@ public class LaunchCommand {
         // intake.runIntake(0.15F);
 
         switch (currentState) {
+            case PRIME_SHOOTER:
+                break;
             case PREPARE_TO_SHOOT:
-                if (launcher.atTargetVelocity(20) && popper.atTargetVelocity(50)) {
+                if (launcher.atTargetVelocity(20) && popper.atTargetVelocity(20)) {
                     spindexer.setSpeed(spindexerSpeed);
                     spindexer.setMode(Spindexer.SpindexerMode.LAUNCH_MODE);
                     currentState = State.SHOOTING;
@@ -90,5 +93,12 @@ public class LaunchCommand {
 
     public State getCurrentState() {
         return currentState;
+    }
+
+    public void startShootingSequence() {
+        if (currentState == State.PRIME_SHOOTER) {
+            launcher.calculateTargetVelocity(pinpoint.getDistanceToGoal());
+            currentState = State.PREPARE_TO_SHOOT;
+        }
     }
 }

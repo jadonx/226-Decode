@@ -58,10 +58,6 @@ public class RedClose extends LinearOpMode {
             telemetryPacket.put("PinPoint Heading", botHead);
 
             PoseStorage.updatePose(botXCoord, botYCoord, botHead);
-
-            telemetryPacket.put("Bot X", currentPoseRR.position.x);
-            telemetryPacket.put("Bot Y", currentPoseRR.position.y);
-            telemetryPacket.put("Bot Heading", Math.toDegrees(currentPoseRR.heading.log()));
             return true;
         }
     }

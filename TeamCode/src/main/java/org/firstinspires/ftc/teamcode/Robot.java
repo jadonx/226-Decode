@@ -69,7 +69,7 @@ public class Robot {
         updateDrive();
         updateLauncherCover();
         updatePinPoint();
-        updateTurret();
+        // updateTurret();
         updateTelemetry();
 
         if (gamepad1.right_trigger > 0.1) {
@@ -80,13 +80,17 @@ public class Robot {
             colorIntakeCommand.update();
             updateIntake();
 
-            if (gamepad1.a && launchCommand == null) {
+            if (gamepad1.aWasPressed() && launchCommand == null) {
                 launchCommand = new LaunchCommand(spindexer, popper, launcher, pinpoint, intake);
                 launchCommand.start();
             }
         }
 
         if (launchCommand != null) {
+            if (gamepad1.bWasPressed()) {
+                launchCommand.startShootingSequence();
+            }
+
             if (!launchCommand.isFinished()) {
                 launchCommand.update();
             }
@@ -95,10 +99,6 @@ public class Robot {
                 colorIntakeCommand.start();
                 stopLaunchCommand();
             }
-        }
-
-        if (gamepad1.bWasPressed()) {
-            spindexer.resetHolderStatuses();
         }
     }
 
@@ -179,6 +179,7 @@ public class Robot {
 
     private void stopLaunchCommand() {
         launchCommand = null;
+        colorIntakeCommand.start();
         launcher.stopLauncher();
         popper.deactivatePopper();
     }
