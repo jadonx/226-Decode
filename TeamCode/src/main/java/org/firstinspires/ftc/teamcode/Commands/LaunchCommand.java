@@ -9,13 +9,14 @@ import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.PinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
+import org.firstinspires.ftc.teamcode.Subsystems.RoadRunnerPinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 
 public class LaunchCommand {
     private final Spindexer spindexer;
     private final Popper popper;
     private final Launcher launcher;
-    private final PinPoint pinpoint;
+    private final RoadRunnerPinPoint pinpoint;
     private final Intake intake;
 
     public enum State {
@@ -27,7 +28,7 @@ public class LaunchCommand {
 
     private double spindexerSpeed;
 
-    public LaunchCommand(Spindexer spindexer, Popper popper, Launcher launcher, PinPoint pinpoint, Intake intake) {
+    public LaunchCommand(Spindexer spindexer, Popper popper, Launcher launcher, RoadRunnerPinPoint pinpoint, Intake intake) {
         this.spindexer = spindexer;
         this.popper = popper;
         this.launcher = launcher;

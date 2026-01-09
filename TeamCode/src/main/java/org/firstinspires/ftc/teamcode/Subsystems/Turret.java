@@ -35,7 +35,7 @@ public class Turret {
 
         turretEncoder.initialize(turretParameters);
 
-        turretEncoder.resetYaw();
+        // turretEncoder.resetYaw();
 
         pid = new PIDFController(kP, kI, kD, kF);
     }
@@ -87,6 +87,9 @@ public class Turret {
         return angle;
     }
 
+    public void resetTurretIMU() {
+        turretEncoder.resetYaw();
+    }
 
     public void setPower(double power) {
         turretLeft.setPower(-power);

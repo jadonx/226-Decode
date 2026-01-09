@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.Robot;
 import org.firstinspires.ftc.teamcode.Subsystems.FieldCentricDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.PinPoint;
+import org.firstinspires.ftc.teamcode.Subsystems.RoadRunnerPinPoint;
 
 @TeleOp(name="BlueTeleOp", group="!TeleOp")
 public class BlueTeleOp extends OpMode {
@@ -20,7 +21,7 @@ public class BlueTeleOp extends OpMode {
     public void init() {
         packet = new TelemetryPacket();
         dashboard = FtcDashboard.getInstance();
-        robot = new Robot(hardwareMap, PinPoint.AllianceColor.BLUE, gamepad1, telemetry, 0, 0, 0);
+        robot = new Robot(hardwareMap, RoadRunnerPinPoint.AllianceColor.BLUE, gamepad1, telemetry);
         robot.start();
     }
 

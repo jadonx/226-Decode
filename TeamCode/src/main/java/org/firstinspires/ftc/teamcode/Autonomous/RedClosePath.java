@@ -19,27 +19,19 @@ import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.BetterPinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.PinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Supporters.PoseStorage;
+import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
 @Autonomous(name="RedClosePath")
 public class RedClosePath extends LinearOpMode {
     MecanumDrive drive;
-    PinPoint pinpoint;
-    BetterPinPoint betterPinPoint;
+    Turret turret;
 
     public class UpdateBotPosition implements Action {
         private boolean initialized = false;
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if (!initialized) {
-                PoseStorage.updatePose(40, 61, 90);
-            }
+            PoseStorage.updatePose(drive.localizer.getPose().position.x, drive.localizer.getPose().position.y, drive.localizer.getPose().heading.toDouble());
 
-            betterPinPoint.update();
-            PoseStorage.updatePose(PoseStorage.getX()+betterPinPoint.getCorrectX(), PoseStorage.getY()+betterPinPoint.getCorrectY(), PoseStorage.getHeading()+betterPinPoint.getCorrectHeading());
-
-            telemetry.addData("Pinpoint x ", betterPinPoint.getCorrectX());
-            telemetry.addData("Pinpoint y ", betterPinPoint.getCorrectY());
-            telemetry.addData("Pinpoint heading ", betterPinPoint.getCorrectHeading());
             telemetry.addData("Storage x ", PoseStorage.getX());
             telemetry.addData("Storage y ", PoseStorage.getY());
             telemetry.addData("Storage heading ", PoseStorage.getHeading());
@@ -53,10 +45,10 @@ public class RedClosePath extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Pose2d initialPose = new Pose2d(-63, 35, Math.toRadians(90));
+        Pose2d initialPose = new Pose2d(-61, 39, Math.toRadians(90));
         drive = new MecanumDrive(hardwareMap, initialPose);
-
-        betterPinPoint = new BetterPinPoint(hardwareMap, BetterPinPoint.AllianceColor.RED);
+        turret = new Turret(hardwareMap);
+        turret.resetTurretIMU();
 
         TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(-14,22), Math.toRadians(90));
         TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,25)).strafeToConstantHeading(new Vector2d(-14,42), new TranslationalVelConstraint(5.5));
@@ -66,11 +58,6 @@ public class RedClosePath extends LinearOpMode {
         TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(34, 25)).strafeToConstantHeading(new Vector2d(34,42), new TranslationalVelConstraint(5.5));
         TrajectoryActionBuilder fourthLaunch = thirdPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,22));
         TrajectoryActionBuilder park = fourthLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-7,34));
-
-        telemetry.addData("Pinpoint x (init) ", betterPinPoint.getCorrectX());
-        telemetry.addData("Pinpoint y (init) ", betterPinPoint.getCorrectY());
-        telemetry.addData("Pinpoint heading (init) ", betterPinPoint.getCorrectHeading());
-        telemetry.update();
 
         waitForStart();
 
