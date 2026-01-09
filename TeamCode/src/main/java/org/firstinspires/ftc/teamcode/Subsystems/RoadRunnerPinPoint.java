@@ -42,7 +42,7 @@ public class RoadRunnerPinPoint {
         Pose2d currentPose = getPose();
 
         // We do 90 plus because we found that it had to be flipped
-        return 90 + Math.toDegrees(
+        return 90 - Math.toDegrees(
                 Math.atan2(
                         GOAL_POS_X - getPose().position.x,
                         GOAL_POS_Y - getPose().position.y

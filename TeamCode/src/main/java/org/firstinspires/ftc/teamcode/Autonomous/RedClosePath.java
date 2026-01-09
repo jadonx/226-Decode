@@ -30,7 +30,7 @@ public class RedClosePath extends LinearOpMode {
         private boolean initialized = false;
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            PoseStorage.updatePose(drive.localizer.getPose().position.x, drive.localizer.getPose().position.y, drive.localizer.getPose().heading.toDouble());
+            PoseStorage.updatePose(drive.localizer.getPose().position.x, drive.localizer.getPose().position.y, Math.toDegrees(drive.localizer.getPose().heading.toDouble()));
 
             telemetry.addData("Storage x ", PoseStorage.getX());
             telemetry.addData("Storage y ", PoseStorage.getY());

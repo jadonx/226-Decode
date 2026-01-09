@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
@@ -21,6 +22,7 @@ public class Turret {
     public static double kI = 0.0; // Integral gain on position error
     public static double kD = 0.0006; // Derivative gain on position error
     public static double kF = 0.05; // Feedforward to overcome static friction
+    private double error;
 
     double lastError = 0;
     long lastTime = System.nanoTime();
@@ -28,6 +30,9 @@ public class Turret {
     public Turret(HardwareMap hardwareMap) {
         turretRight = hardwareMap.get(CRServo.class, Constants.HMServoTurretRight);
         turretLeft = hardwareMap.get(CRServo.class, Constants.HMServoTurretLeft);
+
+        turretRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        turretLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
         turretEncoder = hardwareMap.get(IMU.class, Constants.HMTurretEncoder);
 
@@ -41,9 +46,8 @@ public class Turret {
     }
 
     public void goToAngle(double targetAngle) {
-
         double currentAngle = getTurretAngle();
-        double error = wrapDegrees(targetAngle - currentAngle);
+        error = wrapDegrees(targetAngle - currentAngle);
 
         long currentTime = System.nanoTime();
         double deltaTime = (currentTime - lastTime) / 1.0e9;
@@ -66,7 +70,6 @@ public class Turret {
             setPower(power);
         }
 
-
         lastError = error;
         lastTime = currentTime;
     }
@@ -77,8 +80,12 @@ public class Turret {
         return (Math.abs(error) < 0.5);
     }
 
+    public double getError() {
+        return error;
+    }
+
     public double getTurretAngle() {
-        return -1*turretEncoder.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+        return turretEncoder.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
     }
 
     private double wrapDegrees(double angle) {

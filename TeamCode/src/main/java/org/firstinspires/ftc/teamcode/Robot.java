@@ -49,7 +49,7 @@ public class Robot {
         spindexer = new Spindexer(hardwareMap);
         turret = new Turret(hardwareMap);
 
-        Pose2d startPose = new Pose2d(PoseStorage.getX(), PoseStorage.getY(), PoseStorage.getHeading());
+        Pose2d startPose = new Pose2d(PoseStorage.getX(), PoseStorage.getY(), Math.toRadians(PoseStorage.getHeading()));
         pinpoint = new RoadRunnerPinPoint(hardwareMap, allianceColor, startPose);
 
         this.gamepad1 = gamepad1;
@@ -69,7 +69,7 @@ public class Robot {
         updateDrive();
         updateLauncherCover();
         updatePinPoint();
-        // updateTurret();
+        updateTurret();
         updateTelemetry();
 
         if (gamepad1.right_trigger > 0.1) {
