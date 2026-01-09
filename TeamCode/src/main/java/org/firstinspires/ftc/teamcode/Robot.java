@@ -12,6 +12,7 @@ import org.firstinspires.ftc.teamcode.Commands.LaunchCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.FieldCentricDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
+import org.firstinspires.ftc.teamcode.Subsystems.LimeLight;
 import org.firstinspires.ftc.teamcode.Subsystems.PinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
@@ -26,6 +27,7 @@ public class Robot {
     private final Spindexer spindexer;
     private final Turret turret;
     private final PinPoint pinpoint;
+    private final LimeLight limelight;
 
     private final Telemetry telemetry;
 
@@ -44,6 +46,7 @@ public class Robot {
         spindexer = new Spindexer(hardwareMap);
         turret = new Turret(hardwareMap);
         pinpoint = new PinPoint(hardwareMap, allianceColor, botPosX, botPosY, heading);
+        limelight = new LimeLight(hardwareMap);
 
         this.gamepad1 = gamepad1;
         this.telemetry = telemetry;
@@ -77,6 +80,10 @@ public class Robot {
                 launchCommand = new LaunchCommand(spindexer, popper, launcher, pinpoint, intake);
                 launchCommand.start();
             }
+        }
+
+        if(gamepad1.left_bumper){
+            launcher.calculateTargetVelocity(pinpoint.getDistanceToGoal());
         }
 
         if (launchCommand != null) {
@@ -121,6 +128,14 @@ public class Robot {
 
     private void updatePinPoint() {
         pinpoint.updatePose();
+        /*
+        limelight.updateRobotOrientation(-pinpoint.getHeading());
+        limelight.getResult();
+        if(gamepad1.dpadUpWasPressed()){
+            pinpoint.setPose(limelight.getEstimatedPose());
+        }
+        */
+
     }
 
     private void updateTurret() {
@@ -131,7 +146,7 @@ public class Robot {
             turret.goToAngle(pinpoint.getHeading());
         }
 
-        if (gamepad1.dpadUpWasPressed()) {
+        if (gamepad1.yWasPressed()) {
             isUsingTurret = !isUsingTurret;
         }
     }
@@ -149,8 +164,9 @@ public class Robot {
         telemetry.addData("Target cover angle ", launcher.getTargetCoverAngle() + "\n");
 
         // Pinpoint
-         String currentPose = String.format("[%f, %f]", pinpoint.getXCoordinate(pinpoint.getPose(), DistanceUnit.INCH), pinpoint.getYCoordinate(pinpoint.getPose(), DistanceUnit.INCH));
-         telemetry.addData("Pinpoint Position ", currentPose);
+        String currentPose = String.format("[%f, %f]", pinpoint.getXCoordinate(pinpoint.getPose(), DistanceUnit.INCH), pinpoint.getYCoordinate(pinpoint.getPose(), DistanceUnit.INCH));
+        telemetry.addData("Pinpoint Position ", currentPose);
+        telemetry.addData("Limelight Pose", limelight.getEstimatedPose());
         telemetry.addData("Goal Distance ", pinpoint.getDistanceToGoal() + "\n");
 
         telemetry.addData("Desired Angle", (90 - pinpoint.getAngleToGoal()));
