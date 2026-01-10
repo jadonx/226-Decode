@@ -1,12 +1,12 @@
 package org.firstinspires.ftc.teamcode.Autonomous;
 
-import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
@@ -15,30 +15,53 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Commands.ColorIntakeCommand;
-import org.firstinspires.ftc.teamcode.Commands.LaunchCommand;
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
+import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
+import org.firstinspires.ftc.teamcode.Subsystems.LimeLight;
 import org.firstinspires.ftc.teamcode.Subsystems.PinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
+import org.firstinspires.ftc.teamcode.Subsystems.Supporters.PoseStorage;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
 
 @Autonomous (name="RedFar", group="Autonomous")
 public class RedFar extends LinearOpMode {
-    Turret turret;
     MecanumDrive drive;
     PinPoint pinpoint;
-
+    LimeLight limelight;
+    Intake intake;
+    Turret turret;
     Spindexer spindexer;
     Launcher launcher;
     Popper popper;
 
-    LaunchCommand launchCommand;
     ColorIntakeCommand colorIntakeCommand;
 
-    /** Turret Actions */
+    public class UpdateBotPosition implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            Pose2d currentPoseRR = drive.localizer.getPose();
+            double botXCoord = pinpoint.getXCoordinate(pinpoint.getPose(), DistanceUnit.INCH);
+            double botYCoord = pinpoint.getYCoordinate(pinpoint.getPose(), DistanceUnit.INCH);
+            double botHead = pinpoint.getHeading();
+            telemetryPacket.put("PinPoint X", botXCoord);
+            telemetryPacket.put("PinPoint Y", botYCoord);
+            telemetryPacket.put("PinPoint Heading", botHead);
+
+            PoseStorage.updatePose(botXCoord, botYCoord, botHead);
+
+            telemetryPacket.put("Bot X", currentPoseRR.position.x);
+            telemetryPacket.put("Bot Y", currentPoseRR.position.y);
+            telemetryPacket.put("Bot Heading", Math.toDegrees(currentPoseRR.heading.log()));
+            return true;
+        }
+    }
+    public Action updateBotPosition() {return new org.firstinspires.ftc.teamcode.Autonomous.RedFar.UpdateBotPosition();}
+
     public class UpdatePinPoint implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
@@ -47,7 +70,7 @@ public class RedFar extends LinearOpMode {
         }
     }
     public Action updatePinPoint( ) {
-        return new UpdatePinPoint();
+        return new org.firstinspires.ftc.teamcode.Autonomous.RedFar.UpdatePinPoint();
     }
 
     public class TurretTrackingAngle implements Action {
@@ -58,77 +81,186 @@ public class RedFar extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             turret.goToAngle(targetAngle);
-            return !turret.atTargetAngle(targetAngle);
-        }
-    }
-    public Action turretTrackingAngle(double tA) {
-        return new TurretTrackingAngle(tA);
-    }
-
-    public class TurretTrackingGoal implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            turret.goToAngle(pinpoint.getAngleToGoal());
             return true;
         }
     }
-    public Action turretTrackingGoal() {
-        return new TurretTrackingGoal();
+    public Action turretTrackingAngle(double tA) {
+        return new org.firstinspires.ftc.teamcode.Autonomous.RedFar.TurretTrackingAngle(tA);
     }
 
-    /** Shoot Artifact Actions */
-    public class ShootArtifacts implements Action {
+    public class MoveCover implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            launcher.setTargetCoverAngle(0.0);
+            return false;
+        }
+    }
+    public Action moveCover() {
+        return new org.firstinspires.ftc.teamcode.Autonomous.RedFar.MoveCover();
+    }
+
+    public class UpdateLauncher implements Action {
         private boolean initialized = false;
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (!initialized) {
-                // launchCommand = new LaunchCommand(spindexer, popper, launcher, pinpoint);
-                launchCommand.startAuto();
+                launcher.setTargetVelocity(1850); // Modify for far zone
                 initialized = true;
             }
 
-            if (launchCommand != null && !launchCommand.isFinished()) {
-                launchCommand.update();
-            }
-
-            if (launchCommand != null && launchCommand.isFinished()) {
-                launchCommand = null;
-                launcher.stopLauncher();
-                launcher.setTargetCoverAngle(0.5);
-                popper.deactivatePopper();
-                return false;
-            }
+            launcher.update();
 
             return true;
         }
     }
-    public Action shootArtifacts() {
-        return new ShootArtifacts();
+    public Action updateLauncher() {
+        return new org.firstinspires.ftc.teamcode.Autonomous.RedFar.UpdateLauncher();
+    }
+
+    public class ActivatePopper implements Action {
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            popper.setTargetVelocity(1800);
+            popper.pushInPopper();
+            return false;
+        }
+    }
+    public Action activatePopper() {
+        return new org.firstinspires.ftc.teamcode.Autonomous.RedFar.ActivatePopper();
+    }
+
+    public class DeactivatePopper implements Action {
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            popper.deactivatePopper();
+            return false;
+        }
+    }
+    public Action deactivatePopper() {
+        return new org.firstinspires.ftc.teamcode.Autonomous.RedFar.DeactivatePopper();
+    }
+
+    public class SpindexerFullRotation implements Action {
+        private boolean initialized = false;
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (!initialized) {
+                spindexer.setMode(Spindexer.SpindexerMode.LAUNCH_MODE);
+                spindexer.setSpeed(0.2);
+                initialized = true;
+            }
+
+            spindexer.update();
+
+            return !spindexer.atTargetAngle(0);
+        }
+    }
+    public Action spindexerFullRotation() {
+        return new org.firstinspires.ftc.teamcode.Autonomous.RedFar.SpindexerFullRotation();
+    }
+
+    public class AutoColorIntakeCommand implements Action {
+        private final ColorIntakeCommand colorIntakeCommand;
+
+        private boolean initialized = false;
+
+        public AutoColorIntakeCommand(ColorIntakeCommand colorIntakeCommand) {
+            this.colorIntakeCommand = colorIntakeCommand;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (!initialized) {
+                colorIntakeCommand.start();
+                initialized = true;
+            }
+            colorIntakeCommand.update();
+
+            return true;
+        }
+    }
+    public Action autoColorIntakeCommand(ColorIntakeCommand colorIntakeCommand) {
+        return new org.firstinspires.ftc.teamcode.Autonomous.RedFar.AutoColorIntakeCommand(colorIntakeCommand);
+    }
+
+    public class RunIntake implements Action {
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            intake.runIntake(1);
+            return false;
+        }
+    }
+    public Action runIntake() {
+        return new org.firstinspires.ftc.teamcode.Autonomous.RedFar.RunIntake();
+    }
+
+    public class StopIntakeSpindexer implements Action {
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            intake.stopIntake();
+            spindexer.setPower(0);
+            return false;
+        }
+    }
+    public Action stopIntakeSpindexer() {
+        return new org.firstinspires.ftc.teamcode.Autonomous.RedFar.StopIntakeSpindexer();
     }
 
     @Override
     public void runOpMode() throws InterruptedException {
-        double botPosX = 60;
-        double botPosY = 22;
-        double botHeadingRR = 90;
-        double botHeadingPP = 0;
-        Pose2d initialPose = new Pose2d(botPosX, botPosY, Math.toRadians(botHeadingRR));
+        telemetry.addData("Status:", "Initializing");
+        telemetry.update();
+
+        Pose2d initialPose = new Pose2d(-63, 35, Math.toRadians(90));
         drive = new MecanumDrive(hardwareMap, initialPose);
+
+        intake = new Intake(hardwareMap);
         turret = new Turret(hardwareMap);
-        pinpoint = new PinPoint(hardwareMap, PinPoint.AllianceColor.RED, botPosX, botPosY, botHeadingPP);
+        pinpoint = new PinPoint(hardwareMap, PinPoint.AllianceColor.RED, 40, 61, 0);
         spindexer = new Spindexer(hardwareMap);
         launcher = new Launcher(hardwareMap);
         popper = new Popper(hardwareMap);
+        limelight = new LimeLight(hardwareMap);
 
-        TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(55,13), Math.toRadians(90));
-        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(36,40)).strafeToConstantHeading(new Vector2d(36,60), new TranslationalVelConstraint(6));
-        TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(55,13));
-        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(13.5, 40)).strafeToConstantHeading(new Vector2d(13.5,60) , new TranslationalVelConstraint(6));
-        TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(55,13));
-        TrajectoryActionBuilder park = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-2,40));
+        colorIntakeCommand = new ColorIntakeCommand(spindexer);
 
-        telemetry.addData("Status", "Initialized");
+
+        TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(55,26), Math.toRadians(90));
+        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(36, 28)).strafeToConstantHeading(new Vector2d(36,48), new TranslationalVelConstraint(6));
+        TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(55,26));
+        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(12, 28)).strafeToConstantHeading(new Vector2d(12,48) , new TranslationalVelConstraint(6));
+        TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(55,26));
+        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-11,28)).strafeToConstantHeading(new Vector2d(-11,48), new TranslationalVelConstraint(6));
+        TrajectoryActionBuilder fourthLaunch = thirdPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(55,26));
+        TrajectoryActionBuilder park = fourthLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-7,34));
+
+        telemetry.addData("Status:", "Subsystems Initialized");
+        telemetry.addData("Status:", "Path Built");
+        telemetry.update();
+        telemetry.addData("Status:", "Getting Motif");
+        Spindexer.HolderStatus[] motif;
+        while (opModeInInit() && !limelight.hasMotif()) {
+            turret.goToAngle(-80);  //Modify for far zone
+            limelight.getResult();
+            limelight.getAprilTagID();
+        }
+
+        if (limelight.hasMotif()) {
+            telemetry.addData("Status:", "Motif Detected: " + limelight.getMotifID());
+            motif = limelight.getMotif();
+            telemetry.addData("Motif: ", motif[0] + ", " + motif[1] + ", " + motif[2]);
+            telemetry.update();
+        } else {
+            motif = new Spindexer.HolderStatus[]{Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.GREEN};
+            telemetry.addData("Motif: ", "Defaulting to PPG");
+            telemetry.update();
+        }
+
         telemetry.update();
 
         waitForStart();
@@ -136,16 +268,50 @@ public class RedFar extends LinearOpMode {
         if (isStopRequested()) return;
 
         Actions.runBlocking(
-                new ParallelAction(
-                        updatePinPoint(),
-                        turretTrackingGoal(),
-                        new SequentialAction(
-                                firstLaunch.build(),
-                                shootArtifacts(),
-                                firstPickup.build()
-                        )
+                new SequentialAction(
+                        firstLaunch.build(),
+                        firstPickup.build(),
+                        secondLaunch.build(),
+                        secondPickup.build(),
+                        thirdLaunch.build(),
+                        thirdPickup.build(),
+                        fourthLaunch.build(),
+                        park.build()
                 )
+//                new ParallelAction(
+//                        updatePinPoint(),
+//                        updateBotPosition(),
+//                        turretTrackingAngle(-53), // Modify for far zone
+//                        updateLauncher(),
+//                        new SequentialAction(
+//                                moveCover(),
+//                                activatePopper(),
+//                                firstLaunch.build(),
+//                                spindexerFullRotation(),
+//                                deactivatePopper(),
+//                                runIntake(),
+//                                new RaceAction(
+//                                        firstPickup.build(),
+//                                        autoColorIntakeCommand(colorIntakeCommand)
+//                                ),
+//                                stopIntakeSpindexer(),
+//                                activatePopper(),
+//                                secondLaunch.build(),
+//                                spindexerFullRotation(),
+//                                deactivatePopper(),
+//                                runIntake(),
+//                                new RaceAction(
+//                                        secondPickup.build(),
+//                                        autoColorIntakeCommand(colorIntakeCommand)
+//                                ),
+//                                stopIntakeSpindexer(),
+//                                activatePopper(),
+//                                thirdLaunch.build(),
+//                                spindexerFullRotation()
+//                        )
+//                )
         );
 
     }
 }
+

@@ -60,9 +60,7 @@ public class Turret {
         double fTerm = Math.signum(error) * kF; // Static friction boooost!!!!
         double power = pTerm + dTerm + fTerm;
 
-
         power = Math.max(Math.min(power, 1), -1);
-
 
         if (Math.abs(error) < 0.5) {
             setPower(0);
