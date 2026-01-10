@@ -13,7 +13,7 @@ public class ColorIntakeCommand {
     private final Spindexer spindexer;
 
     private ElapsedTime colorSensorTimer;
-    private int colorSensorUpdateTime = 10;
+    private int colorSensorUpdateTime = 100;
 
     private double currentHue;
     private double currentAngle;

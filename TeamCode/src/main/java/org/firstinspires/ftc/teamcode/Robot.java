@@ -42,6 +42,7 @@ public class Robot {
     private ColorIntakeCommand colorIntakeCommand;
     private LaunchCommand launchCommand;
 
+    private int numLoops;
     private ElapsedTime loopTimer;
 
     private Gamepad gamepad1;
@@ -114,10 +115,10 @@ public class Robot {
             }
         }
 
-        telemetry.addData("Loop Times", loopTimer.milliseconds());
+        numLoops++;
+        telemetry.addData("Average Loop Times", ((double) loopTimer.milliseconds())/numLoops);
         telemetry.update();
         // updateTelemetry();
-        loopTimer.reset();
     }
 
     private void updateDrive() {
@@ -147,7 +148,6 @@ public class Robot {
     private void updatePinPoint() {
         pinpoint.updatePose();
     }
-
 
     private void updateTurret() {
         double TURRET_MIN = -160.0;
