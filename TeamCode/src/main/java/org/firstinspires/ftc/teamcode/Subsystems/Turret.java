@@ -102,4 +102,18 @@ public class Turret {
         turretLeft.setPower(-power);
         turretRight.setPower(-power);
     }
+
+    public double wrapDegRobot(double a) {
+        a = (a + 180.0) % 360.0;
+        if (a < 0) a += 360.0;
+        return a - 180.0;
+    }
+
+    public double deltaDeg(double to, double from) {
+        return wrapDegRobot(to - from);
+    }
+
+    public double clamp(double x, double lo, double hi) {
+        return Math.max(lo, Math.min(hi, x));
+    }
 }

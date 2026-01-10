@@ -70,10 +70,12 @@ public class Robot {
         updateLauncherCover();
         updatePinPoint();
         updateTurret();
+        updateStoredPosition();
         updateTelemetry();
 
-        if (gamepad1.right_trigger > 0.1) {
+        if (gamepad1.right_trigger > 0.1 && launchCommand != null) {
             stopLaunchCommand();
+            colorIntakeCommand.start();
         }
 
         if (launchCommand == null) {
@@ -143,6 +145,11 @@ public class Robot {
         }
     }
 
+    private void updateStoredPosition() {
+        Pose2d storedPose = pinpoint.getPose();
+        PoseStorage.updatePose(storedPose.position.x, storedPose.position.y, Math.toDegrees(storedPose.heading.toDouble()));
+    }
+
     private void updateTelemetry() {
         // Spindexer
 //        telemetry.addData("Spindexer Mode ", spindexer.getMode());
@@ -179,7 +186,6 @@ public class Robot {
 
     private void stopLaunchCommand() {
         launchCommand = null;
-        colorIntakeCommand.start();
         launcher.stopLauncher();
         popper.deactivatePopper();
     }

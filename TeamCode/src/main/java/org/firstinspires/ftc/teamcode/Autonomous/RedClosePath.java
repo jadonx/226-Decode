@@ -59,6 +59,8 @@ public class RedClosePath extends LinearOpMode {
         TrajectoryActionBuilder fourthLaunch = thirdPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,22));
         TrajectoryActionBuilder park = fourthLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-7,34));
 
+        // turret.goToAngle(170);
+
         waitForStart();
 
         if (isStopRequested()) return;
