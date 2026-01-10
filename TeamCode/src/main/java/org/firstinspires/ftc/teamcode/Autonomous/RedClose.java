@@ -38,7 +38,6 @@ import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 @Autonomous (name="RedClose", group="Autonomous")
 public class RedClose extends LinearOpMode {
     MecanumDrive drive;
-    PinPoint pinpoint;
     LimeLight limelight;
     Intake intake;
     Turret turret;
@@ -87,23 +86,6 @@ public class RedClose extends LinearOpMode {
         return new LimeLightDetectMotif();
     }
 
-    public class SetTurretAngle implements Action {
-        private double tA;
-
-        public SetTurretAngle(double tA) {
-            this.tA = tA;
-        }
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            turretAngle = tA;
-            return false;
-        }
-    }
-    public Action setTurretAngle(double tA) {
-        return new SetTurretAngle(tA);
-    }
-
     public class SetSpindexerStartPosition implements Action {
 
         @Override
@@ -122,7 +104,6 @@ public class RedClose extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Pose2d initialPose = new Pose2d(-62, 40, Math.toRadians(90));
         drive = new MecanumDrive(hardwareMap, initialPose);
-        pinpoint = new PinPoint(hardwareMap, PinPoint.AllianceColor.RED, 40, 61, 0);
 
         TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(-14,22), Math.toRadians(90));
         TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-12.5,33)).strafeToConstantHeading(new Vector2d(-12.5,48), new TranslationalVelConstraint(5.5));
@@ -161,7 +142,7 @@ public class RedClose extends LinearOpMode {
                 new ParallelAction(
                         autonomousActions.updateTurret(),
                         autonomousActions.updateBotPosition(),
-                        autonomousActions.updateLauncher(),
+                        autonomousActions.updateLauncher(1330),
                         new SequentialAction(
                                 autonomousActions.moveCover(),
                                 autonomousActions.runPopper(),
@@ -235,58 +216,5 @@ public class RedClose extends LinearOpMode {
                         )
                 )
         );
-
-//        Actions.runBlocking(
-//                new ParallelAction(
-//                        autonomousActions.updateBotPosition(),
-//                        autonomousActions.turretTrackingAngle(-53),
-//                        autonomousActions.updateLauncher(),
-//                        new SequentialAction(
-//                                autonomousActions.moveCover(),
-//                                autonomousActions.runPopper(),
-//                                autonomousActions.pushInPopper(),
-//                                firstLaunch.build(),
-//                                autonomousActions.spindexerFullRotation(),
-//                                autonomousActions.deactivatePopper(),
-//                                autonomousActions.runIntake(),
-//                                new RaceAction(
-//                                        firstPickup.build(),
-//                                        autonomousActions.autoColorIntakeCommand(colorIntakeCommand)
-//                                ),
-//                                autonomousActions.stopSpindexer(),
-//                                autonomousActions.runPopper(),
-//                                new ParallelAction(
-//                                        secondLaunch.build(),
-//                                        new SequentialAction(
-//                                                autonomousActions.moveToSortedPosition(motif),
-//                                                autonomousActions.stopSpindexer()
-//                                        )
-//                                ),
-//                                autonomousActions.pushInPopper(),
-//                                autonomousActions.stopIntake(),
-//                                autonomousActions.spindexerFullRotation(),
-//                                autonomousActions.deactivatePopper(),
-//                                autonomousActions.runIntake(),
-//                                new RaceAction(
-//                                        secondPickup.build(),
-//                                        autonomousActions.autoColorIntakeCommand(colorIntakeCommand)
-//                                ),
-//                                autonomousActions.stopSpindexer(),
-//                                autonomousActions.runPopper(),
-//                                new ParallelAction(
-//                                        thirdLaunch.build(),
-//                                        new SequentialAction(
-//                                                autonomousActions.moveToSortedPosition(motif),
-//                                                autonomousActions.stopSpindexer()
-//                                        )
-//                                ),
-//                                autonomousActions.pushInPopper(),
-//                                autonomousActions.stopIntake(),
-//                                autonomousActions.spindexerFullRotation(),
-//                                autonomousActions.deactivatePopper(),
-//                                autonomousActions.runIntake()
-//                        )
-//                )
-//        );
     }
 }

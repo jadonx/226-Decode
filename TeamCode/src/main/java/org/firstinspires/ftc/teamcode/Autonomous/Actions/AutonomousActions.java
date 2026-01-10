@@ -92,11 +92,16 @@ public class AutonomousActions {
 
     public class UpdateLauncher implements Action {
         private boolean initialized = false;
+        private int velocity;
+
+        public UpdateLauncher(int velocity) {
+            this.velocity = velocity;
+        }
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (!initialized) {
-                launcher.setTargetVelocity(1330);
+                launcher.setTargetVelocity(velocity);
                 initialized = true;
             }
 
@@ -105,8 +110,19 @@ public class AutonomousActions {
             return true;
         }
     }
-    public Action updateLauncher() {
-        return new UpdateLauncher();
+    public Action updateLauncher(int velocity) {
+        return new UpdateLauncher(velocity);
+    }
+
+    public class AtLauncherTargetVelocity implements Action {
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            return !launcher.atTargetVelocity(20);
+        }
+    }
+    public Action atLauncherTargetVelocity() {
+        return new AtLauncherTargetVelocity();
     }
 
     public class RunPopper implements Action {
