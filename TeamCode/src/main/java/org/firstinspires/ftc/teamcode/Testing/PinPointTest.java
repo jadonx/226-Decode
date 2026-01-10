@@ -59,7 +59,7 @@ public class PinPointTest extends OpMode {
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, Constants.HMPinPointer);
         drive = new FieldCentricDrive(hardwareMap);
 
-        betterPinPoint = new BetterPinPoint(hardwareMap);
+        betterPinPoint = new BetterPinPoint(hardwareMap, BetterPinPoint.AllianceColor.RED);
 
         // Configure the sensor
         configurePinpoint();
@@ -92,9 +92,9 @@ public class PinPointTest extends OpMode {
 
         // Better pinpoint test
         betterPinPoint.update();
-        telemetry.addData("Better pinpoint X ", betterPinPoint.getFilteredPos().getX(DistanceUnit.INCH));
-        telemetry.addData("Better pinpoint Y ", betterPinPoint.getFilteredPos().getY(DistanceUnit.INCH));
-        telemetry.addData("Better pinpoint heading ", betterPinPoint.getFilteredPos().getHeading(AngleUnit.DEGREES));
+        telemetry.addData("Better pinpoint X ", betterPinPoint.getCorrectX());
+        telemetry.addData("Better pinpoint Y ", betterPinPoint.getCorrectY());
+        telemetry.addData("Better pinpoint heading ", betterPinPoint.getCorrectHeading());
 
         if (gamepad1.b) {
             betterPinPoint.setPosition(6, 7, 67);

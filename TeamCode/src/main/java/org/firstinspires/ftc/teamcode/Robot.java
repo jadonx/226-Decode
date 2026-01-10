@@ -1,7 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
+import androidx.xr.runtime.math.Pose;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -16,6 +19,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.LimeLight;
 import org.firstinspires.ftc.teamcode.Subsystems.PinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
+import org.firstinspires.ftc.teamcode.Subsystems.RoadRunnerPinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 import org.firstinspires.ftc.teamcode.Subsystems.Supporters.PoseStorage;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
@@ -27,8 +31,8 @@ public class Robot {
     private final Popper popper;
     private final Spindexer spindexer;
     private final Turret turret;
-    private final PinPoint pinpoint;
-    private final LimeLight limelight;
+
+    private final RoadRunnerPinPoint pinpoint;
 
     private final Telemetry telemetry;
 
@@ -39,15 +43,16 @@ public class Robot {
 
     private Gamepad gamepad1;
 
-    public Robot(HardwareMap hardwareMap, PinPoint.AllianceColor allianceColor, Gamepad gamepad1, Telemetry telemetry, double botPosX, double botPosY, double heading) {
+    public Robot(HardwareMap hardwareMap, RoadRunnerPinPoint.AllianceColor allianceColor, Gamepad gamepad1, Telemetry telemetry) {
         drive = new FieldCentricDrive(hardwareMap);
         intake = new Intake(hardwareMap);
         launcher = new Launcher(hardwareMap);
         popper = new Popper(hardwareMap);
         spindexer = new Spindexer(hardwareMap);
         turret = new Turret(hardwareMap);
-        pinpoint = new PinPoint(hardwareMap, allianceColor, botPosX, botPosY, heading);
-        limelight = new LimeLight(hardwareMap);
+
+        Pose2d startPose = new Pose2d(PoseStorage.getX(), PoseStorage.getY(), Math.toRadians(PoseStorage.getHeading()));
+        pinpoint = new RoadRunnerPinPoint(hardwareMap, allianceColor, startPose);
 
         this.gamepad1 = gamepad1;
         this.telemetry = telemetry;
@@ -67,17 +72,19 @@ public class Robot {
         updateLauncherCover();
         updatePinPoint();
         updateTurret();
+        updateStoredPosition();
         updateTelemetry();
 
-        if (gamepad1.right_trigger > 0.1) {
+        if (gamepad1.right_trigger > 0.1 && launchCommand != null) {
             stopLaunchCommand();
+            colorIntakeCommand.start();
         }
 
         if (launchCommand == null) {
             colorIntakeCommand.update();
             updateIntake();
 
-            if (gamepad1.a && launchCommand == null) {
+            if (gamepad1.aWasPressed() && launchCommand == null) {
                 launchCommand = new LaunchCommand(spindexer, popper, launcher, pinpoint, intake);
                 launchCommand.start();
             }
@@ -88,6 +95,10 @@ public class Robot {
         }
 
         if (launchCommand != null) {
+            if (gamepad1.bWasPressed()) {
+                launchCommand.startShootingSequence();
+            }
+
             if (!launchCommand.isFinished()) {
                 launchCommand.update();
             }
@@ -96,10 +107,6 @@ public class Robot {
                 colorIntakeCommand.start();
                 stopLaunchCommand();
             }
-        }
-
-        if (gamepad1.bWasPressed()) {
-            spindexer.resetHolderStatuses();
         }
     }
 
@@ -145,8 +152,8 @@ public class Robot {
     private void updateTurret() {
         double TURRET_MIN = -160.0;
         double TURRET_MAX = 160.0;
-        double heading = turret.wrapDegRobot(pinpoint.getHeading());
-        double desired = turret.wrapDegRobot(90.0 - pinpoint.getAngleToGoal());
+        double heading = turret.wrapDegRobot(Math.toDegrees(pinpoint.getPose().heading.toDouble()));
+        double desired = turret.wrapDegRobot(pinpoint.getAngleToGoal());
         double turretRel = turret.deltaDeg(turret.getTurretAngle(), heading);
         double desiredRel = turret.deltaDeg(desired, heading);
         desiredRel = turret.clamp(desiredRel, TURRET_MIN, TURRET_MAX);
@@ -169,6 +176,11 @@ public class Robot {
         }
     }
 
+    private void updateStoredPosition() {
+        Pose2d storedPose = pinpoint.getPose();
+        PoseStorage.updatePose(storedPose.position.x, storedPose.position.y, Math.toDegrees(storedPose.heading.toDouble()));
+    }
+
     private void updateTelemetry() {
         telemetry.addData("Desired Angle", (90 - pinpoint.getAngleToGoal()));
         telemetry.addData("Actual Angle", (turret.getTurretAngle()));
@@ -185,10 +197,12 @@ public class Robot {
         telemetry.addData("Target cover angle ", launcher.getTargetCoverAngle() + "\n");
 
         // Pinpoint
-        String currentPose = String.format("[%f, %f]", pinpoint.getXCoordinate(pinpoint.getPose(), DistanceUnit.INCH), pinpoint.getYCoordinate(pinpoint.getPose(), DistanceUnit.INCH));
-        telemetry.addData("Pinpoint Position ", currentPose);
-        telemetry.addData("Limelight Pose", limelight.getEstimatedPose());
+        telemetry.addData("Pinpoint Position ", pinpoint.getPose().position.x + ", " + pinpoint.getPose().position.y);
+        telemetry.addData("Rotation ", Math.toDegrees(pinpoint.getPose().heading.toDouble()));
         telemetry.addData("Goal Distance ", pinpoint.getDistanceToGoal() + "\n");
+
+        telemetry.addData("Desired Angle", pinpoint.getAngleToGoal());
+        telemetry.addData("Actual Angle", (turret.getTurretAngle()));
 
         // Color intake command
         telemetry.addData("Intake Command State ", colorIntakeCommand.getCurrentState() + "\n");
@@ -200,8 +214,6 @@ public class Robot {
         else {
             telemetry.addData("Launch Command State ", "Null \n");
         }
-
-        telemetry.addData("Stored position ", PoseStorage.getX() + ", " + PoseStorage.getY() + ", " + PoseStorage.getHeading());
 
         telemetry.update();
     }
