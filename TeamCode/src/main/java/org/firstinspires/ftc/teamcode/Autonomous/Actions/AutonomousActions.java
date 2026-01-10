@@ -44,7 +44,7 @@ public class AutonomousActions {
         private boolean initialized = false;
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            PoseStorage.updatePose(drive.localizer.getPose().position.x, drive.localizer.getPose().position.y, Math.toDegrees(drive.localizer.getPose().heading.toDouble()));
+            PoseStorage.updatePose(drive.localizer.getPose().position.x, drive.localizer.getPose().position.y, drive.localizer.getPose().heading.toDouble());
 
             return true;
         }
@@ -185,17 +185,11 @@ public class AutonomousActions {
 
     public class SpindexerFullRotation implements Action {
         private boolean initialized = false;
-        private double speed = 0.2;
-
-        public SpindexerFullRotation(double speed) {
-            this.speed = speed;
-        }
-
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (!initialized) {
                 spindexer.setMode(Spindexer.SpindexerMode.LAUNCH_MODE);
-                spindexer.setSpeed(speed);
+                spindexer.setSpeed(0.2);
                 initialized = true;
             }
 
@@ -204,22 +198,8 @@ public class AutonomousActions {
             return !spindexer.atTargetAngle(0);
         }
     }
-    public Action spindexerFullRotation(double speed) {
-        return new SpindexerFullRotation(speed);
-    }
-
-    public class SetSpindexerStartPosition implements Action {
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            spindexer.setHolderStatus(0, Spindexer.HolderStatus.GREEN);
-            spindexer.setHolderStatus(1, Spindexer.HolderStatus.PURPLE);
-            spindexer.setHolderStatus(2, Spindexer.HolderStatus.PURPLE);
-            return false;
-        }
-    }
-    public Action setSpindexerStartPosition() {
-        return new SetSpindexerStartPosition();
+    public Action spindexerFullRotation() {
+        return new SpindexerFullRotation();
     }
 
     public class MoveToSortedPosition implements Action {
