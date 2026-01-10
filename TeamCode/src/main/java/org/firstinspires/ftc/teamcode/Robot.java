@@ -133,15 +133,29 @@ public class Robot {
     }
 
     private void updateTurret() {
-        if (isUsingTurret) {
-            double desired = pinpoint.getAngleToGoal();
-            turret.goToAngle(desired);
-        } else {
-            turret.goToAngle(Math.toDegrees(pinpoint.getPose().heading.toDouble()));
-        }
+        double TURRET_MIN = -160.0;
+        double TURRET_MAX = 160.0;
+        double heading = turret.wrapDegRobot(Math.toDegrees(pinpoint.getPose().heading.toDouble()));
+        double desired = turret.wrapDegRobot(pinpoint.getAngleToGoal());
+        double turretRel = turret.deltaDeg(turret.getTurretAngle(), heading);
+        double desiredRel = turret.deltaDeg(desired, heading);
+        desiredRel = turret.clamp(desiredRel, TURRET_MIN, TURRET_MAX);
+        double target = turret.wrapDegRobot(heading + desiredRel);
 
+        if (isUsingTurret) {
+            if (Math.abs(turretRel) > 135) {
+                turret.goToAngle(heading);
+                isUsingTurret = false;
+            } else {
+                turret.goToAngle(target);
+            }
+        } else {
+            turret.goToAngle(heading);
+        }
         if (gamepad1.dpadUpWasPressed()) {
-            isUsingTurret = !isUsingTurret;
+            isUsingTurret = true;
+        } else if (gamepad1.dpadUpWasPressed() && isUsingTurret) {
+            isUsingTurret = false;
         }
     }
 
