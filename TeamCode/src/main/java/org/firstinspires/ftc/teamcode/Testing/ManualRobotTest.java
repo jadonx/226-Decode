@@ -152,9 +152,9 @@ public class ManualRobotTest extends OpMode {
 
         if (isUsingTurret) {
             double desired = 90-pinpoint.getAngleToGoal();
-            turret.goToAngle(desired);
+            // turret.goToAngle(desired);
         } else {
-            turret.goToAngle(pinpoint.getHeading());
+            // turret.goToAngle(pinpoint.getHeading());
         }
 
         if (gamepad1.dpadUpWasPressed()) {

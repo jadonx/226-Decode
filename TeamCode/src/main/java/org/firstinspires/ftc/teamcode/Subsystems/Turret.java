@@ -22,6 +22,8 @@ public class Turret {
     public static double kI = 0.0; // Integral gain on position error
     public static double kD = 0.0006; // Derivative gain on position error
     public static double kF = 0.05; // Feedforward to overcome static friction
+
+    private double targetAngle = 0;
     private double error;
 
     double lastError = 0;
@@ -45,7 +47,7 @@ public class Turret {
         pid = new PIDFController(kP, kI, kD, kF);
     }
 
-    public void goToAngle(double targetAngle) {
+    public void update() {
         double currentAngle = getTurretAngle();
         error = wrapDegrees(targetAngle - currentAngle);
 
@@ -74,7 +76,11 @@ public class Turret {
         lastTime = currentTime;
     }
 
-    public boolean atTargetAngle(double targetAngle) {
+    public void setTarget(double targetAngle) {
+        this.targetAngle = targetAngle;
+    }
+
+    public boolean atTargetAngle() {
         double currentAngle = getTurretAngle();
         double error = wrapDegrees(targetAngle - currentAngle);
         return (Math.abs(error) < 0.5);

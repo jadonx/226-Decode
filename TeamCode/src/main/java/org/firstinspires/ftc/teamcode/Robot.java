@@ -142,20 +142,21 @@ public class Robot {
         desiredRel = turret.clamp(desiredRel, TURRET_MIN, TURRET_MAX);
         double target = turret.wrapDegRobot(heading + desiredRel);
 
+        turret.update();
+
         if (isUsingTurret) {
             if (Math.abs(turretRel) > 135) {
-                turret.goToAngle(heading);
+                turret.setTarget(heading);
                 isUsingTurret = false;
             } else {
-                turret.goToAngle(target);
+                turret.setTarget(target);
             }
         } else {
-            turret.goToAngle(heading);
+            turret.setTarget(heading);
         }
+
         if (gamepad1.dpadUpWasPressed()) {
-            isUsingTurret = true;
-        } else if (gamepad1.dpadUpWasPressed() && isUsingTurret) {
-            isUsingTurret = false;
+            isUsingTurret = !isUsingTurret;
         }
     }
 

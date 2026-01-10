@@ -48,7 +48,7 @@ public class TurretTester extends OpMode {
     @Override
     public void loop() {
         pinpoint.updatePose();
-        turret.goToAngle(turretAngle);
+        // turret.goToAngle(turretAngle);
 
         launcher.setTargetCoverAngle(coverPos);
         packet.put("bot heading - angle to goal ", pinpoint.getHeading() - pinpoint.getAngleToGoal());

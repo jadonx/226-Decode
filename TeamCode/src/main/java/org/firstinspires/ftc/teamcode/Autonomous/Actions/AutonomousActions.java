@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Autonomous.RedClose;
 import org.firstinspires.ftc.teamcode.Autonomous.RedClosePath;
@@ -50,6 +51,34 @@ public class AutonomousActions {
     }
     public Action updateBotPosition() {return new UpdateBotPosition();}
 
+    public class UpdateTurret implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            turret.update();
+            return true;
+        }
+    }
+    public Action updateTurret() {
+        return new UpdateTurret();
+    }
+
+    public class SetTurretTarget implements Action {
+        private double targetAngle;
+
+        public SetTurretTarget(double targetAngle) {
+            this.targetAngle = targetAngle;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            turret.setTarget(targetAngle);
+            return false;
+        }
+    }
+    public Action setTurretTarget(double targetAngle) {
+        return new SetTurretTarget(targetAngle);
+    }
+
     public class MoveCover implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
@@ -67,7 +96,7 @@ public class AutonomousActions {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (!initialized) {
-                launcher.setTargetVelocity(1330);
+                launcher.setTargetVelocity(1300);
                 initialized = true;
             }
 
@@ -114,6 +143,30 @@ public class AutonomousActions {
         return new DeactivatePopper();
     }
 
+    public class AutoColorIntakeCommand implements Action {
+        private final ColorIntakeCommand colorIntakeCommand;
+
+        private boolean initialized = false;
+
+        public AutoColorIntakeCommand(ColorIntakeCommand colorIntakeCommand) {
+            this.colorIntakeCommand = colorIntakeCommand;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (!initialized) {
+                colorIntakeCommand.start();
+                initialized = true;
+            }
+            colorIntakeCommand.update();
+
+            return true;
+        }
+    }
+    public Action autoColorIntakeCommand(ColorIntakeCommand colorIntakeCommand) {
+        return new AutoColorIntakeCommand(colorIntakeCommand);
+    }
+
     public class SpindexerFullRotation implements Action {
         private boolean initialized = false;
         @Override
@@ -134,27 +187,21 @@ public class AutonomousActions {
     }
 
     public class MoveToSortedPosition implements Action {
-        private final Spindexer.HolderStatus[] motifPattern;
         private boolean initialized = false;
-
-        public MoveToSortedPosition(Spindexer.HolderStatus[] motifPattern) {
-            this.motifPattern = motifPattern;
-        }
-
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (!initialized) {
                 spindexer.setMode(Spindexer.SpindexerMode.INTAKE_MODE);
-                spindexer.setTargetAngle(spindexer.getSortedPosition(motifPattern));
+                spindexer.setTargetAngle(spindexer.getSortedPosition());
                 initialized = true;
             }
 
             spindexer.update();
-            return !spindexer.atTargetAngle(10);
+            return !spindexer.atTargetAngle(5);
         }
     }
-    public Action moveToSortedPosition(Spindexer.HolderStatus[] motifPattern) {
-        return new MoveToSortedPosition(motifPattern);
+    public Action moveToSortedPosition() {
+        return new MoveToSortedPosition();
     }
 
     public class RunIntake implements Action {
