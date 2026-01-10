@@ -9,12 +9,14 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Commands.ColorIntakeCommand;
 import org.firstinspires.ftc.teamcode.Commands.LaunchCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.FieldCentricDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
+import org.firstinspires.ftc.teamcode.Subsystems.LimeLight;
 import org.firstinspires.ftc.teamcode.Subsystems.PinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
 import org.firstinspires.ftc.teamcode.Subsystems.RoadRunnerPinPoint;
@@ -88,6 +90,10 @@ public class Robot {
             }
         }
 
+        if(gamepad1.left_bumper){
+            launcher.calculateTargetVelocity(pinpoint.getDistanceToGoal());
+        }
+
         if (launchCommand != null) {
             if (gamepad1.bWasPressed()) {
                 launchCommand.startShootingSequence();
@@ -130,7 +136,18 @@ public class Robot {
 
     private void updatePinPoint() {
         pinpoint.updatePose();
+        /*
+        limelight.updateRobotOrientation(-pinpoint.getHeading());
+        limelight.getResult();
+        if(gamepad1.dpadUpWasPressed()){
+            pinpoint.setPose(limelight.getEstimatedPose());
+        }
+        */
+
     }
+
+
+
 
     private void updateTurret() {
         double TURRET_MIN = -160.0;
@@ -166,6 +183,9 @@ public class Robot {
     }
 
     private void updateTelemetry() {
+        telemetry.addData("Desired Angle", (90 - pinpoint.getAngleToGoal()));
+        telemetry.addData("Actual Angle", (turret.getTurretAngle()));
+        telemetry.addData("Robot Angle", (Math.abs(pinpoint.getPose().getHeading(AngleUnit.DEGREES))) - turret.getTurretAngle());
         // Spindexer
 //        telemetry.addData("Spindexer Mode ", spindexer.getMode());
 //        String holderStatuses = String.format("[%s, %s, %s]", spindexer.getHolderStatus(0), spindexer.getHolderStatus(1), spindexer.getHolderStatus(2));

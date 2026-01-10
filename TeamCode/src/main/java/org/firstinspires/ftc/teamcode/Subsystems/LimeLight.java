@@ -5,6 +5,11 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.Constants;
 
 import java.util.List;
@@ -17,7 +22,7 @@ public class LimeLight {
     double tY;
     double distance;
     double CAM_DEG = 27.3;//25.85
-    double CAM_H = 11.5;
+    double CAM_H = 11.578;
     double TARGET_H = 29.5;
     int id = -1;
     int motifID = -1;
@@ -40,12 +45,26 @@ public class LimeLight {
         }
     }
 
+    public Pose2D getEstimatedPose() {
+
+        if (result != null) {
+            Pose3D pose = result.getBotpose_MT2();
+
+            return new Pose2D(DistanceUnit.INCH, DistanceUnit.INCH.fromMeters(pose.getPosition().x), DistanceUnit.INCH.fromMeters(pose.getPosition().y), AngleUnit.DEGREES, pose.getOrientation().getYaw());
+        }
+        return null;
+    }
+
     public boolean hasMotif() {
         return motifID != -1;
     }
 
     public int getMotifID() {
         return motifID;
+    }
+
+    public void updateRobotOrientation(double degrees) {
+        limelight.updateRobotOrientation(degrees);
     }
 
     public Spindexer.HolderStatus[] getMotif() {

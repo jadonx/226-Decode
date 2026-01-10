@@ -78,6 +78,12 @@ public class PinPoint {
         return pinpoint.getPosition();
     }
 
+    public void setPose(Pose2D pose){
+        if(pose!= null){
+            pinpoint.setPosition(pose);
+        }
+    }
+
     public double getHeading() {
         return -1*getPose().getHeading(AngleUnit.DEGREES);
     }
