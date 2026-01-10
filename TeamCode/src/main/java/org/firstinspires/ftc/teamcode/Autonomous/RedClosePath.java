@@ -45,17 +45,20 @@ public class RedClosePath extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Pose2d initialPose = new Pose2d(-61, 39, Math.toRadians(90));
-        drive = new MecanumDrive(hardwareMap, initialPose);
         turret = new Turret(hardwareMap);
         turret.resetTurretIMU();
 
+        Pose2d initialPose = new Pose2d(-62, 40, Math.toRadians(90));
+
+        drive = new MecanumDrive(hardwareMap, initialPose);
+
         TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(-14,22), Math.toRadians(90));
-        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,25)).strafeToConstantHeading(new Vector2d(-14,42), new TranslationalVelConstraint(5.5));
-        TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,22));
-        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(11, 25)).strafeToConstantHeading(new Vector2d(11,42) , new TranslationalVelConstraint(5.5));
+        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-12.5,33)).strafeToConstantHeading(new Vector2d(-12.5,48), new TranslationalVelConstraint(5.5));
+        TrajectoryActionBuilder openGate = firstPickup.endTrajectory().fresh().strafeToLinearHeading(new Vector2d(-4, 54), Math.toRadians(180));
+        TrajectoryActionBuilder secondLaunch = openGate.endTrajectory().fresh().strafeToLinearHeading(new Vector2d(-14,22), Math.toRadians(90));
+        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(12, 33)).strafeToConstantHeading(new Vector2d(12,48) , new TranslationalVelConstraint(5.5));
         TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,22));
-        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(34, 25)).strafeToConstantHeading(new Vector2d(34,42), new TranslationalVelConstraint(5.5));
+        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(36, 33)).strafeToConstantHeading(new Vector2d(36,48), new TranslationalVelConstraint(5.5));
         TrajectoryActionBuilder fourthLaunch = thirdPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,22));
         TrajectoryActionBuilder park = fourthLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-7,34));
 
@@ -71,6 +74,7 @@ public class RedClosePath extends LinearOpMode {
                         new SequentialAction(
                                 firstLaunch.build(),
                                 firstPickup.build(),
+                                openGate.build(),
                                 secondLaunch.build(),
                                 secondPickup.build(),
                                 thirdLaunch.build(),

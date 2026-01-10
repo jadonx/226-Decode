@@ -120,16 +120,17 @@ public class RedClose extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Pose2d initialPose = new Pose2d(-63, 35, Math.toRadians(90));
+        Pose2d initialPose = new Pose2d(-62, 40, Math.toRadians(90));
         drive = new MecanumDrive(hardwareMap, initialPose);
         pinpoint = new PinPoint(hardwareMap, PinPoint.AllianceColor.RED, 40, 61, 0);
 
         TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(-14,22), Math.toRadians(90));
-        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,25)).strafeToConstantHeading(new Vector2d(-14,42), new TranslationalVelConstraint(5.5));
-        TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,22));
-        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(11, 25)).strafeToConstantHeading(new Vector2d(11,42) , new TranslationalVelConstraint(5.5));
+        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-12.5,33)).strafeToConstantHeading(new Vector2d(-12.5,48), new TranslationalVelConstraint(5.5));
+        TrajectoryActionBuilder openGate = firstPickup.endTrajectory().fresh().strafeToLinearHeading(new Vector2d(-4, 55.5), Math.toRadians(180));
+        TrajectoryActionBuilder secondLaunch = openGate.endTrajectory().fresh().strafeToLinearHeading(new Vector2d(-14,22), Math.toRadians(90));
+        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(12, 33)).strafeToConstantHeading(new Vector2d(12,48) , new TranslationalVelConstraint(5.5));
         TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,22));
-        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(34, 25)).strafeToConstantHeading(new Vector2d(34,42), new TranslationalVelConstraint(5.5));
+        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(36, 31)).strafeToConstantHeading(new Vector2d(36,48), new TranslationalVelConstraint(5.5));
         TrajectoryActionBuilder fourthLaunch = thirdPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,22));
         TrajectoryActionBuilder park = fourthLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-7,34));
 
@@ -170,7 +171,7 @@ public class RedClose extends LinearOpMode {
                                         firstLaunch.build(),
                                         new SequentialAction(
                                                 limeLightDetectMotif(),
-                                                autonomousActions.setTurretTarget(145)
+                                                autonomousActions.setTurretTarget(137)
                                         )
                                 ),
                                 autonomousActions.spindexerFullRotation(),
@@ -181,15 +182,16 @@ public class RedClose extends LinearOpMode {
                                         autonomousActions.autoColorIntakeCommand(colorIntakeCommand)
                                 ),
                                 autonomousActions.stopSpindexer(),
+                                openGate.build(),
                                 autonomousActions.runPopper(),
                                 new ParallelAction(
                                         secondLaunch.build(),
                                         new SequentialAction(
                                                 autonomousActions.moveToSortedPosition(),
-                                                autonomousActions.stopSpindexer()
+                                                autonomousActions.stopSpindexer(),
+                                                autonomousActions.pushInPopper()
                                         )
                                 ),
-                                autonomousActions.pushInPopper(),
                                 autonomousActions.stopIntake(),
                                 autonomousActions.spindexerFullRotation(),
                                 autonomousActions.deactivatePopper(),
@@ -204,13 +206,32 @@ public class RedClose extends LinearOpMode {
                                         thirdLaunch.build(),
                                         new SequentialAction(
                                                 autonomousActions.moveToSortedPosition(),
-                                                autonomousActions.stopSpindexer()
+                                                autonomousActions.stopSpindexer(),
+                                                autonomousActions.pushInPopper()
                                         )
                                 ),
-                                autonomousActions.pushInPopper(),
+                                autonomousActions.stopIntake(),
+                                autonomousActions.spindexerFullRotation(),
+                                autonomousActions.deactivatePopper(),
+                                autonomousActions.runIntake(),
+                                new RaceAction(
+                                        thirdPickup.build(),
+                                        autonomousActions.autoColorIntakeCommand(colorIntakeCommand)
+                                ),
+                                autonomousActions.stopSpindexer(),
+                                autonomousActions.runPopper(),
+                                new ParallelAction(
+                                        fourthLaunch.build(),
+                                        new SequentialAction(
+                                                autonomousActions.moveToSortedPosition(),
+                                                autonomousActions.stopSpindexer(),
+                                                autonomousActions.pushInPopper()
+                                        )
+                                ),
                                 autonomousActions.stopIntake(),
                                 autonomousActions.spindexerFullRotation(),
                                 autonomousActions.deactivatePopper()
+
                         )
                 )
         );

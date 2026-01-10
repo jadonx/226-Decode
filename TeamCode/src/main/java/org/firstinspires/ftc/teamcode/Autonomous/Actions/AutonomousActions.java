@@ -96,7 +96,7 @@ public class AutonomousActions {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (!initialized) {
-                launcher.setTargetVelocity(1300);
+                launcher.setTargetVelocity(1330);
                 initialized = true;
             }
 

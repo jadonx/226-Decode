@@ -183,9 +183,9 @@ public class Robot {
     }
 
     private void updateTelemetry() {
-        telemetry.addData("Desired Angle", (90 - pinpoint.getAngleToGoal()));
-        telemetry.addData("Actual Angle", (turret.getTurretAngle()));
-        telemetry.addData("Robot Angle", (Math.abs(pinpoint.getPose().getHeading(AngleUnit.DEGREES))) - turret.getTurretAngle());
+//        telemetry.addData("Desired Angle", (90 - pinpoint.getAngleToGoal()));
+//        telemetry.addData("Actual Angle", (turret.getTurretAngle()));
+//        telemetry.addData("Robot Angle", (Math.abs(pinpoint.getPose().getHeading(AngleUnit.DEGREES))) - turret.getTurretAngle());
         // Spindexer
 //        telemetry.addData("Spindexer Mode ", spindexer.getMode());
 //        String holderStatuses = String.format("[%s, %s, %s]", spindexer.getHolderStatus(0), spindexer.getHolderStatus(1), spindexer.getHolderStatus(2));
