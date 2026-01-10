@@ -7,6 +7,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
@@ -39,81 +40,13 @@ public class RedFar extends LinearOpMode {
     Launcher launcher;
     Popper popper;
 
-    Spindexer.HolderStatus[] motif;
-    double turretAngle;
-
     ColorIntakeCommand colorIntakeCommand;
 
     AutonomousActions autonomousActions;
 
-    public class LimeLightDetectMotif implements Action {
-        private ElapsedTime detectionTimer = new ElapsedTime();
-        private boolean intialized = false;
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if (!intialized) {
-                detectionTimer.reset();
-                intialized = true;
-            }
-
-            limelight.getResult();
-            limelight.getAprilTagID();
-
-            if (limelight.hasMotif()) {
-                telemetry.addData("Status: ", "Motif detected " + limelight.getMotifID());
-                motif = limelight.getMotif();
-                spindexer.setMotifPattern(motif[0], motif[1], motif[2]);
-                telemetry.addData("Motif: ", motif[0] + " " + motif[1] + " " + motif[2]);
-            }
-            else {
-                telemetry.addData("Status: ", "nothing detected");
-            }
-
-            telemetry.addData("Target angle ", turretAngle);
-            telemetry.update();
-
-            return !(detectionTimer.milliseconds() > 1500 || limelight.hasMotif());
-        }
-    }
-    public Action limeLightDetectMotif() {
-        return new LimeLightDetectMotif();
-    }
-
-    public class SetTurretAngle implements Action {
-        private double tA;
-
-        public SetTurretAngle(double tA) {
-            this.tA = tA;
-        }
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            turretAngle = tA;
-            return false;
-        }
-    }
-    public Action setTurretAngle(double tA) {
-        return new SetTurretAngle(tA);
-    }
-
-    public class SetSpindexerStartPosition implements Action {
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            spindexer.setHolderStatus(0, Spindexer.HolderStatus.GREEN);
-            spindexer.setHolderStatus(1, Spindexer.HolderStatus.PURPLE);
-            spindexer.setHolderStatus(2, Spindexer.HolderStatus.PURPLE);
-            return false;
-        }
-    }
-    public Action setSpindexerStartPosition() {
-        return new SetSpindexerStartPosition();
-    }
-
     @Override
     public void runOpMode() throws InterruptedException {
-        Pose2d initialPose = new Pose2d(62.5, 13.5, Math.toRadians(180));
+        Pose2d initialPose = new Pose2d(63, 14, Math.toRadians(180));
 
         drive = new MecanumDrive(hardwareMap, initialPose);
 
@@ -122,7 +55,7 @@ public class RedFar extends LinearOpMode {
         TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(51,18));
         TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(12, 33)).strafeToConstantHeading(new Vector2d(12,48) , new TranslationalVelConstraint(5.5));
         TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(51,18));
-        TrajectoryActionBuilder park = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-2,40));
+        TrajectoryActionBuilder park = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(45,30));
 
         intake = new Intake(hardwareMap);
         turret = new Turret(hardwareMap);
@@ -158,22 +91,68 @@ public class RedFar extends LinearOpMode {
 
         Actions.runBlocking(
                 new ParallelAction(
-                        autonomousActions.updateLauncher(1800),
+                        autonomousActions.updateLauncher(1650),
                         autonomousActions.updateBotPosition(),
                         autonomousActions.updateTurret(),
                         new SequentialAction(
+                                /** Setup Sequence */
+                                autonomousActions.setSpindexerStartPosition(),
                                 autonomousActions.moveCover(),
                                 autonomousActions.runPopper(),
-                                autonomousActions.setTurretTarget(160),
-                                autonomousActions.pushInPopper(),
-                                firstLaunch.build(),
+                                autonomousActions.setTurretTarget(157),
+                                /** First Shooting Sequence */
+                                new ParallelAction(
+                                        firstLaunch.build(),
+                                        new SequentialAction(
+                                                autonomousActions.moveToSortedPosition(),
+                                                autonomousActions.stopSpindexer(),
+                                                autonomousActions.pushInPopper()
+                                        )
+                                ),
                                 autonomousActions.atLauncherTargetVelocity(),
-                                autonomousActions.spindexerFullRotation(),
+                                autonomousActions.spindexerFullRotation(0.15),
+                                /** First Intake Sequence */
                                 autonomousActions.deactivatePopper(),
-                                firstPickup.build(),
-                                secondLaunch.build(),
-                                secondPickup.build(),
-                                thirdLaunch.build()
+                                autonomousActions.runIntake(),
+                                new RaceAction(
+                                        firstPickup.build(),
+                                        autonomousActions.autoColorIntakeCommand(colorIntakeCommand)
+                                ),
+                                autonomousActions.stopSpindexer(),
+                                /** Second Shooting Sequence */
+                                autonomousActions.runPopper(),
+                                new ParallelAction(
+                                        secondLaunch.build(),
+                                        new SequentialAction(
+                                                autonomousActions.moveToSortedPosition(),
+                                                autonomousActions.stopSpindexer(),
+                                                autonomousActions.pushInPopper()
+                                        )
+                                ),
+                                autonomousActions.stopIntake(),
+                                autonomousActions.spindexerFullRotation(0.15),
+                                /** Second Intake Sequence */
+                                autonomousActions.deactivatePopper(),
+                                autonomousActions.runIntake(),
+                                new RaceAction(
+                                        secondPickup.build(),
+                                        autonomousActions.autoColorIntakeCommand(colorIntakeCommand)
+                                ),
+                                autonomousActions.stopSpindexer(),
+                                /** Third Shooting Sequence */
+                                autonomousActions.runPopper(),
+                                new ParallelAction(
+                                        thirdLaunch.build(),
+                                        new SequentialAction(
+                                                autonomousActions.moveToSortedPosition(),
+                                                autonomousActions.stopSpindexer(),
+                                                autonomousActions.pushInPopper()
+                                        )
+                                ),
+                                autonomousActions.stopIntake(),
+                                autonomousActions.spindexerFullRotation(0.15),
+                                autonomousActions.deactivatePopper(),
+                                park.build()
                         )
                 )
         );

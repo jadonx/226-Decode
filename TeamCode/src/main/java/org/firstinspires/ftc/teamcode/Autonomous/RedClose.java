@@ -144,10 +144,12 @@ public class RedClose extends LinearOpMode {
                         autonomousActions.updateBotPosition(),
                         autonomousActions.updateLauncher(1330),
                         new SequentialAction(
+                                /** Setup Sequence */
                                 autonomousActions.moveCover(),
                                 autonomousActions.runPopper(),
                                 autonomousActions.setTurretTarget(-160),
                                 autonomousActions.pushInPopper(),
+                                /** Motif Detection Sequence */
                                 new ParallelAction(
                                         firstLaunch.build(),
                                         new SequentialAction(
@@ -155,7 +157,9 @@ public class RedClose extends LinearOpMode {
                                                 autonomousActions.setTurretTarget(137)
                                         )
                                 ),
-                                autonomousActions.spindexerFullRotation(),
+                                /** First Shooting Sequence */
+                                autonomousActions.spindexerFullRotation(0.2),
+                                /** First Intaking Sequence */
                                 autonomousActions.deactivatePopper(),
                                 autonomousActions.runIntake(),
                                 new RaceAction(
@@ -164,6 +168,7 @@ public class RedClose extends LinearOpMode {
                                 ),
                                 autonomousActions.stopSpindexer(),
                                 openGate.build(),
+                                /** Second Shooting Sequence */
                                 autonomousActions.runPopper(),
                                 new ParallelAction(
                                         secondLaunch.build(),
@@ -174,7 +179,8 @@ public class RedClose extends LinearOpMode {
                                         )
                                 ),
                                 autonomousActions.stopIntake(),
-                                autonomousActions.spindexerFullRotation(),
+                                autonomousActions.spindexerFullRotation(0.2),
+                                /** Second Intaking Sequence */
                                 autonomousActions.deactivatePopper(),
                                 autonomousActions.runIntake(),
                                 new RaceAction(
@@ -182,6 +188,7 @@ public class RedClose extends LinearOpMode {
                                         autonomousActions.autoColorIntakeCommand(colorIntakeCommand)
                                 ),
                                 autonomousActions.stopSpindexer(),
+                                /** Third Shooting Sequence */
                                 autonomousActions.runPopper(),
                                 new ParallelAction(
                                         thirdLaunch.build(),
@@ -192,7 +199,8 @@ public class RedClose extends LinearOpMode {
                                         )
                                 ),
                                 autonomousActions.stopIntake(),
-                                autonomousActions.spindexerFullRotation(),
+                                autonomousActions.spindexerFullRotation(0.2),
+                                /** Third Intaking Sequence */
                                 autonomousActions.deactivatePopper(),
                                 autonomousActions.runIntake(),
                                 new RaceAction(
@@ -200,6 +208,7 @@ public class RedClose extends LinearOpMode {
                                         autonomousActions.autoColorIntakeCommand(colorIntakeCommand)
                                 ),
                                 autonomousActions.stopSpindexer(),
+                                /** Fourth Shooting Sequence */
                                 autonomousActions.runPopper(),
                                 new ParallelAction(
                                         fourthLaunch.build(),
@@ -210,9 +219,9 @@ public class RedClose extends LinearOpMode {
                                         )
                                 ),
                                 autonomousActions.stopIntake(),
-                                autonomousActions.spindexerFullRotation(),
-                                autonomousActions.deactivatePopper()
-
+                                autonomousActions.spindexerFullRotation(0.2),
+                                autonomousActions.deactivatePopper(),
+                                park.build()
                         )
                 )
         );

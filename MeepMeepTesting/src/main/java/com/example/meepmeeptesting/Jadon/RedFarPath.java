@@ -31,7 +31,7 @@ public class RedFarPath {
         TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(51,18));
         TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(12, 33)).strafeToConstantHeading(new Vector2d(12,48) , new TranslationalVelConstraint(5.5));
         TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(51,18));
-        TrajectoryActionBuilder park = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-2,40));
+        TrajectoryActionBuilder park = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(45,30));
 
         bot.runAction(
                 new SequentialAction(
@@ -39,7 +39,8 @@ public class RedFarPath {
                         firstPickup.build(),
                         secondLaunch.build(),
                         secondPickup.build(),
-                        thirdLaunch.build()
+                        thirdLaunch.build(),
+                        park.build()
                 )
         );
         // run in order

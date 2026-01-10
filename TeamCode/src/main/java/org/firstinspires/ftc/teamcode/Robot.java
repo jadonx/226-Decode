@@ -7,6 +7,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -41,6 +42,8 @@ public class Robot {
     private ColorIntakeCommand colorIntakeCommand;
     private LaunchCommand launchCommand;
 
+    private ElapsedTime loopTimer;
+
     private Gamepad gamepad1;
 
     public Robot(HardwareMap hardwareMap, RoadRunnerPinPoint.AllianceColor allianceColor, Gamepad gamepad1, Telemetry telemetry) {
@@ -56,6 +59,7 @@ public class Robot {
 
         this.gamepad1 = gamepad1;
         this.telemetry = telemetry;
+        loopTimer = new ElapsedTime();
     }
 
     public void start() {
@@ -65,6 +69,8 @@ public class Robot {
         colorIntakeCommand.start();
 
         launchCommand = null;
+
+        loopTimer.reset();
     }
 
     public void update() {
@@ -73,7 +79,6 @@ public class Robot {
         updatePinPoint();
         updateTurret();
         updateStoredPosition();
-        updateTelemetry();
 
         if (gamepad1.right_trigger > 0.1 && launchCommand != null) {
             stopLaunchCommand();
@@ -108,6 +113,11 @@ public class Robot {
                 stopLaunchCommand();
             }
         }
+
+        telemetry.addData("Loop Times", loopTimer.milliseconds());
+        telemetry.update();
+        // updateTelemetry();
+        loopTimer.reset();
     }
 
     private void updateDrive() {
@@ -136,17 +146,7 @@ public class Robot {
 
     private void updatePinPoint() {
         pinpoint.updatePose();
-        /*
-        limelight.updateRobotOrientation(-pinpoint.getHeading());
-        limelight.getResult();
-        if(gamepad1.dpadUpWasPressed()){
-            pinpoint.setPose(limelight.getEstimatedPose());
-        }
-        */
-
     }
-
-
 
 
     private void updateTurret() {
