@@ -74,9 +74,9 @@ public class Robot {
         loopTimer.reset();
     }
 
-    public void update(int targetVelocity, double coverAngle) {
+    public void update() {
         updateDrive();
-        // updateLauncherCover();
+        updateLauncherCover();
         updatePinPoint();
         updateTurret();
         updateStoredPosition();
@@ -92,7 +92,7 @@ public class Robot {
 
             if (gamepad1.aWasPressed() && launchCommand == null) {
                 launchCommand = new LaunchCommand(spindexer, popper, launcher, pinpoint, intake);
-                launchCommand.start(targetVelocity, coverAngle);
+                launchCommand.start();
             }
         }
 

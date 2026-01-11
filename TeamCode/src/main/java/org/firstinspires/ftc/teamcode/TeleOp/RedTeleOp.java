@@ -21,9 +21,6 @@ public class RedTeleOp extends OpMode {
     FtcDashboard dashboard;
     TelemetryPacket packet;
 
-    public static int launcherVelocity;
-    public static double coverAngle;
-
     @Override
     public void init() {
         packet = new TelemetryPacket();
@@ -35,7 +32,7 @@ public class RedTeleOp extends OpMode {
 
     @Override
     public void loop() {
-        robot.update(launcherVelocity, coverAngle);
+        robot.update();
 
         packet.put("launcher vel ", robot.getLauncherVel());
         packet.put("launcher target vel ", robot.getLauncherTargetVel());
