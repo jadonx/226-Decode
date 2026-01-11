@@ -155,7 +155,7 @@ public class RedClose extends LinearOpMode {
                                                 autonomousActions.setTurretTarget(137)
                                         )
                                 ),
-                                autonomousActions.spindexerFullRotation(),
+                                autonomousActions.spindexerFullRotation(0.2),
                                 autonomousActions.deactivatePopper(),
                                 autonomousActions.runIntake(),
                                 new RaceAction(
@@ -174,7 +174,7 @@ public class RedClose extends LinearOpMode {
                                         )
                                 ),
                                 autonomousActions.stopIntake(),
-                                autonomousActions.spindexerFullRotation(),
+                                autonomousActions.spindexerFullRotation(0.2),
                                 autonomousActions.deactivatePopper(),
                                 autonomousActions.runIntake(),
                                 new RaceAction(
@@ -192,7 +192,7 @@ public class RedClose extends LinearOpMode {
                                         )
                                 ),
                                 autonomousActions.stopIntake(),
-                                autonomousActions.spindexerFullRotation(),
+                                autonomousActions.spindexerFullRotation(0.2),
                                 autonomousActions.deactivatePopper(),
                                 autonomousActions.runIntake(),
                                 new RaceAction(
@@ -210,7 +210,7 @@ public class RedClose extends LinearOpMode {
                                         )
                                 ),
                                 autonomousActions.stopIntake(),
-                                autonomousActions.spindexerFullRotation(),
+                                autonomousActions.spindexerFullRotation(0.2),
                                 autonomousActions.deactivatePopper()
 
                         )
