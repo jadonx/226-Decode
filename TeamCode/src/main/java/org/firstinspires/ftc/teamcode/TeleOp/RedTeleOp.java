@@ -33,10 +33,5 @@ public class RedTeleOp extends OpMode {
     @Override
     public void loop() {
         robot.update();
-
-        packet.put("launcher vel ", robot.getLauncherVel());
-        packet.put("launcher target vel ", robot.getLauncherTargetVel());
-
-        dashboard.sendTelemetryPacket(packet);
     }
 }

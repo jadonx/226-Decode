@@ -23,6 +23,7 @@ public class Spindexer {
     private RevColorSensorV3 colorSensorFront;
     private RevColorSensorV3 colorSensorBack;
 
+    private double currentAngle;
     private double targetAngle = 0;
     private double kP = 0.002, kS = 0.05;
 
@@ -36,7 +37,7 @@ public class Spindexer {
     private double lastAngle = 0;
     private double unwrappedAngle = 0;
 
-    private int[] intakePositions = {233, 111, 354};
+    private int[] intakePositions = {354, 225, 113};
     public enum HolderStatus { NONE, GREEN, PURPLE }
     private HolderStatus[] holderStatuses = {HolderStatus.NONE, HolderStatus.NONE, HolderStatus.NONE};
     private HolderStatus[] motifPattern = new Spindexer.HolderStatus[] {Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.GREEN};
@@ -51,6 +52,7 @@ public class Spindexer {
     }
 
     public void update() {
+        currentAngle = spindexerEncoder.getWrappedAngle();
         updateUnwrappedAngle();
 
         if (spindexerMode == SpindexerMode.INTAKE_MODE) {
@@ -101,7 +103,7 @@ public class Spindexer {
 
     private double calculateError() {
         if (spindexerMode == SpindexerMode.INTAKE_MODE) {
-            return AngleUnit.normalizeDegrees(targetAngle - spindexerEncoder.getWrappedAngle());
+            return AngleUnit.normalizeDegrees(targetAngle - currentAngle);
         }
         else {
             return 0;
@@ -109,10 +111,9 @@ public class Spindexer {
     }
 
     private void updateUnwrappedAngle() {
-        double current = spindexerEncoder.getWrappedAngle();
-        double delta = AngleUnit.normalizeDegrees(current - lastAngle);
+        double delta = AngleUnit.normalizeDegrees(currentAngle - lastAngle);
         unwrappedAngle += delta;
-        lastAngle = current;
+        lastAngle = currentAngle;
     }
 
     /** AUTO SORTING METHOD */
@@ -162,7 +163,7 @@ public class Spindexer {
                 targetAngle = getUnwrappedAngle();
                 targetAngle += 360;
             } else {
-                targetAngle = spindexerEncoder.getWrappedAngle();
+                targetAngle = currentAngle;
             }
             spindexerMode = newMode;
         }
@@ -189,7 +190,7 @@ public class Spindexer {
     }
 
     public double getWrappedAngle() {
-        return spindexerEncoder.getWrappedAngle();
+        return currentAngle;
     }
 
     public void setPower(double power) {

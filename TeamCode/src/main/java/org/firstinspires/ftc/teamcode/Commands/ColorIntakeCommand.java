@@ -111,9 +111,11 @@ public class ColorIntakeCommand {
     }
 
     private boolean withinIntakeAngle(double current, int currentHolder) {
-        if (currentHolder == 2) {
-            // For intake angle 1
-            return current > 345 || current < 17;
+        if (intakePositions[currentHolder]-12 < 0) {
+           return current > ((intakePositions[currentHolder]-12) % 360) || current < (intakePositions[currentHolder]+12);
+        }
+        else if (intakePositions[currentHolder]+12 > 360) {
+            return current > (intakePositions[currentHolder]-12) || current <  (intakePositions[currentHolder] + 12 % 360);
         }
         else return current > (intakePositions[currentHolder]-12) && current < (intakePositions[currentHolder]+12);
     }
