@@ -23,6 +23,7 @@ public class Spindexer {
     private RevColorSensorV3 colorSensorFront;
     private RevColorSensorV3 colorSensorBack;
 
+    private double currentAngle;
     private double targetAngle = 0;
     private double kP = 0.002, kS = 0.05;
 
@@ -51,6 +52,7 @@ public class Spindexer {
     }
 
     public void update() {
+        currentAngle = spindexerEncoder.getWrappedAngle();
         updateUnwrappedAngle();
 
         if (spindexerMode == SpindexerMode.INTAKE_MODE) {
@@ -101,7 +103,7 @@ public class Spindexer {
 
     private double calculateError() {
         if (spindexerMode == SpindexerMode.INTAKE_MODE) {
-            return AngleUnit.normalizeDegrees(targetAngle - spindexerEncoder.getWrappedAngle());
+            return AngleUnit.normalizeDegrees(targetAngle - currentAngle);
         }
         else {
             return 0;
@@ -109,10 +111,9 @@ public class Spindexer {
     }
 
     private void updateUnwrappedAngle() {
-        double current = spindexerEncoder.getWrappedAngle();
-        double delta = AngleUnit.normalizeDegrees(current - lastAngle);
+        double delta = AngleUnit.normalizeDegrees(currentAngle - lastAngle);
         unwrappedAngle += delta;
-        lastAngle = current;
+        lastAngle = currentAngle;
     }
 
     /** AUTO SORTING METHOD */
@@ -162,7 +163,7 @@ public class Spindexer {
                 targetAngle = getUnwrappedAngle();
                 targetAngle += 360;
             } else {
-                targetAngle = spindexerEncoder.getWrappedAngle();
+                targetAngle = currentAngle;
             }
             spindexerMode = newMode;
         }
@@ -189,7 +190,7 @@ public class Spindexer {
     }
 
     public double getWrappedAngle() {
-        return spindexerEncoder.getWrappedAngle();
+        return currentAngle;
     }
 
     public void setPower(double power) {

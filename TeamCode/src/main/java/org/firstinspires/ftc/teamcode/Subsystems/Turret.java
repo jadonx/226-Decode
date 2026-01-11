@@ -23,6 +23,7 @@ public class Turret {
     public static double kD = 0.0006; // Derivative gain on position error
     public static double kF = 0.05; // Feedforward to overcome static friction
 
+    private double currentAngle;
     private double targetAngle = 0;
     private double error;
 
@@ -48,7 +49,7 @@ public class Turret {
     }
 
     public void update() {
-        double currentAngle = getTurretAngle();
+        currentAngle = turretEncoder.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
         error = wrapDegrees(targetAngle - currentAngle);
 
         long currentTime = System.nanoTime();
@@ -89,7 +90,7 @@ public class Turret {
     }
 
     public double getTurretAngle() {
-        return turretEncoder.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+        return currentAngle;
     }
 
     private double wrapDegrees(double angle) {
