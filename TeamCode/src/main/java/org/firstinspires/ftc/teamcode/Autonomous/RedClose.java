@@ -86,26 +86,12 @@ public class RedClose extends LinearOpMode {
         return new LimeLightDetectMotif();
     }
 
-    public class SetSpindexerStartPosition implements Action {
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            spindexer.setHolderStatus(0, Spindexer.HolderStatus.GREEN);
-            spindexer.setHolderStatus(1, Spindexer.HolderStatus.PURPLE);
-            spindexer.setHolderStatus(2, Spindexer.HolderStatus.PURPLE);
-            return false;
-        }
-    }
-    public Action setSpindexerStartPosition() {
-        return new SetSpindexerStartPosition();
-    }
-
     @Override
     public void runOpMode() throws InterruptedException {
         Pose2d initialPose = new Pose2d(-61, 39, Math.toRadians(90));
         drive = new MecanumDrive(hardwareMap, initialPose);
 
-        TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(-14,22), Math.toRadians(90));
+        TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToConstantHeading(new Vector2d(-14,22));
         TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-12.5,33)).strafeToConstantHeading(new Vector2d(-12.5,48), new TranslationalVelConstraint(5.5));
         TrajectoryActionBuilder openGate = firstPickup.endTrajectory().fresh().strafeToLinearHeading(new Vector2d(-4, 55.5), Math.toRadians(180));
         TrajectoryActionBuilder secondLaunch = openGate.endTrajectory().fresh().strafeToLinearHeading(new Vector2d(-14,22), Math.toRadians(90));
@@ -211,8 +197,8 @@ public class RedClose extends LinearOpMode {
                                 ),
                                 autonomousActions.stopIntake(),
                                 autonomousActions.spindexerFullRotation(0.2),
-                                autonomousActions.deactivatePopper()
-
+                                autonomousActions.deactivatePopper(),
+                                park.build()
                         )
                 )
         );

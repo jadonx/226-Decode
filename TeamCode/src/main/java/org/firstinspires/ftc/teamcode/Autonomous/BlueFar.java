@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.Autonomous;
 
-import android.graphics.Color;
-
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
@@ -19,11 +17,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.Autonomous.Actions.AutonomousActions;
 import org.firstinspires.ftc.teamcode.Commands.ColorIntakeCommand;
+import org.firstinspires.ftc.teamcode.Commands.LaunchCommand;
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
@@ -31,12 +27,11 @@ import org.firstinspires.ftc.teamcode.Subsystems.LimeLight;
 import org.firstinspires.ftc.teamcode.Subsystems.PinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
-import org.firstinspires.ftc.teamcode.Subsystems.Supporters.PoseStorage;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
 
-@Autonomous (name="BlueClose", group="Autonomous")
-public class BlueClose extends LinearOpMode {
+@Autonomous (name="BlueFar", group="Autonomous")
+public class BlueFar extends LinearOpMode {
     MecanumDrive drive;
     LimeLight limelight;
     Intake intake;
@@ -45,61 +40,22 @@ public class BlueClose extends LinearOpMode {
     Launcher launcher;
     Popper popper;
 
-    Spindexer.HolderStatus[] motif;
-    double turretAngle;
-
     ColorIntakeCommand colorIntakeCommand;
 
     AutonomousActions autonomousActions;
 
-    public class LimeLightDetectMotif implements Action {
-        private ElapsedTime detectionTimer = new ElapsedTime();
-        private boolean intialized = false;
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if (!intialized) {
-                detectionTimer.reset();
-                intialized = true;
-            }
-
-            limelight.getResult();
-            limelight.getAprilTagID();
-
-            if (limelight.hasMotif()) {
-                telemetry.addData("Status: ", "Motif detected " + limelight.getMotifID());
-                motif = limelight.getMotif();
-                spindexer.setMotifPattern(motif[0], motif[1], motif[2]);
-                telemetry.addData("Motif: ", motif[0] + " " + motif[1] + " " + motif[2]);
-            }
-            else {
-                telemetry.addData("Status: ", "nothing detected");
-            }
-
-            telemetry.addData("Target angle ", turretAngle);
-            telemetry.update();
-
-            return !(detectionTimer.milliseconds() > 1500 || limelight.hasMotif());
-        }
-    }
-    public Action limeLightDetectMotif() {
-        return new LimeLightDetectMotif();
-    }
-
     @Override
     public void runOpMode() throws InterruptedException {
-        Pose2d initialPose = new Pose2d(-61, -39, Math.toRadians(-90));
+        Pose2d initialPose = new Pose2d(62, -14, Math.toRadians(180));
+
         drive = new MecanumDrive(hardwareMap, initialPose);
 
-        TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToConstantHeading(new Vector2d(-14,-22));
-        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-12.5,-33)).strafeToConstantHeading(new Vector2d(-12.5,-48), new TranslationalVelConstraint(5.5));
-        TrajectoryActionBuilder openGate = firstPickup.endTrajectory().fresh().strafeToLinearHeading(new Vector2d(-4, -55.5), Math.toRadians(180));
-        TrajectoryActionBuilder secondLaunch = openGate.endTrajectory().fresh().strafeToLinearHeading(new Vector2d(-14,-22), Math.toRadians(-90));
+        TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(51,-18), Math.toRadians(-90));
+        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(36,-31)).strafeToConstantHeading(new Vector2d(36,-48), new TranslationalVelConstraint(5.5));
+        TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(51,-18));
         TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(12, -33)).strafeToConstantHeading(new Vector2d(12,-48) , new TranslationalVelConstraint(5.5));
-        TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,-22));
-        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(36, -31)).strafeToConstantHeading(new Vector2d(36,-48), new TranslationalVelConstraint(5.5));
-        TrajectoryActionBuilder fourthLaunch = thirdPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,-22));
-        TrajectoryActionBuilder park = fourthLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-7,-34));
+        TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(51,-18));
+        TrajectoryActionBuilder park = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(45,-30));
 
         intake = new Intake(hardwareMap);
         turret = new Turret(hardwareMap);
@@ -115,9 +71,18 @@ public class BlueClose extends LinearOpMode {
         Spindexer.HolderStatus[] motif = new Spindexer.HolderStatus[]{Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.GREEN};
 
         turret.resetTurretIMU();
-        turret.setTarget(160);
+        turret.setTarget(170);
         while (opModeInInit()) {
             turret.update();
+
+            limelight.getResult();
+            limelight.getAprilTagID();
+
+            telemetry.addData("Status: ", limelight.getMotifID());
+            motif = limelight.getMotif();
+            spindexer.setMotifPattern(motif[0], motif[1], motif[2]);
+            telemetry.addData("Motif: ", motif[0] + " " + motif[1] + " " + motif[2]);
+            telemetry.update();
         }
 
         waitForStart();
@@ -126,22 +91,27 @@ public class BlueClose extends LinearOpMode {
 
         Actions.runBlocking(
                 new ParallelAction(
-                        autonomousActions.updateTurret(),
+                        autonomousActions.updateLauncher(1650),
                         autonomousActions.updateBotPosition(),
-                        autonomousActions.updateLauncher(1330),
+                        autonomousActions.updateTurret(),
                         new SequentialAction(
+                                /** Setup Sequence */
+                                autonomousActions.setSpindexerStartPosition(),
                                 autonomousActions.moveCover(),
                                 autonomousActions.runPopper(),
-                                autonomousActions.setTurretTarget(-160),
-                                autonomousActions.pushInPopper(),
+                                autonomousActions.setTurretTarget(-157),
+                                /** First Shooting Sequence */
                                 new ParallelAction(
                                         firstLaunch.build(),
                                         new SequentialAction(
-                                                limeLightDetectMotif(),
-                                                autonomousActions.setTurretTarget(137)
+                                                autonomousActions.moveToSortedPosition(),
+                                                autonomousActions.stopSpindexer(),
+                                                autonomousActions.pushInPopper()
                                         )
                                 ),
-                                autonomousActions.spindexerFullRotation(0.2),
+                                autonomousActions.atLauncherTargetVelocity(),
+                                autonomousActions.spindexerFullRotation(0.15),
+                                /** First Intake Sequence */
                                 autonomousActions.deactivatePopper(),
                                 autonomousActions.runIntake(),
                                 new RaceAction(
@@ -149,7 +119,7 @@ public class BlueClose extends LinearOpMode {
                                         autonomousActions.autoColorIntakeCommand(colorIntakeCommand)
                                 ),
                                 autonomousActions.stopSpindexer(),
-                                openGate.build(),
+                                /** Second Shooting Sequence */
                                 autonomousActions.runPopper(),
                                 new ParallelAction(
                                         secondLaunch.build(),
@@ -160,7 +130,8 @@ public class BlueClose extends LinearOpMode {
                                         )
                                 ),
                                 autonomousActions.stopIntake(),
-                                autonomousActions.spindexerFullRotation(0.2),
+                                autonomousActions.spindexerFullRotation(0.15),
+                                /** Second Intake Sequence */
                                 autonomousActions.deactivatePopper(),
                                 autonomousActions.runIntake(),
                                 new RaceAction(
@@ -168,6 +139,7 @@ public class BlueClose extends LinearOpMode {
                                         autonomousActions.autoColorIntakeCommand(colorIntakeCommand)
                                 ),
                                 autonomousActions.stopSpindexer(),
+                                /** Third Shooting Sequence */
                                 autonomousActions.runPopper(),
                                 new ParallelAction(
                                         thirdLaunch.build(),
@@ -178,25 +150,7 @@ public class BlueClose extends LinearOpMode {
                                         )
                                 ),
                                 autonomousActions.stopIntake(),
-                                autonomousActions.spindexerFullRotation(0.2),
-                                autonomousActions.deactivatePopper(),
-                                autonomousActions.runIntake(),
-                                new RaceAction(
-                                        thirdPickup.build(),
-                                        autonomousActions.autoColorIntakeCommand(colorIntakeCommand)
-                                ),
-                                autonomousActions.stopSpindexer(),
-                                autonomousActions.runPopper(),
-                                new ParallelAction(
-                                        fourthLaunch.build(),
-                                        new SequentialAction(
-                                                autonomousActions.moveToSortedPosition(),
-                                                autonomousActions.stopSpindexer(),
-                                                autonomousActions.pushInPopper()
-                                        )
-                                ),
-                                autonomousActions.stopIntake(),
-                                autonomousActions.spindexerFullRotation(0.2),
+                                autonomousActions.spindexerFullRotation(0.15),
                                 autonomousActions.deactivatePopper(),
                                 park.build()
                         )
