@@ -102,7 +102,7 @@ public class RedClose extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Pose2d initialPose = new Pose2d(-62, 40, Math.toRadians(90));
+        Pose2d initialPose = new Pose2d(-61, 39, Math.toRadians(90));
         drive = new MecanumDrive(hardwareMap, initialPose);
 
         TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(-14,22), Math.toRadians(90));

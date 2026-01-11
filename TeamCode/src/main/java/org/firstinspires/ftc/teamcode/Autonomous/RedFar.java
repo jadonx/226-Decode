@@ -46,7 +46,7 @@ public class RedFar extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Pose2d initialPose = new Pose2d(63, 14, Math.toRadians(180));
+        Pose2d initialPose = new Pose2d(62, 14, Math.toRadians(180));
 
         drive = new MecanumDrive(hardwareMap, initialPose);
 

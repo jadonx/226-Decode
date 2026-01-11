@@ -37,7 +37,7 @@ public class LaunchCommand {
         this.intake = intake;
     }
 
-    public void start() {
+    public void start(int targetVelocity, double coverAngle) {
         spindexer.setMode(Spindexer.SpindexerMode.INTAKE_MODE);
         spindexer.setTargetAngle(spindexer.getTargetAngle());
 
@@ -46,7 +46,8 @@ public class LaunchCommand {
         popper.pushInPopper();
         popper.setTargetVelocity(1800);
 
-        launcher.calculateTargetVelocity(pinpoint.getDistanceToGoal());
+        launcher.setTargetVelocity(targetVelocity);
+        launcher.setTargetCoverAngle(coverAngle);
 
         currentState = State.PRIME_SHOOTER;
     }
@@ -97,7 +98,7 @@ public class LaunchCommand {
 
     public void startShootingSequence() {
         if (currentState == State.PRIME_SHOOTER) {
-            launcher.calculateTargetVelocity(pinpoint.getDistanceToGoal());
+            // launcher.calculateTargetVelocity(pinpoint.getDistanceToGoal());
             currentState = State.PREPARE_TO_SHOOT;
         }
     }

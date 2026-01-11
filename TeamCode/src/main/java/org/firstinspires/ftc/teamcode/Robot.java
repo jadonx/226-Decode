@@ -74,9 +74,9 @@ public class Robot {
         loopTimer.reset();
     }
 
-    public void update() {
+    public void update(int targetVelocity, double coverAngle) {
         updateDrive();
-        updateLauncherCover();
+        // updateLauncherCover();
         updatePinPoint();
         updateTurret();
         updateStoredPosition();
@@ -92,7 +92,7 @@ public class Robot {
 
             if (gamepad1.aWasPressed() && launchCommand == null) {
                 launchCommand = new LaunchCommand(spindexer, popper, launcher, pinpoint, intake);
-                launchCommand.start();
+                launchCommand.start(targetVelocity, coverAngle);
             }
         }
 
@@ -117,8 +117,7 @@ public class Robot {
 
         numLoops++;
         telemetry.addData("Average Loop Times", ((double) loopTimer.milliseconds())/numLoops);
-        telemetry.update();
-        // updateTelemetry();
+        updateTelemetry();
     }
 
     private void updateDrive() {
@@ -192,29 +191,29 @@ public class Robot {
 //        telemetry.addData("Spindexer Holders ", holderStatuses + "\n");
 
         // Launcher
-        telemetry.addData("Target velocity ", launcher.getTargetVelocity());
-        telemetry.addData("Current velocity ", launcher.getVelocity());
-        telemetry.addData("Current Power ", launcher.getPower());
-        telemetry.addData("Target cover angle ", launcher.getTargetCoverAngle() + "\n");
+//        telemetry.addData("Target velocity ", launcher.getTargetVelocity());
+//        telemetry.addData("Current velocity ", launcher.getVelocity());
+//        telemetry.addData("Current Power ", launcher.getPower());
+//        telemetry.addData("Target cover angle ", launcher.getTargetCoverAngle() + "\n");
 
         // Pinpoint
         telemetry.addData("Pinpoint Position ", pinpoint.getPose().position.x + ", " + pinpoint.getPose().position.y);
         telemetry.addData("Rotation ", Math.toDegrees(pinpoint.getPose().heading.toDouble()));
         telemetry.addData("Goal Distance ", pinpoint.getDistanceToGoal() + "\n");
 
-        telemetry.addData("Desired Angle", pinpoint.getAngleToGoal());
-        telemetry.addData("Actual Angle", (turret.getTurretAngle()));
-
-        // Color intake command
-        telemetry.addData("Intake Command State ", colorIntakeCommand.getCurrentState() + "\n");
-
-        // Launch command
-        if (launchCommand != null) {
-            telemetry.addData("Launch Command State ", launchCommand.getCurrentState() + "\n");
-        }
-        else {
-            telemetry.addData("Launch Command State ", "Null \n");
-        }
+//        telemetry.addData("Desired Angle", pinpoint.getAngleToGoal());
+//        telemetry.addData("Actual Angle", (turret.getTurretAngle()));
+//
+//        // Color intake command
+//        telemetry.addData("Intake Command State ", colorIntakeCommand.getCurrentState() + "\n");
+//
+//        // Launch command
+//        if (launchCommand != null) {
+//            telemetry.addData("Launch Command State ", launchCommand.getCurrentState() + "\n");
+//        }
+//        else {
+//            telemetry.addData("Launch Command State ", "Null \n");
+//        }
 
         telemetry.update();
     }
@@ -223,5 +222,13 @@ public class Robot {
         launchCommand = null;
         launcher.stopLauncher();
         popper.deactivatePopper();
+    }
+
+    public double getLauncherVel() {
+        return launcher.getVelocity();
+    }
+
+    public double getLauncherTargetVel() {
+        return launcher.getTargetVelocity();
     }
 }
