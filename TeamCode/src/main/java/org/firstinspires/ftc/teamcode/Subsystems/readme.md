@@ -78,6 +78,7 @@ class RoadRunnerPinPoint{
 Robot *-- FieldCentricDrive
 Robot *-- ColorIntakeCommand
 Robot *-- LaunchCommand
+Robot *-- Intake
 LaunchCommand *-- Spindexer
 LaunchCommand *-- Popper
 LaunchCommand *-- Launcher
