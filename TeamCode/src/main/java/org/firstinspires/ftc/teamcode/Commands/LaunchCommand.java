@@ -1,13 +1,7 @@
 package org.firstinspires.ftc.teamcode.Commands;
 
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
-import org.firstinspires.ftc.teamcode.Subsystems.PinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
 import org.firstinspires.ftc.teamcode.Subsystems.RoadRunnerPinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
@@ -17,7 +11,6 @@ public class LaunchCommand {
     private final Popper popper;
     private final Launcher launcher;
     private final RoadRunnerPinPoint pinpoint;
-    private final Intake intake;
 
     public enum State {
         PRIME_SHOOTER,
@@ -34,14 +27,13 @@ public class LaunchCommand {
         this.popper = popper;
         this.launcher = launcher;
         this.pinpoint = pinpoint;
-        this.intake = intake;
     }
 
     public void start() {
         spindexer.setMode(Spindexer.SpindexerMode.INTAKE_MODE);
         spindexer.setTargetAngle(spindexer.getTargetAngle());
 
-        this.spindexerSpeed = 0.2; // Speed of spindexer while launching
+        spindexerSpeed = 0.2; // Speed of spindexer while launching
 
         popper.pushInPopper();
         popper.setTargetVelocity(1800);
@@ -96,8 +88,15 @@ public class LaunchCommand {
     }
 
     public void startShootingSequence() {
+        // Transition from priming to shooting
         if (currentState == State.PRIME_SHOOTER) {
-            launcher.calculateTargetVelocity(pinpoint.getDistanceToGoal());
+            double distanceToGoal = pinpoint.getDistanceToGoal();
+            launcher.calculateTargetVelocity(distanceToGoal);
+
+            if (distanceToGoal > 115) {
+                spindexerSpeed = 0.15;
+            }
+
             currentState = State.PREPARE_TO_SHOOT;
         }
     }

@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode.Autonomous;
 
-import android.graphics.Color;
-
-import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -19,19 +16,14 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.Autonomous.Actions.AutonomousActions;
 import org.firstinspires.ftc.teamcode.Commands.ColorIntakeCommand;
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.LimeLight;
-import org.firstinspires.ftc.teamcode.Subsystems.PinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
-import org.firstinspires.ftc.teamcode.Subsystems.Supporters.PoseStorage;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
 
@@ -142,8 +134,8 @@ public class RedClose extends LinearOpMode {
                                         )
                                 ),
                                 autonomousActions.spindexerFullRotation(0.2),
-                                autonomousActions.deactivatePopper(),
                                 autonomousActions.runIntake(),
+                                autonomousActions.deactivatePopper(),
                                 new RaceAction(
                                         firstPickup.build(),
                                         autonomousActions.autoColorIntakeCommand(colorIntakeCommand)

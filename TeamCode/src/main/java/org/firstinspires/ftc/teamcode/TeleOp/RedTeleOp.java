@@ -8,11 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Robot;
-import org.firstinspires.ftc.teamcode.Subsystems.FieldCentricDrive;
-import org.firstinspires.ftc.teamcode.Subsystems.Intake;
-import org.firstinspires.ftc.teamcode.Subsystems.PinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.RoadRunnerPinPoint;
-import org.firstinspires.ftc.teamcode.Subsystems.Supporters.PoseStorage;
 
 @Config
 @TeleOp(name="RedTeleOp", group="!TeleOp")

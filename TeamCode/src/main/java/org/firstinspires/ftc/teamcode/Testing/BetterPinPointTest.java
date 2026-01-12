@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.Testing;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Subsystems.BetterPinPoint;
+import org.firstinspires.ftc.teamcode.Subsystems.Archived.BetterPinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.FieldCentricDrive;
 
 @TeleOp(name="BetterPinPointTest", group="Test")

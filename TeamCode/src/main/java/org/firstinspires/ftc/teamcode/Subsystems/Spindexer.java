@@ -37,7 +37,7 @@ public class Spindexer {
     private double lastAngle = 0;
     private double unwrappedAngle = 0;
 
-    private int[] intakePositions = {354, 225, 113};
+    private int[] intakePositions = {114, 349, 233};
     public enum HolderStatus { NONE, GREEN, PURPLE }
     private HolderStatus[] holderStatuses = {HolderStatus.NONE, HolderStatus.NONE, HolderStatus.NONE};
     private HolderStatus[] motifPattern = new Spindexer.HolderStatus[] {Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.GREEN};

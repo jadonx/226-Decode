@@ -23,8 +23,6 @@ public class Launcher {
     private double targetVelocity = 0;
     private double targetCoverAngle = 0;
 
-    private final double EULERS_NUMBER = 2.7183;
-
     public Launcher(HardwareMap hardwareMap) {
         launcher1 = hardwareMap.get(DcMotorEx.class, Constants.HMMotorShooter1);
         launcher2 = hardwareMap.get(DcMotorEx.class, Constants.HMMotorShooter2);
