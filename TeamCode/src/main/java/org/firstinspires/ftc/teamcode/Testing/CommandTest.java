@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.Commands.ColorIntakeCommand;
 import org.firstinspires.ftc.teamcode.Commands.LaunchCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
-import org.firstinspires.ftc.teamcode.Subsystems.PinPoint;
+import org.firstinspires.ftc.teamcode.Subsystems.Archived.PinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 
@@ -58,7 +58,7 @@ public class CommandTest extends OpMode {
 
         if (gamepad1.aWasPressed() && launchCommand == null) {
             // launchCommand = new LaunchCommand(spindexer, popper, launcher, pinpoint);
-            launchCommand.start();
+            // launchCommand.start();
         }
 
         if (launchCommand != null && !launchCommand.isFinished()) {

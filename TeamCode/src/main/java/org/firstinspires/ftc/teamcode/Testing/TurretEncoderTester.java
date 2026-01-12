@@ -24,7 +24,8 @@ public class TurretEncoderTester extends OpMode {
         }
 
         if (isFollowingBotHeading) {
-            turret.goToAngle(PoseStorage.getHeading());
+            turret.update();
+            turret.setTarget(PoseStorage.getHeading());
         }
         else {
             turret.setPower(gamepad1.left_stick_x);
