@@ -45,7 +45,7 @@ public class BlueFar extends LinearOpMode {
         TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(51,-18), Math.toRadians(-90));
         TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(36,-31)).strafeToConstantHeading(new Vector2d(36,-48), new TranslationalVelConstraint(5.5));
         TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(51,-18));
-        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(12, -33)).strafeToConstantHeading(new Vector2d(12,-48) , new TranslationalVelConstraint(5.5));
+        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(12, -31)).strafeToConstantHeading(new Vector2d(12,-48) , new TranslationalVelConstraint(5.5));
         TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(51,-18));
         TrajectoryActionBuilder park = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(45,-30));
 
@@ -63,9 +63,15 @@ public class BlueFar extends LinearOpMode {
         Spindexer.HolderStatus[] motif = new Spindexer.HolderStatus[]{Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.GREEN};
 
         turret.resetTurretIMU();
-        turret.setTarget(170);
+        turret.setTarget(-170);
+        boolean reachedMiddlePoint = false;
         while (opModeInInit()) {
             turret.update();
+
+            if (turret.getTurretAngle() < -160 && !reachedMiddlePoint) {
+                turret.setTarget(170);
+                reachedMiddlePoint = true;
+            }
 
             limelight.getResult();
             limelight.getAprilTagID();

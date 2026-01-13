@@ -84,12 +84,12 @@ public class BlueClose extends LinearOpMode {
         drive = new MecanumDrive(hardwareMap, initialPose);
 
         TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToConstantHeading(new Vector2d(-14,-22));
-        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-12.5,-33)).strafeToConstantHeading(new Vector2d(-12.5,-48), new TranslationalVelConstraint(5.5));
+        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-11,-32)).strafeToConstantHeading(new Vector2d(-12.5,-48), new TranslationalVelConstraint(5.5));
         TrajectoryActionBuilder openGate = firstPickup.endTrajectory().fresh().strafeToLinearHeading(new Vector2d(-4, -55.5), Math.toRadians(180));
         TrajectoryActionBuilder secondLaunch = openGate.endTrajectory().fresh().strafeToLinearHeading(new Vector2d(-14,-22), Math.toRadians(-90));
-        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(12, -33)).strafeToConstantHeading(new Vector2d(12,-48) , new TranslationalVelConstraint(5.5));
+        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(12, -32)).strafeToConstantHeading(new Vector2d(12,-48) , new TranslationalVelConstraint(5.5));
         TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,-22));
-        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(36, -31)).strafeToConstantHeading(new Vector2d(36,-48), new TranslationalVelConstraint(5.5));
+        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(36, -32)).strafeToConstantHeading(new Vector2d(36,-48), new TranslationalVelConstraint(5.5));
         TrajectoryActionBuilder fourthLaunch = thirdPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,-22));
         TrajectoryActionBuilder park = fourthLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-7,-34));
 
@@ -107,7 +107,7 @@ public class BlueClose extends LinearOpMode {
         Spindexer.HolderStatus[] motif = new Spindexer.HolderStatus[]{Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.GREEN};
 
         turret.resetTurretIMU();
-        turret.setTarget(160);
+        turret.setTarget(-160);
         while (opModeInInit()) {
             turret.update();
         }
@@ -124,13 +124,13 @@ public class BlueClose extends LinearOpMode {
                         new SequentialAction(
                                 autonomousActions.moveCover(),
                                 autonomousActions.runPopper(),
-                                autonomousActions.setTurretTarget(-160),
+                                autonomousActions.setTurretTarget(160),
                                 autonomousActions.pushInPopper(),
                                 new ParallelAction(
                                         firstLaunch.build(),
                                         new SequentialAction(
                                                 limeLightDetectMotif(),
-                                                autonomousActions.setTurretTarget(137)
+                                                autonomousActions.setTurretTarget(-137)
                                         )
                                 ),
                                 autonomousActions.spindexerFullRotation(0.2),
