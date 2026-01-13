@@ -33,15 +33,21 @@ public class LimeLight {
         limelight.start();
     }
 
+    public void getResult() {
+        result = limelight.getLatestResult();
+    }
+
     public void getAprilTagID() {
         if (result != null) {
             List<LLResultTypes.FiducialResult> fiducialResult = result.getFiducialResults();
             for(LLResultTypes.FiducialResult fid : fiducialResult){
                 id = fid.getFiducialId();
-                if (motifID == -1 && (id == 21 || id == 22 || id == 23)) {
+                if (id == 21 || id == 22 || id == 23) {
                     motifID = id;
                 }
             }
+        } else {
+            motifID = -1;
         }
     }
 
@@ -77,10 +83,6 @@ public class LimeLight {
     public void stopLimeLight() {
         limelight.stop();
         limelight.shutdown();
-    }
-
-    public void getResult() {
-        result = limelight.getLatestResult();
     }
 
     public boolean isResulted() {

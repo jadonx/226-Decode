@@ -13,7 +13,7 @@ public class ColorIntakeCommand {
     private final Spindexer spindexer;
 
     private ElapsedTime colorSensorTimer;
-    private int colorSensorUpdateTime = 10;
+    private int colorSensorUpdateTime = 200;
 
     private double currentHue;
     private double currentAngle;
@@ -47,12 +47,6 @@ public class ColorIntakeCommand {
         spindexer.setSpeed(0.4);
         spindexer.setTargetAngle(intakePositions[0]);
         currentState = State.WAIT_AT_FIRST_HOLDER;
-    }
-
-    public void startAuto() {
-        spindexer.setHolderStatus(0, Spindexer.HolderStatus.PURPLE);
-        spindexer.setHolderStatus(1, Spindexer.HolderStatus.PURPLE);
-        spindexer.setHolderStatus(2, Spindexer.HolderStatus.GREEN);
     }
 
     public void update() {
@@ -111,10 +105,10 @@ public class ColorIntakeCommand {
     }
 
     private boolean withinIntakeAngle(double current, int currentHolder) {
-        if (currentHolder == 2) {
-            // For intake angle 1
-            return current > 345 || current < 17;
+        if (currentHolder == 1) {
+           return (current > 349 - 12) || (current < 2);
         }
-        else return current > (intakePositions[currentHolder]-12) && current < (intakePositions[currentHolder]+12);
+
+        return current > (intakePositions[currentHolder]-12) && current < (intakePositions[currentHolder]+12);
     }
 }
