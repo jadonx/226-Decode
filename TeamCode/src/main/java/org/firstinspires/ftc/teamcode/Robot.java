@@ -76,7 +76,7 @@ public class Robot {
         updateTurret();
         updateStoredPosition();
 
-        if (gamepad1.right_trigger > 0.1 && launchCommand != null) {
+        if (gamepad1.left_trigger > 0.1 && launchCommand != null) {
             stopLaunchCommand();
             colorIntakeCommand.start();
         }
@@ -187,9 +187,12 @@ public class Robot {
 //        telemetry.addData("Actual Angle", (turret.getTurretAngle()));
 //        telemetry.addData("Robot Angle", (Math.abs(pinpoint.getPose().getHeading(AngleUnit.DEGREES))) - turret.getTurretAngle());
         // Spindexer
-//        telemetry.addData("Spindexer Mode ", spindexer.getMode());
-//        String holderStatuses = String.format("[%s, %s, %s]", spindexer.getHolderStatus(0), spindexer.getHolderStatus(1), spindexer.getHolderStatus(2));
-//        telemetry.addData("Spindexer Holders ", holderStatuses + "\n");
+        telemetry.addData("Spindexer Mode ", spindexer.getMode());
+        String holderStatuses = String.format("[%s, %s, %s]", spindexer.getHolderStatus(0), spindexer.getHolderStatus(1), spindexer.getHolderStatus(2));
+        telemetry.addData("Spindexer Holders ", holderStatuses + "\n");
+
+        telemetry.addData("Spindexer wrapped pos ", spindexer.getWrappedAngle());
+        telemetry.addData("Spindexer unwrapped pos ", spindexer.getUnwrappedAngle());
 
         // Launcher
 //        telemetry.addData("Target velocity ", launcher.getTargetVelocity());
@@ -231,5 +234,13 @@ public class Robot {
 
     public double getLauncherTargetVel() {
         return launcher.getTargetVelocity();
+    }
+
+    public double getSpindexerWrapped() {
+        return spindexer.getWrappedAngle();
+    }
+
+    public double getSpindexerUnwrapped() {
+        return spindexer.getUnwrappedAngle();
     }
 }

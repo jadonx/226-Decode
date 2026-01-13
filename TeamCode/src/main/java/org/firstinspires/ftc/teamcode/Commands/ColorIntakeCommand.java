@@ -49,12 +49,6 @@ public class ColorIntakeCommand {
         currentState = State.WAIT_AT_FIRST_HOLDER;
     }
 
-    public void startAuto() {
-        spindexer.setHolderStatus(0, Spindexer.HolderStatus.PURPLE);
-        spindexer.setHolderStatus(1, Spindexer.HolderStatus.PURPLE);
-        spindexer.setHolderStatus(2, Spindexer.HolderStatus.GREEN);
-    }
-
     public void update() {
         // Color sensor readings
         if (colorSensorTimer.milliseconds() > colorSensorUpdateTime) {
@@ -111,12 +105,10 @@ public class ColorIntakeCommand {
     }
 
     private boolean withinIntakeAngle(double current, int currentHolder) {
-        if (intakePositions[currentHolder]-12 < 0) {
-           return current > ((intakePositions[currentHolder]-12) % 360) || current < (intakePositions[currentHolder]+12);
+        if (currentHolder == 1) {
+           return (current > 349 - 12) || (current < 2);
         }
-        else if (intakePositions[currentHolder]+12 > 360) {
-            return current > (intakePositions[currentHolder]-12) || current <  (intakePositions[currentHolder] + 12 % 360);
-        }
-        else return current > (intakePositions[currentHolder]-12) && current < (intakePositions[currentHolder]+12);
+
+        return current > (intakePositions[currentHolder]-12) && current < (intakePositions[currentHolder]+12);
     }
 }
