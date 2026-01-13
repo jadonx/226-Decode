@@ -101,7 +101,7 @@ public class ColorIntakeCommand {
     }
 
     private boolean hasBall(double hue) {
-        return ((hue > 130 && hue < 190) || (hue > 210 && hue < 270)) && spindexer.getColorDistance() < 2;
+        return ((hue > 130 && hue < 190) || (hue > 210 && hue < 270)) && (spindexer.getDistanceFront() < 1 || spindexer.getDistanceBack() < 1.6);
     }
 
     private boolean withinIntakeAngle(double current, int currentHolder) {

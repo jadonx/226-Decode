@@ -33,7 +33,13 @@ public class LimeLight {
         limelight = hardwareMap.get(Limelight3A.class, Constants.HMLimelight);
         limelight.pipelineSwitch(1);
         limelight.start();
-        goalID = (allianceColor == RoadRunnerPinPoint.AllianceColor.RED) ? 20 : 20;
+
+        if (allianceColor == RoadRunnerPinPoint.AllianceColor.RED) {
+            goalID = 24;
+        }
+        else if (allianceColor == RoadRunnerPinPoint.AllianceColor.BLUE) {
+            goalID = 20;
+        }
     }
 
     public void getResult() {
@@ -60,7 +66,6 @@ public class LimeLight {
     }
 
     public Pose2D getEstimatedPose() {
-
         if (result != null) {
             Pose3D pose = result.getBotpose_MT2();
 

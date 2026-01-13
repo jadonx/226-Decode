@@ -23,6 +23,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.LimeLight;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
+import org.firstinspires.ftc.teamcode.Subsystems.RoadRunnerPinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
@@ -98,7 +99,7 @@ public class RedClose extends LinearOpMode {
         spindexer = new Spindexer(hardwareMap);
         launcher = new Launcher(hardwareMap);
         popper = new Popper(hardwareMap);
-        limelight = new LimeLight(hardwareMap);
+        limelight = new LimeLight(hardwareMap, RoadRunnerPinPoint.AllianceColor.RED);
 
         colorIntakeCommand = new ColorIntakeCommand(spindexer);
 

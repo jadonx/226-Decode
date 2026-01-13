@@ -226,7 +226,11 @@ public class Spindexer {
         return hsv;
     }
 
-    public double getColorDistance() {
+    public double getDistanceFront() {
+        return colorSensorFront.getDistance(DistanceUnit.INCH);
+    }
+
+    public double getDistanceBack() {
         return colorSensorFront.getDistance(DistanceUnit.INCH);
     }
 }

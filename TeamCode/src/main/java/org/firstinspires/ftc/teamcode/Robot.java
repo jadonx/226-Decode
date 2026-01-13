@@ -75,6 +75,7 @@ public class Robot {
         updatePinPoint();
         updateTurret();
         updateStoredPosition();
+        updateIntake();
 
         if (gamepad1.left_trigger > 0.1 && launchCommand != null) {
             stopLaunchCommand();
@@ -83,7 +84,6 @@ public class Robot {
 
         if (launchCommand == null) {
             colorIntakeCommand.update();
-            updateIntake();
 
             if (gamepad1.aWasPressed() && launchCommand == null) {
                 launchCommand = new LaunchCommand(spindexer, popper, launcher, pinpoint, intake);
@@ -154,25 +154,31 @@ public class Robot {
         double target = turret.wrapDegRobot(heading + desiredRel);
 
         turret.update();
+        limelight.getResult();
+        limelight.getAprilTagID();
 
         if (isUsingTurret) {
             if (Math.abs(turretRel) > 135) {
+                turret.setMode(Turret.TurretMode.PINPOINT);
                 turret.setTarget(heading);
                 isUsingTurret = false;
             } else {
                 if (limelight.isResulted()) {
                     if (limelight.isGoalTargeted()) {
-                        turret.setTarget(limelight.getTX());
+                        turret.setMode(Turret.TurretMode.LIMELIGHT);
+                        turret.setLimelightError(-limelight.getTX());
                     }
                 } else {
+                    turret.setMode(Turret.TurretMode.PINPOINT);
                     turret.setTarget(target);
                 }
             }
         } else {
+            turret.setMode(Turret.TurretMode.PINPOINT);
             turret.setTarget(heading);
         }
 
-        if (gamepad1.dpadUpWasPressed()) {
+        if (gamepad1.rightBumperWasPressed()) {
             isUsingTurret = !isUsingTurret;
         }
     }
@@ -193,6 +199,9 @@ public class Robot {
 
         telemetry.addData("Spindexer wrapped pos ", spindexer.getWrappedAngle());
         telemetry.addData("Spindexer unwrapped pos ", spindexer.getUnwrappedAngle());
+
+        telemetry.addData("Turret mode ", turret.getMode());
+        telemetry.addData("Turret error ", turret.getError());
 
         // Launcher
 //        telemetry.addData("Target velocity ", launcher.getTargetVelocity());

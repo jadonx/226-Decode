@@ -53,7 +53,7 @@ public class Launcher {
     }
 
     public void calculateTargetVelocity(double distance){
-        targetVelocity = (-0.0000049301*Math.pow(distance,4))+(0.00170016*Math.pow(distance,3))-(0.187453*Math.pow(distance,2))+(12.56425*distance)+941.70386;
+        targetVelocity = (-0.00000984161*Math.pow(distance,4))+(0.00341324*Math.pow(distance,3))-(0.402618*Math.pow(distance,2))+(24.86681*distance)+625.89373;
     }
 
     public void calculateTargetAngle(double distance){

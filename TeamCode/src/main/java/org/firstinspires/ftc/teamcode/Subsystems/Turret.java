@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.Autonomous.Actions.AutonomousActions;
 import org.firstinspires.ftc.teamcode.Constants;
 
 @Config
@@ -28,6 +29,12 @@ public class Turret {
 
     double lastError = 0;
     long lastTime = System.nanoTime();
+
+    public enum TurretMode {
+        PINPOINT,
+        LIMELIGHT
+    }
+    private TurretMode turretMode = TurretMode.PINPOINT;
 
     public Turret(HardwareMap hardwareMap) {
         turretRight = hardwareMap.get(CRServo.class, Constants.HMServoTurretRight);
@@ -49,7 +56,10 @@ public class Turret {
 
     public void update() {
         double currentAngle = getTurretAngle();
-        error = wrapDegrees(targetAngle - currentAngle);
+
+        if (turretMode == TurretMode.PINPOINT) {
+            error = wrapDegrees(targetAngle - currentAngle);
+        }
 
         long currentTime = System.nanoTime();
         double deltaTime = (currentTime - lastTime) / 1.0e9;
@@ -86,6 +96,18 @@ public class Turret {
 
     public double getError() {
         return error;
+    }
+
+    public void setLimelightError(double error) {
+        this.error = error;
+    }
+
+    public void setMode(TurretMode mode) {
+        turretMode = mode;
+    }
+
+    public TurretMode getMode() {
+        return turretMode;
     }
 
     public double getTurretAngle() {
