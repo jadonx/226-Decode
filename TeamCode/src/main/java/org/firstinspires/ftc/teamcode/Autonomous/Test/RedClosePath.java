@@ -65,21 +65,26 @@ public class RedClosePath extends LinearOpMode {
 
         if (isStopRequested()) return;
 
-        Actions.runBlocking(
-                new ParallelAction(
-                        updateBotPosition(),
-                        new SequentialAction(
-                                firstLaunch.build(),
-                                firstPickup.build(),
-                                openGate.build(),
-                                secondLaunch.build(),
-                                secondPickup.build(),
-                                thirdLaunch.build(),
-                                thirdPickup.build(),
-                                fourthLaunch.build(),
-                                park.build()
-                        )
-                )
-        );
+        try {
+            Actions.runBlocking(
+                    new ParallelAction(
+                            updateBotPosition(),
+                            new SequentialAction(
+                                    firstLaunch.build(),
+                                    firstPickup.build(),
+                                    openGate.build(),
+                                    secondLaunch.build(),
+                                    secondPickup.build(),
+                                    thirdLaunch.build(),
+                                    thirdPickup.build(),
+                                    fourthLaunch.build(),
+                                    park.build()
+                            )
+                    )
+            );
+        }
+        finally {
+
+        }
     }
 }

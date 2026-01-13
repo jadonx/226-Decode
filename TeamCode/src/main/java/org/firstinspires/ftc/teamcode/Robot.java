@@ -73,7 +73,7 @@ public class Robot {
         updateTurret();
         updateStoredPosition();
 
-        if (gamepad1.right_trigger > 0.1 && launchCommand != null) {
+        if (gamepad1.left_trigger > 0.1 && launchCommand != null) {
             stopLaunchCommand();
             colorIntakeCommand.start();
         }
