@@ -25,7 +25,7 @@ public class Spindexer {
 
     private double currentAngle;
     private double targetAngle = 0;
-    private double kP = 0.002, kS = 0.05;
+    private double kP = 0.002, kS = 0.04;
 
     public enum SpindexerMode {
         INTAKE_MODE,
@@ -161,7 +161,7 @@ public class Spindexer {
         if (spindexerMode != newMode) {
             if (newMode == SpindexerMode.LAUNCH_MODE) {
                 targetAngle = getUnwrappedAngle();
-                targetAngle += 360;
+                targetAngle += 400;
             } else {
                 targetAngle = currentAngle;
             }

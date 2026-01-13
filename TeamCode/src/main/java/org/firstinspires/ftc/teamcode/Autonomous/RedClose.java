@@ -84,12 +84,12 @@ public class RedClose extends LinearOpMode {
         drive = new MecanumDrive(hardwareMap, initialPose);
 
         TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToConstantHeading(new Vector2d(-14,22));
-        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-12.5,33)).strafeToConstantHeading(new Vector2d(-12.5,48), new TranslationalVelConstraint(5.5));
-        TrajectoryActionBuilder openGate = firstPickup.endTrajectory().fresh().strafeToLinearHeading(new Vector2d(-4, 55.5), Math.toRadians(180));
+        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-11,31.5)).strafeToConstantHeading(new Vector2d(-11,48), new TranslationalVelConstraint(5.5));
+        TrajectoryActionBuilder openGate = firstPickup.endTrajectory().fresh().strafeToLinearHeading(new Vector2d(-4, 55.5), Math.toRadians(180)).waitSeconds(0.5);
         TrajectoryActionBuilder secondLaunch = openGate.endTrajectory().fresh().strafeToLinearHeading(new Vector2d(-14,22), Math.toRadians(90));
-        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(12, 33)).strafeToConstantHeading(new Vector2d(12,48) , new TranslationalVelConstraint(5.5));
+        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(13.5, 31.5)).strafeToConstantHeading(new Vector2d(13.5,48) , new TranslationalVelConstraint(5.5));
         TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,22));
-        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(36, 31)).strafeToConstantHeading(new Vector2d(36,48), new TranslationalVelConstraint(5.5));
+        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(37.5, 31.5)).strafeToConstantHeading(new Vector2d(37.5,48), new TranslationalVelConstraint(5.5));
         TrajectoryActionBuilder fourthLaunch = thirdPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,22));
         TrajectoryActionBuilder park = fourthLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-7,34));
 

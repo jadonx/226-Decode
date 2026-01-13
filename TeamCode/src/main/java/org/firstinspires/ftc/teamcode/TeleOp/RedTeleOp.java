@@ -29,5 +29,8 @@ public class RedTeleOp extends OpMode {
     @Override
     public void loop() {
         robot.update();
+        packet.put("spindexer wrapped ", robot.getSpindexerWrapped());
+        packet.put("spindexer unwrapped ", robot.getSpindexerUnwrapped());
+        dashboard.sendTelemetryPacket(packet);
     }
 }
