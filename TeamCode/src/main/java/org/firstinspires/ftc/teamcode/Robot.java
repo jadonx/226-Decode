@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.Commands.LaunchCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.FieldCentricDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
+import org.firstinspires.ftc.teamcode.Subsystems.LimeLight;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
 import org.firstinspires.ftc.teamcode.Subsystems.RoadRunnerPinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
@@ -24,6 +25,7 @@ public class Robot {
     private final Popper popper;
     private final Spindexer spindexer;
     private final Turret turret;
+    private final LimeLight limelight;
 
     private final RoadRunnerPinPoint pinpoint;
 
@@ -46,6 +48,7 @@ public class Robot {
         popper = new Popper(hardwareMap);
         spindexer = new Spindexer(hardwareMap);
         turret = new Turret(hardwareMap);
+        limelight = new LimeLight(hardwareMap, allianceColor);
 
         Pose2d startPose = new Pose2d(PoseStorage.getX(), PoseStorage.getY(), Math.toRadians(PoseStorage.getHeading()));
         pinpoint = new RoadRunnerPinPoint(hardwareMap, allianceColor, startPose);
@@ -157,7 +160,13 @@ public class Robot {
                 turret.setTarget(heading);
                 isUsingTurret = false;
             } else {
-                turret.setTarget(target);
+                if (limelight.isResulted()) {
+                    if (limelight.isGoalTargeted()) {
+                        turret.setTarget(limelight.getTX());
+                    }
+                } else {
+                    turret.setTarget(target);
+                }
             }
         } else {
             turret.setTarget(heading);

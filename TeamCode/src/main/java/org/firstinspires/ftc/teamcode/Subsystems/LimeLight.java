@@ -27,10 +27,13 @@ public class LimeLight {
     int id = -1;
     int motifID = -1;
 
-    public LimeLight(HardwareMap hardwareMap) {
+    int goalID = -1;
+
+    public LimeLight(HardwareMap hardwareMap, RoadRunnerPinPoint.AllianceColor allianceColor) {
         limelight = hardwareMap.get(Limelight3A.class, Constants.HMLimelight);
         limelight.pipelineSwitch(1);
         limelight.start();
+        goalID = (allianceColor == RoadRunnerPinPoint.AllianceColor.RED) ? 20 : 20;
     }
 
     public void getResult() {
@@ -49,6 +52,11 @@ public class LimeLight {
         } else {
             motifID = -1;
         }
+    }
+
+    public boolean isGoalTargeted() {
+        getAprilTagID();
+        return id == goalID;
     }
 
     public Pose2D getEstimatedPose() {
