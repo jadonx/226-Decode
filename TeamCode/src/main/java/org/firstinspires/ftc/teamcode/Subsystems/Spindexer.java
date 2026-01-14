@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 import android.graphics.Color;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.hardware.lynx.commands.core.LynxSetMotorPIDControlLoopCoefficientsCommand;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
@@ -17,6 +18,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Constants;
 
+@Config
 public class Spindexer {
     private CRServo spindexerServo;
     private SpindexerEncoder spindexerEncoder;
@@ -25,7 +27,7 @@ public class Spindexer {
 
     private double currentAngle;
     private double targetAngle = 0;
-    private double kP = 0.002, kS = 0.04;
+    public static double kP = 0.002, kS = 0.04;
 
     public enum SpindexerMode {
         INTAKE_MODE,

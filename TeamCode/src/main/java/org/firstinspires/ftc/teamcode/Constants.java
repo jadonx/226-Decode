@@ -25,4 +25,5 @@ public class Constants {
     public static String HMServoTurretRight = "turretRight";
     public static String HMServobackSpin = "backSpinServo";
     public static String HMServospinDexer = "spinDexerServo";
+    public static String HMServoLight = "Light";
 }

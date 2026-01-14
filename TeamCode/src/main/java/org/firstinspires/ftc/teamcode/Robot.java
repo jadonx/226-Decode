@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.Commands.LaunchCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.FieldCentricDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
+import org.firstinspires.ftc.teamcode.Subsystems.Light;
 import org.firstinspires.ftc.teamcode.Subsystems.LimeLight;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
 import org.firstinspires.ftc.teamcode.Subsystems.RoadRunnerPinPoint;
@@ -26,12 +27,11 @@ public class Robot {
     private final Spindexer spindexer;
     private final Turret turret;
     private final LimeLight limelight;
+    private final Light light;
 
     private final RoadRunnerPinPoint pinpoint;
 
     private final Telemetry telemetry;
-
-    private boolean isUsingTurret;
 
     private ColorIntakeCommand colorIntakeCommand;
     private LaunchCommand launchCommand;
@@ -49,6 +49,7 @@ public class Robot {
         spindexer = new Spindexer(hardwareMap);
         turret = new Turret(hardwareMap);
         limelight = new LimeLight(hardwareMap, allianceColor);
+        light = new Light(hardwareMap);
 
         Pose2d startPose = new Pose2d(PoseStorage.getX(), PoseStorage.getY(), Math.toRadians(PoseStorage.getHeading()));
         pinpoint = new RoadRunnerPinPoint(hardwareMap, allianceColor, startPose);
@@ -59,8 +60,6 @@ public class Robot {
     }
 
     public void start() {
-        isUsingTurret = false;
-
         colorIntakeCommand = new ColorIntakeCommand(spindexer);
         colorIntakeCommand.start();
 
@@ -76,6 +75,7 @@ public class Robot {
         updateTurret();
         updateStoredPosition();
         updateIntake();
+        updateLight();
 
         if (gamepad1.left_trigger > 0.1 && launchCommand != null) {
             stopLaunchCommand();
@@ -135,6 +135,21 @@ public class Robot {
         }
     }
 
+    private void updateLight() {
+        if (spindexer.getHolderStatus(2) != Spindexer.HolderStatus.NONE) {
+            light.setLightValue(0.5);
+        }
+        else if (spindexer.getHolderStatus(1) != Spindexer.HolderStatus.NONE) {
+            light.setLightValue(0.333);
+        }
+        else if (spindexer.getHolderStatus(0) != Spindexer.HolderStatus.NONE) {
+            light.setLightValue(0.277);
+        }
+        else {
+            light.setLightValue(1);
+        }
+    }
+
     private void updateLauncherCover() {
         launcher.calculateTargetAngle(pinpoint.getDistanceToGoal());
     }
@@ -157,29 +172,19 @@ public class Robot {
         limelight.getResult();
         limelight.getAprilTagID();
 
-        if (isUsingTurret) {
-            if (Math.abs(turretRel) > 135) {
-                turret.setMode(Turret.TurretMode.PINPOINT);
-                turret.setTarget(heading);
-                isUsingTurret = false;
-            } else {
-                if (limelight.isResulted()) {
-                    if (limelight.isGoalTargeted()) {
-                        turret.setMode(Turret.TurretMode.LIMELIGHT);
-                        turret.setLimelightError(-limelight.getTX());
-                    }
-                } else {
-                    turret.setMode(Turret.TurretMode.PINPOINT);
-                    turret.setTarget(target);
-                }
-            }
-        } else {
+        if (Math.abs(turretRel) > 135) {
             turret.setMode(Turret.TurretMode.PINPOINT);
             turret.setTarget(heading);
-        }
-
-        if (gamepad1.rightBumperWasPressed()) {
-            isUsingTurret = !isUsingTurret;
+        } else {
+            if (limelight.isResulted()) {
+                if (limelight.isGoalTargeted()) {
+                    turret.setMode(Turret.TurretMode.LIMELIGHT);
+                    turret.setLimelightError(-limelight.getTX());
+                }
+            } else {
+                turret.setMode(Turret.TurretMode.PINPOINT);
+                turret.setTarget(target);
+            }
         }
     }
 
