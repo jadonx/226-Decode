@@ -13,14 +13,14 @@ public class ColorIntakeCommand {
     private final Spindexer spindexer;
 
     private ElapsedTime colorSensorTimer;
-    private int colorSensorUpdateTime = 50;
+    private final int colorSensorUpdateTime = 150;
 
     private double currentHue;
     private double currentAngle;
     private int targetAngle;
 
     private ElapsedTime holdingBallTimer;
-    private int holdingBallThreshold = 50;
+    private final int holdingBallThreshold = 50;
 
     private int[] intakePositions;
 
