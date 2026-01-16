@@ -185,11 +185,9 @@ public class Robot {
                 turret.setTarget(heading);
                 isUsingTurret = false;
             } else {
-                if (limelight.isResulted()) {
-                    if (limelight.isGoalTargeted()) {
-                        turret.setMode(Turret.TurretMode.LIMELIGHT);
-                        turret.setLimelightError(-limelight.getTX());
-                    }
+                if (limelight.isResulted() && limelight.isGoalTargeted()) {
+                    turret.setMode(Turret.TurretMode.LIMELIGHT);
+                    turret.setLimelightError(-limelight.getTX());
                 } else {
                     turret.setMode(Turret.TurretMode.PINPOINT);
                     turret.setTarget(target);
@@ -223,6 +221,7 @@ public class Robot {
 //        telemetry.addData("Spindexer unwrapped pos ", spindexer.getUnwrappedAngle());
 
         telemetry.addData("Turret mode ", turret.getMode());
+        telemetry.addData("Turret target ", turret.getTarget());
 //        telemetry.addData("Turret error ", turret.getError());
 
         // Launcher

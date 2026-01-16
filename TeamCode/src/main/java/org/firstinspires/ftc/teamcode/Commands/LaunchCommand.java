@@ -93,8 +93,8 @@ public class LaunchCommand {
             double distanceToGoal = pinpoint.getDistanceToGoal();
             launcher.calculateTargetVelocity(distanceToGoal);
 
-            if (distanceToGoal > 115) {
-                spindexerSpeed = 0.15;
+            if (distanceToGoal > 130) {
+                spindexerSpeed = 0.125;
             }
 
             currentState = State.PREPARE_TO_SHOOT;

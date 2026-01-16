@@ -37,6 +37,8 @@ public class RedFar extends LinearOpMode {
 
     AutonomousActions autonomousActions;
 
+    private final double spindexerSpeed = 0.125;
+
     @Override
     public void runOpMode() throws InterruptedException {
         Pose2d initialPose = new Pose2d(62, 14, Math.toRadians(180));
@@ -46,7 +48,7 @@ public class RedFar extends LinearOpMode {
         TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(51,18), Math.toRadians(90));
         TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(36,31)).strafeToConstantHeading(new Vector2d(36,48), new TranslationalVelConstraint(5.5));
         TrajectoryActionBuilder secondLaunch = firstPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(51,18));
-        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(12, 33)).strafeToConstantHeading(new Vector2d(12,48) , new TranslationalVelConstraint(5.5));
+        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(12, 31)).strafeToConstantHeading(new Vector2d(12,48) , new TranslationalVelConstraint(5.5));
         TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(51,18));
         TrajectoryActionBuilder park = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(45,30));
 
@@ -84,7 +86,7 @@ public class RedFar extends LinearOpMode {
 
         Actions.runBlocking(
                 new ParallelAction(
-                        autonomousActions.updateLauncher(1650),
+                        autonomousActions.updateLauncher(1680),
                         autonomousActions.updateBotPosition(),
                         autonomousActions.updateTurret(),
                         new SequentialAction(
@@ -94,6 +96,7 @@ public class RedFar extends LinearOpMode {
                                 autonomousActions.runPopper(),
                                 autonomousActions.setTurretTarget(157),
                                 /** First Shooting Sequence */
+                                autonomousActions.runIntake(),
                                 new ParallelAction(
                                         firstLaunch.build(),
                                         new SequentialAction(
@@ -103,10 +106,9 @@ public class RedFar extends LinearOpMode {
                                         )
                                 ),
                                 autonomousActions.atLauncherTargetVelocity(),
-                                autonomousActions.spindexerFullRotation(0.15),
+                                autonomousActions.spindexerFullRotation(spindexerSpeed),
                                 /** First Intake Sequence */
                                 autonomousActions.deactivatePopper(),
-                                autonomousActions.runIntake(),
                                 new RaceAction(
                                         firstPickup.build(),
                                         autonomousActions.autoColorIntakeCommand(colorIntakeCommand)
@@ -123,7 +125,7 @@ public class RedFar extends LinearOpMode {
                                         )
                                 ),
                                 autonomousActions.stopIntake(),
-                                autonomousActions.spindexerFullRotation(0.15),
+                                autonomousActions.spindexerFullRotation(spindexerSpeed),
                                 /** Second Intake Sequence */
                                 autonomousActions.deactivatePopper(),
                                 autonomousActions.runIntake(),
@@ -143,7 +145,7 @@ public class RedFar extends LinearOpMode {
                                         )
                                 ),
                                 autonomousActions.stopIntake(),
-                                autonomousActions.spindexerFullRotation(0.15),
+                                autonomousActions.spindexerFullRotation(spindexerSpeed),
                                 autonomousActions.deactivatePopper(),
                                 park.build()
                         )

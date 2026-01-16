@@ -101,12 +101,13 @@ public class ColorIntakeCommand {
     }
 
     private boolean hasBall(double hue) {
-        return ((hue > 130 && hue < 190) || (hue > 210 && hue < 270)) && (spindexer.getDistanceFront() < 1 || spindexer.getDistanceBack() < 1.6);
+        return ((hue > 130 && hue < 190) || (hue > 210 && hue < 270)) && (spindexer.getDistanceFront() < 2.3 || spindexer.getDistanceBack() < 2.3);
+        // return (hue > 130 && hue < 190) || (hue > 210 && hue < 270);
     }
 
     private boolean withinIntakeAngle(double current, int currentHolder) {
         if (currentHolder == 1) {
-           return (current > 349 - 12) || (current < 2);
+           return (current > 349 - 12) || (current < 3);
         }
 
         return current > (intakePositions[currentHolder]-12) && current < (intakePositions[currentHolder]+12);

@@ -88,6 +88,10 @@ public class Turret {
         this.targetAngle = targetAngle;
     }
 
+    public double getTarget() {
+        return targetAngle;
+    }
+
     public boolean atTargetAngle() {
         double currentAngle = getTurretAngle();
         double error = wrapDegrees(targetAngle - currentAngle);

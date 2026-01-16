@@ -35,6 +35,7 @@ public class Spindexer {
     }
     SpindexerMode spindexerMode;
     private double spindexerSpeed = 0.4;
+    // public static double spindexerSpeed = 0.4;
 
     private double lastAngle = 0;
     private double unwrappedAngle = 0;

@@ -37,6 +37,8 @@ public class BlueFar extends LinearOpMode {
 
     AutonomousActions autonomousActions;
 
+    private final double spindexerSpeed = 0.125;
+
     @Override
     public void runOpMode() throws InterruptedException {
         Pose2d initialPose = new Pose2d(62, -14, Math.toRadians(180));
@@ -90,7 +92,7 @@ public class BlueFar extends LinearOpMode {
 
         Actions.runBlocking(
                 new ParallelAction(
-                        autonomousActions.updateLauncher(1650),
+                        autonomousActions.updateLauncher(1680),
                         autonomousActions.updateBotPosition(),
                         autonomousActions.updateTurret(),
                         new SequentialAction(
@@ -98,7 +100,7 @@ public class BlueFar extends LinearOpMode {
                                 autonomousActions.setSpindexerStartPosition(),
                                 autonomousActions.moveCover(),
                                 autonomousActions.runPopper(),
-                                autonomousActions.setTurretTarget(-157),
+                                autonomousActions.setTurretTarget(-160),
                                 /** First Shooting Sequence */
                                 new ParallelAction(
                                         firstLaunch.build(),
@@ -109,7 +111,7 @@ public class BlueFar extends LinearOpMode {
                                         )
                                 ),
                                 autonomousActions.atLauncherTargetVelocity(),
-                                autonomousActions.spindexerFullRotation(0.15),
+                                autonomousActions.spindexerFullRotation(spindexerSpeed),
                                 /** First Intake Sequence */
                                 autonomousActions.deactivatePopper(),
                                 autonomousActions.runIntake(),
@@ -129,7 +131,7 @@ public class BlueFar extends LinearOpMode {
                                         )
                                 ),
                                 autonomousActions.stopIntake(),
-                                autonomousActions.spindexerFullRotation(0.15),
+                                autonomousActions.spindexerFullRotation(spindexerSpeed),
                                 /** Second Intake Sequence */
                                 autonomousActions.deactivatePopper(),
                                 autonomousActions.runIntake(),
@@ -149,7 +151,7 @@ public class BlueFar extends LinearOpMode {
                                         )
                                 ),
                                 autonomousActions.stopIntake(),
-                                autonomousActions.spindexerFullRotation(0.15),
+                                autonomousActions.spindexerFullRotation(spindexerSpeed),
                                 autonomousActions.deactivatePopper(),
                                 park.build()
                         )
