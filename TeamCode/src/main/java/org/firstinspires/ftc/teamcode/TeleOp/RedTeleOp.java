@@ -22,15 +22,12 @@ public class RedTeleOp extends OpMode {
         packet = new TelemetryPacket();
         dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
-        robot = new Robot(hardwareMap, RoadRunnerPinPoint.AllianceColor.RED, gamepad1, telemetry);
+        robot = new Robot(hardwareMap, RoadRunnerPinPoint.AllianceColor.RED, gamepad1, gamepad2, telemetry);
         robot.start();
     }
 
     @Override
     public void loop() {
         robot.update();
-        packet.put("spindexer wrapped ", robot.getSpindexerWrapped());
-        packet.put("spindexer unwrapped ", robot.getSpindexerUnwrapped());
-        dashboard.sendTelemetryPacket(packet);
     }
 }

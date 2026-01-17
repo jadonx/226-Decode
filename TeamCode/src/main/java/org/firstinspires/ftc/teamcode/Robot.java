@@ -42,8 +42,9 @@ public class Robot {
     private boolean isUsingTurret;
 
     private Gamepad gamepad1;
+    private Gamepad gamepad2;
 
-    public Robot(HardwareMap hardwareMap, RoadRunnerPinPoint.AllianceColor allianceColor, Gamepad gamepad1, Telemetry telemetry) {
+    public Robot(HardwareMap hardwareMap, RoadRunnerPinPoint.AllianceColor allianceColor, Gamepad gamepad1, Gamepad gamepad2, Telemetry telemetry) {
         drive = new FieldCentricDrive(hardwareMap);
         intake = new Intake(hardwareMap);
         launcher = new Launcher(hardwareMap);
@@ -57,6 +58,7 @@ public class Robot {
         pinpoint = new RoadRunnerPinPoint(hardwareMap, allianceColor, startPose);
 
         this.gamepad1 = gamepad1;
+        this.gamepad2 = gamepad2;
         this.telemetry = telemetry;
         loopTimer = new ElapsedTime();
     }

@@ -100,7 +100,7 @@ public class BlueFar extends LinearOpMode {
                                 autonomousActions.setSpindexerStartPosition(),
                                 autonomousActions.moveCover(),
                                 autonomousActions.runPopper(),
-                                autonomousActions.setTurretTarget(-160),
+                                autonomousActions.setTurretTarget(-157),
                                 /** First Shooting Sequence */
                                 new ParallelAction(
                                         firstLaunch.build(),

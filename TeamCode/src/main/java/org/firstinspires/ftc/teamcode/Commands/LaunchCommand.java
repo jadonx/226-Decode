@@ -38,7 +38,7 @@ public class LaunchCommand {
         popper.pushInPopper();
         popper.setTargetVelocity(1800);
 
-        launcher.calculateTargetVelocity(pinpoint.getDistanceToGoal());
+        // launcher.calculateTargetVelocity(pinpoint.getDistanceToGoal());
 
         currentState = State.PRIME_SHOOTER;
     }
@@ -54,6 +54,16 @@ public class LaunchCommand {
     }
 
     public void update() {
+        double distanceToGoal = pinpoint.getDistanceToGoal();
+
+        if (distanceToGoal > 130) {
+            spindexerSpeed = 0.125;
+        }
+        else {
+            spindexerSpeed = 0.2;
+        }
+
+        launcher.calculateTargetVelocity(distanceToGoal);
         launcher.update();
         spindexer.update();
         // intake.runIntake(0.15F);
@@ -90,13 +100,6 @@ public class LaunchCommand {
     public void startShootingSequence() {
         // Transition from priming to shooting
         if (currentState == State.PRIME_SHOOTER) {
-            double distanceToGoal = pinpoint.getDistanceToGoal();
-            launcher.calculateTargetVelocity(distanceToGoal);
-
-            if (distanceToGoal > 130) {
-                spindexerSpeed = 0.125;
-            }
-
             currentState = State.PREPARE_TO_SHOOT;
         }
     }
