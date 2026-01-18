@@ -37,7 +37,7 @@ public class RedFar extends LinearOpMode {
 
     AutonomousActions autonomousActions;
 
-    private final double spindexerSpeed = 0.125;
+    private final double spindexerSpeed = 0.15;
 
     @Override
     public void runOpMode() throws InterruptedException {

@@ -57,7 +57,7 @@ public class LaunchCommand {
         double distanceToGoal = pinpoint.getDistanceToGoal();
 
         if (distanceToGoal > 130) {
-            spindexerSpeed = 0.125;
+            spindexerSpeed = 0.15;
         }
         else {
             spindexerSpeed = 0.2;

@@ -240,7 +240,7 @@ public class AutonomousActions {
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            intake.runIntake(1);
+            intake.runIntake(0.7f);
             return false;
         }
     }
