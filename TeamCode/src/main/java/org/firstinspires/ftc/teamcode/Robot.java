@@ -89,7 +89,6 @@ public class Robot {
         }
 
         if (launchCommand == null) {
-
             if (gamepad1.aWasPressed() && launchCommand == null) {
                 launchCommand = new LaunchCommand(spindexer, popper, launcher, pinpoint, intake);
                 launchCommand.start();
