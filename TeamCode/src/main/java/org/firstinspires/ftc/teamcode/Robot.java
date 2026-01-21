@@ -140,6 +140,10 @@ public class Robot {
         else {
             intake.stopIntake();
         }
+
+        if(gamepad1.dpadLeftWasPressed()){
+            spindexer.unjammer();
+        }
     }
 
     private void updateLight() {

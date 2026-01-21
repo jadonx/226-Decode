@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.Constants;
 public class Popper {
     private Servo popperServo;
     private DcMotorEx popperMotor;
-    public static double popperPos = 0.00875;
+    public static double popperPos = 0.009;
 
     private int targetVelocity;
 
