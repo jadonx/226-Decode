@@ -99,10 +99,6 @@ public class Robot {
             colorIntakeCommand.update();
         }
 
-        if(gamepad1.left_bumper){
-            launcher.calculateTargetVelocity(pinpoint.getDistanceToGoal());
-        }
-
         if (launchCommand != null) {
             if (gamepad1.bWasPressed()) {
                 launchCommand.startShootingSequence();

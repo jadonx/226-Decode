@@ -1,6 +1,4 @@
-package org.firstinspires.ftc.teamcode.Testing;
-
-import android.view.View;
+package org.firstinspires.ftc.teamcode.Testing.Spindexer;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
