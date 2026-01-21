@@ -64,6 +64,7 @@ public class RedClose extends LinearOpMode {
                 motif = limelight.getMotif();
                 spindexer.setMotifPattern(motif[0], motif[1], motif[2]);
                 telemetry.addData("Motif: ", motif[0] + " " + motif[1] + " " + motif[2]);
+                telemetry.addData("Holder status: ", spindexer.getHolderStatus(0) + " " + spindexer.getHolderStatus(1) + " " + spindexer.getHolderStatus(2));
             }
             else {
                 telemetry.addData("Status: ", "nothing detected");

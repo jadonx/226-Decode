@@ -29,6 +29,8 @@ public class Spindexer {
     private double targetAngle = 0;
     public static double kP = 0.002, kS = 0.04;
 
+    private boolean unjam = false;
+
     public enum SpindexerMode {
         INTAKE_MODE,
         LAUNCH_MODE
@@ -57,8 +59,10 @@ public class Spindexer {
     public void update() {
         currentAngle = spindexerEncoder.getWrappedAngle();
         updateUnwrappedAngle();
-
-        if (spindexerMode == SpindexerMode.INTAKE_MODE) {
+        if(unjam){
+            spindexerServo.setPower(-0.5);
+        }
+        else if (spindexerMode == SpindexerMode.INTAKE_MODE) {
             updateIntakeMode();
         }
         else if (spindexerMode == SpindexerMode.LAUNCH_MODE) {
@@ -215,6 +219,10 @@ public class Spindexer {
 
     public int[] getIntakePositions() {
         return intakePositions;
+    }
+
+    public void unjammer (){
+        unjam = !unjam;
     }
 
     /** Color sensor code */
