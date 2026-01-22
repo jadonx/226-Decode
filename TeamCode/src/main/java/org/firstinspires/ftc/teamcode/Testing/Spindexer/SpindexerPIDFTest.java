@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Testing.Spindexer;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -13,33 +15,35 @@ import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 
 @TeleOp(name="SpindexerPIDFTest", group = "Test")
 public class SpindexerPIDFTest extends OpMode {
-    CRServo spindexerServo;
+    Spindexer spindexer;
 
     int numLoops;
     ElapsedTime loopTimer;
 
-    PIDFController pid;
-
-    public static double kP, kI, kD, kF;
-    public static double targetAngle;
+    TelemetryPacket packet;
+    FtcDashboard dashboard;
     @Override
     public void init() {
-        spindexerServo = hardwareMap.get(CRServo.class, Constants.HMServospinDexer);
-        spindexerServo.setDirection(DcMotorSimple.Direction.REVERSE);
+        spindexer = new Spindexer(hardwareMap);
+        spindexer.setMode(Spindexer.SpindexerMode.INTAKE_MODE);
+
+        packet = new TelemetryPacket();
+        dashboard = FtcDashboard.getInstance();
 
         numLoops = 0;
         loopTimer = new ElapsedTime();
         loopTimer.reset();
-
-        pid = new PIDFController(kP, kI, kD, kF);
     }
 
     @Override
     public void loop() {
-        pid.setPIDF(kP, kI, kD, kF);
+        spindexer.update();
 
         numLoops++;
-        telemetry.addData("Average Loop Times", ((double) loopTimer.milliseconds())/numLoops);
-        telemetry.update();
+        packet.put("Average Loop Times", ((double) loopTimer.milliseconds())/numLoops);
+
+        packet.put("current ", spindexer.getWrappedAngle());
+        packet.put("target ", spindexer.getTargetAngle());
+        dashboard.sendTelemetryPacket(packet);
     }
 }

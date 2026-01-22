@@ -4,6 +4,7 @@ import android.graphics.Color;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.hardware.lynx.commands.core.LynxSetMotorPIDControlLoopCoefficientsCommand;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -26,10 +27,10 @@ public class Spindexer {
     private RevColorSensorV3 colorSensorBack;
 
     private double currentAngle;
-    private double targetAngle = 0;
-    public static double kP = 0.002, kS = 0.04;
-
-    private boolean unjam = false;
+    public static double targetAngle = 0;
+    private double kP = 0.002, kS = 0.04;
+    // public static double kP, kI, kD, kF;
+    private PIDFController pid;
 
     public enum SpindexerMode {
         INTAKE_MODE,
@@ -54,21 +55,35 @@ public class Spindexer {
         colorSensorFront = hardwareMap.get(RevColorSensorV3.class, Constants.HMFrontColorSensor);
         colorSensorBack = hardwareMap.get(RevColorSensorV3.class, Constants.HMBackColorSensor);
         spindexerMode = SpindexerMode.INTAKE_MODE;
+
+        // pid = new PIDFController(kP, kI, kD, kF);
     }
 
     public void update() {
         currentAngle = spindexerEncoder.getWrappedAngle();
         updateUnwrappedAngle();
-        if(unjam){
-            spindexerServo.setPower(-0.5);
-        }
-        else if (spindexerMode == SpindexerMode.INTAKE_MODE) {
+
+        if (spindexerMode == SpindexerMode.INTAKE_MODE) {
             updateIntakeMode();
         }
         else if (spindexerMode == SpindexerMode.LAUNCH_MODE) {
             updateLaunchMode();
         }
     }
+
+//    private void updateIntakeMode() {
+//        pid.setPIDF(kP, kI, kD, kF);
+//
+//        double error = calculateError();
+//
+//        double power = pid.calculate(0, error);
+//
+//        if (error < 2) {
+//            power *= 0.4;
+//        }
+//
+//        spindexerServo.setPower(power);
+//    }
 
     private void updateIntakeMode() {
         double error = calculateError();
@@ -219,10 +234,6 @@ public class Spindexer {
 
     public int[] getIntakePositions() {
         return intakePositions;
-    }
-
-    public void unjammer (){
-        unjam = !unjam;
     }
 
     /** Color sensor code */
