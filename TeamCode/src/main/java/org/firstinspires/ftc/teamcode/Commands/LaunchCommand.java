@@ -86,6 +86,7 @@ public class LaunchCommand {
 
     public void startShootingSequence() {
         // Transition from priming to shooting
+        popper.pushInPopper();
         if (currentState == State.PRIME_SHOOTER) {
             currentState = State.PREPARE_TO_SHOOT;
         }

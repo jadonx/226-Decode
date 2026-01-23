@@ -98,6 +98,10 @@ public class Robot {
         updateIntake();
         updateLight();
 
+        if (gamepad1.dpadLeftWasPressed()) {
+            spindexer.toggleUnjam();
+        }
+
         if (gamepad1.left_trigger > 0.1 && launchCommand != null) {
             stopLaunchCommand();
             colorIntakeCommand.start();

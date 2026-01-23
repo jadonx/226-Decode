@@ -36,6 +36,7 @@ public class Spindexer {
     }
     SpindexerMode spindexerMode;
     private double spindexerSpeed = 0.4;
+    private boolean isUnjamming;
     // public static double spindexerSpeed = 0.4;
 
     private double lastAngle = 0;
@@ -57,7 +58,10 @@ public class Spindexer {
         currentAngle = spindexerEncoder.getWrappedAngle();
         updateUnwrappedAngle();
 
-        if (spindexerMode == SpindexerMode.INTAKE_MODE) {
+        if (isUnjamming) {
+            spindexerServo.setPower(-0.5);
+        }
+        else if (spindexerMode == SpindexerMode.INTAKE_MODE) {
             updateIntakeMode();
         }
         else if (spindexerMode == SpindexerMode.LAUNCH_MODE) {
@@ -195,6 +199,10 @@ public class Spindexer {
 
     public void setPower(double power) {
         spindexerServo.setPower(power);
+    }
+
+    public void toggleUnjam() {
+        isUnjamming = !isUnjamming;
     }
 
     /** Color sensing intake logic */
