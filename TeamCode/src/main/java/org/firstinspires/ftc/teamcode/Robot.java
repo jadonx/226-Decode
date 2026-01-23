@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.Pose2d;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -19,6 +20,8 @@ import org.firstinspires.ftc.teamcode.Subsystems.RoadRunnerPinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 import org.firstinspires.ftc.teamcode.Subsystems.Supporters.PoseStorage;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
+
+import java.util.List;
 
 public class Robot {
     private final FieldCentricDrive drive;
@@ -46,6 +49,9 @@ public class Robot {
     private Gamepad gamepad1;
     private Gamepad gamepad2;
 
+    // Bulk caching
+    List<LynxModule> hubs;
+
     public Robot(HardwareMap hardwareMap, RoadRunnerPinPoint.AllianceColor allianceColor, Gamepad gamepad1, Gamepad gamepad2, Telemetry telemetry) {
         drive = new FieldCentricDrive(hardwareMap);
         intake = new Intake(hardwareMap);
@@ -64,6 +70,8 @@ public class Robot {
         this.gamepad2 = gamepad2;
         this.telemetry = telemetry;
         loopTimer = new ElapsedTime();
+
+        hubs = hardwareMap.getAll(LynxModule.class);
     }
 
     public void start() {
@@ -78,6 +86,10 @@ public class Robot {
     }
 
     public void update() {
+        for (LynxModule hub : hubs) {
+            hub.clearBulkCache();
+        }
+
         updateDrive();
         updateLauncherCover();
         updatePinPoint();

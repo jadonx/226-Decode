@@ -20,6 +20,9 @@ public class Launcher {
     public static double kV = 0.000395;  // Velocity feedforward (power per RPM)
     public static double kP = 0.005;   // Proportional gain on velocity error
 
+    private double currentVelocity1;
+    private double currentVelocity2;
+
     private double targetVelocity = 0;
     private double targetCoverAngle = 0;
 
@@ -37,6 +40,9 @@ public class Launcher {
     }
 
     public void update() {
+        currentVelocity1 = launcher1.getVelocity();
+        currentVelocity2 = launcher2.getVelocity();
+
         // Velocity Control
         double error = targetVelocity - getVelocity();
 
@@ -85,7 +91,7 @@ public class Launcher {
     /** SETTER AND GETTER METHODS */
 
     public double getVelocity() {
-        return (launcher1.getVelocity() + launcher2.getVelocity()) / 2.0;
+        return (currentVelocity1 + currentVelocity2) / 2.0;
     }
 
     public double getPower(){

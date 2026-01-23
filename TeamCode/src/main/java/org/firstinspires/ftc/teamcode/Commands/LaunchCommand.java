@@ -38,8 +38,6 @@ public class LaunchCommand {
         popper.pushInPopper();
         popper.setTargetVelocity(1800);
 
-        // launcher.calculateTargetVelocity(pinpoint.getDistanceToGoal());
-
         currentState = State.PRIME_SHOOTER;
     }
 
