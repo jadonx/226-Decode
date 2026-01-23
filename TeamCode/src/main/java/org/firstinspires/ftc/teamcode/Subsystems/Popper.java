@@ -54,4 +54,8 @@ public class Popper {
     public void pullOutPopper() {
         popperServo.setPosition(0);
     }
+
+    public boolean isPushedIn(){
+        return popperServo.getPosition() > popperPos-(popperPos * 0.1);
+    }
 }
