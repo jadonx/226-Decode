@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.Constants;
 
 public class Intake {
     private DcMotor intake;
+    private final float MAX_POWER = 0.7f;
 
     public Intake(HardwareMap hardwareMap) {
         intake = hardwareMap.get(DcMotorEx.class, Constants.HMMotorIntake);
@@ -16,11 +17,11 @@ public class Intake {
     }
 
     public void runIntake(float intakePower) {
-        intake.setPower(intakePower);
+        intake.setPower(Math.min(intakePower, MAX_POWER));
     }
 
     public void reverseIntake(float intakePower) {
-        intake.setPower(-intakePower);
+        intake.setPower(Math.max(-intakePower, -MAX_POWER));
     }
 
     public void stopIntake() {
