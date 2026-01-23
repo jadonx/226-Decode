@@ -5,9 +5,11 @@ import android.graphics.Color;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.Subsystems.ColorSensor;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
@@ -16,12 +18,17 @@ public class ColorSensorsTest extends OpMode {
     RevColorSensorV3 colorSensorFront, colorSensorBack;
     Intake intake;
 
+    ColorSensor colorSensor;
+    float[] hsv = new float[3];
+
     @Override
     public void init() {
         colorSensorFront = hardwareMap.get(RevColorSensorV3.class, Constants.HMFrontColorSensor);
         colorSensorBack = hardwareMap.get(RevColorSensorV3.class, Constants.HMBackColorSensor);
 
         intake = new Intake(hardwareMap);
+
+        colorSensor = new ColorSensor(hardwareMap);
     }
 
     @Override
@@ -32,6 +39,14 @@ public class ColorSensorsTest extends OpMode {
         telemetry.addData("Front Distance ", colorSensorFront.getDistance(DistanceUnit.INCH));
         telemetry.addData("Back HSV ", getHSVRev(colorSensorBack)[0]);
         telemetry.addData("Back Distance ", colorSensorBack.getDistance(DistanceUnit.INCH));
+
+        colorSensor.update();
+        telemetry.addData("Current ball ", colorSensor.getCurrentBall());
+        telemetry.addData("Has ball ", colorSensor.hasBall());
+
+        NormalizedRGBA colors = colorSensorFront.getNormalizedColors();
+        Color.colorToHSV(colors.toColor(), hsv);
+        telemetry.addData("Normalized HSV ", hsv[0]);
 
         telemetry.update();
     }

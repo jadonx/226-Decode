@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Commands.ColorIntakeCommand;
 import org.firstinspires.ftc.teamcode.Commands.LaunchCommand;
+import org.firstinspires.ftc.teamcode.Subsystems.ColorSensor;
 import org.firstinspires.ftc.teamcode.Subsystems.FieldCentricDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
@@ -25,6 +26,7 @@ public class Robot {
     private final Launcher launcher;
     private final Popper popper;
     private final Spindexer spindexer;
+    private final ColorSensor colorSensor;
     private final Turret turret;
     private final LimeLight limelight;
     private final RGBIndicator light;
@@ -50,6 +52,7 @@ public class Robot {
         launcher = new Launcher(hardwareMap);
         popper = new Popper(hardwareMap);
         spindexer = new Spindexer(hardwareMap);
+        colorSensor = new ColorSensor(hardwareMap);
         turret = new Turret(hardwareMap);
         limelight = new LimeLight(hardwareMap, allianceColor);
         light = new RGBIndicator(hardwareMap);
@@ -64,7 +67,7 @@ public class Robot {
     }
 
     public void start() {
-        colorIntakeCommand = new ColorIntakeCommand(spindexer);
+        colorIntakeCommand = new ColorIntakeCommand(spindexer, colorSensor);
         colorIntakeCommand.start();
 
         launchCommand = null;
@@ -116,7 +119,13 @@ public class Robot {
 
         numLoops++;
         telemetry.addData("Average Loop Times", ((double) loopTimer.milliseconds())/numLoops);
-        updateTelemetry();
+        telemetry.update();
+
+        if (numLoops > 150) {
+            numLoops = 0;
+            loopTimer.reset();
+        }
+        // updateTelemetry();
     }
 
     private void updateDrive() {

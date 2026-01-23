@@ -23,14 +23,12 @@ import org.firstinspires.ftc.teamcode.Constants;
 public class Spindexer {
     private CRServo spindexerServo;
     private SpindexerEncoder spindexerEncoder;
-    private RevColorSensorV3 colorSensorFront;
-    private RevColorSensorV3 colorSensorBack;
 
     private double currentAngle;
     public static double targetAngle = 0;
-    private double kP = 0.002, kS = 0.04;
-    // public static double kP, kI, kD, kF;
-    private PIDFController pid;
+    // private double kP = 0.002, kS = 0.04;
+    private final double kP = 0.012, kI = 0, kD = 0.005, kF = 0;
+    private PIDFController pid = new PIDFController(kP, kI, kD, kF);;
 
     public enum SpindexerMode {
         INTAKE_MODE,
@@ -43,7 +41,7 @@ public class Spindexer {
     private double lastAngle = 0;
     private double unwrappedAngle = 0;
 
-    private int[] intakePositions = {114, 349, 233};
+    private int[] intakePositions = {114, 355, 233};
     public enum HolderStatus { NONE, GREEN, PURPLE }
     private HolderStatus[] holderStatuses = {HolderStatus.NONE, HolderStatus.NONE, HolderStatus.NONE};
     private HolderStatus[] motifPattern = new Spindexer.HolderStatus[] {Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.GREEN};
@@ -52,11 +50,7 @@ public class Spindexer {
         spindexerServo = hardwareMap.get(CRServo.class, Constants.HMServospinDexer);
         spindexerServo.setDirection(DcMotorSimple.Direction.REVERSE);
         spindexerEncoder = hardwareMap.get(SpindexerEncoder.class, Constants.HMSpindexerEncoder);
-        colorSensorFront = hardwareMap.get(RevColorSensorV3.class, Constants.HMFrontColorSensor);
-        colorSensorBack = hardwareMap.get(RevColorSensorV3.class, Constants.HMBackColorSensor);
         spindexerMode = SpindexerMode.INTAKE_MODE;
-
-        // pid = new PIDFController(kP, kI, kD, kF);
     }
 
     public void update() {
@@ -72,35 +66,33 @@ public class Spindexer {
     }
 
 //    private void updateIntakeMode() {
-//        pid.setPIDF(kP, kI, kD, kF);
-//
 //        double error = calculateError();
 //
-//        double power = pid.calculate(0, error);
+//        // Feedforward to overcome static friction
+//        double ff = kS * Math.signum(error);
 //
-//        if (error < 2) {
-//            power *= 0.4;
+//        double output = (kP * error) + ff;
+//
+//        if (Math.abs(error) < 2) {
+//            output = ff * 0.2;
 //        }
 //
-//        spindexerServo.setPower(power);
+//        // Clipping output
+//        output = Range.clip(output, -spindexerSpeed, spindexerSpeed);
+//
+//        spindexerServo.setPower(output);
 //    }
 
     private void updateIntakeMode() {
         double error = calculateError();
 
-        // Feedforward to overcome static friction
-        double ff = kS * Math.signum(error);
+        double power = pid.calculate(0, error);
 
-        double output = (kP * error) + ff;
-
-        if (Math.abs(error) < 2) {
-            output = ff * 0.2;
+        if (error < 2) {
+            power *= 0.4;
         }
 
-        // Clipping output
-        output = Range.clip(output, -spindexerSpeed, spindexerSpeed);
-
-        spindexerServo.setPower(output);
+        spindexerServo.setPower(power);
     }
 
     private void updateLaunchMode() {
@@ -114,7 +106,10 @@ public class Spindexer {
 
     public boolean atTargetAngle(double threshold) {
         if (spindexerMode == SpindexerMode.INTAKE_MODE) {
-            return Math.abs(targetAngle - getWrappedAngle()) < threshold;
+            double error = Math.abs(targetAngle - getWrappedAngle());
+            error = Math.min(error, 360 - error);
+
+            return error < threshold;
         }
         else if (spindexerMode == SpindexerMode.LAUNCH_MODE) {
             return getUnwrappedAngle() > targetAngle;
@@ -234,25 +229,5 @@ public class Spindexer {
 
     public int[] getIntakePositions() {
         return intakePositions;
-    }
-
-    /** Color sensor code */
-    public float[] getHSVRev() {
-        int r = Math.max(colorSensorFront.red(), colorSensorBack.red());
-        int g = Math.max(colorSensorFront.green(), colorSensorBack.green());;
-        int b = Math.max(colorSensorFront.blue(), colorSensorBack.blue());;
-
-        float[] hsv = new float[3];
-        Color.RGBToHSV(r, g, b, hsv);
-
-        return hsv;
-    }
-
-    public double getDistanceFront() {
-        return colorSensorFront.getDistance(DistanceUnit.INCH);
-    }
-
-    public double getDistanceBack() {
-        return colorSensorFront.getDistance(DistanceUnit.INCH);
     }
 }

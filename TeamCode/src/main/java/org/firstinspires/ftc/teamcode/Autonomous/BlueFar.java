@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.Autonomous.Actions.AutonomousActions;
 import org.firstinspires.ftc.teamcode.Commands.ColorIntakeCommand;
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
+import org.firstinspires.ftc.teamcode.Subsystems.ColorSensor;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.LimeLight;
@@ -30,6 +31,7 @@ public class BlueFar extends LinearOpMode {
     Intake intake;
     Turret turret;
     Spindexer spindexer;
+    ColorSensor colorSensor;
     Launcher launcher;
     Popper popper;
 
@@ -55,11 +57,12 @@ public class BlueFar extends LinearOpMode {
         intake = new Intake(hardwareMap);
         turret = new Turret(hardwareMap);
         spindexer = new Spindexer(hardwareMap);
+        colorSensor = new ColorSensor(hardwareMap);
         launcher = new Launcher(hardwareMap);
         popper = new Popper(hardwareMap);
         limelight = new LimeLight(hardwareMap, RoadRunnerPinPoint.AllianceColor.BLUE);
 
-        colorIntakeCommand = new ColorIntakeCommand(spindexer);
+        colorIntakeCommand = new ColorIntakeCommand(spindexer, colorSensor);
 
         autonomousActions = new AutonomousActions(drive, limelight, intake, turret, spindexer, launcher, popper, colorIntakeCommand);
 

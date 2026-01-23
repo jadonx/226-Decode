@@ -17,13 +17,13 @@ public class Turret {
     //Hardware
     private CRServo turretLeft, turretRight;
     private IMU turretEncoder;
-    private PIDFController pid;
 
     public static double kP = 0.0065; // Proportional gain on position error
     public static double kI = 0.0; // Integral gain on position error
     public static double kD = 0.0006; // Derivative gain on position error
     public static double kF = 0.05; // Feedforward to overcome static friction
 
+    private double currentAngle;
     private double targetAngle = 0;
     private double error;
 
@@ -50,12 +50,10 @@ public class Turret {
         turretEncoder.initialize(turretParameters);
 
         // turretEncoder.resetYaw();
-
-        pid = new PIDFController(kP, kI, kD, kF);
     }
 
     public void update() {
-        double currentAngle = getTurretAngle();
+        currentAngle = turretEncoder.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
 
         if (turretMode == TurretMode.PINPOINT) {
             error = wrapDegrees(targetAngle - currentAngle);
@@ -93,7 +91,6 @@ public class Turret {
     }
 
     public boolean atTargetAngle() {
-        double currentAngle = getTurretAngle();
         double error = wrapDegrees(targetAngle - currentAngle);
         return (Math.abs(error) < 0.5);
     }
@@ -115,12 +112,13 @@ public class Turret {
     }
 
     public double getTurretAngle() {
-        return turretEncoder.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+        return currentAngle;
     }
 
     private double wrapDegrees(double angle) {
-        while (angle <= -180) angle += 360;
-        while (angle > 180) angle -= 360;
+        angle %= 360.0;
+        if (angle <= -180) angle += 360;
+        if (angle > 180) angle -= 360;
         return angle;
     }
 
