@@ -119,13 +119,13 @@ public class Robot {
 
         numLoops++;
         telemetry.addData("Average Loop Times", ((double) loopTimer.milliseconds())/numLoops);
+        updateTelemetry();
         telemetry.update();
 
         if (numLoops > 150) {
             numLoops = 0;
             loopTimer.reset();
         }
-        // updateTelemetry();
     }
 
     private void updateDrive() {
@@ -226,20 +226,20 @@ public class Robot {
 //        telemetry.addData("Spindexer wrapped pos ", spindexer.getWrappedAngle());
 //        telemetry.addData("Spindexer unwrapped pos ", spindexer.getUnwrappedAngle());
 
-        telemetry.addData("Turret mode ", turret.getMode());
-        telemetry.addData("Turret target ", turret.getTarget());
+//        telemetry.addData("Turret mode ", turret.getMode());
+//        telemetry.addData("Turret target ", turret.getTarget());
 //        telemetry.addData("Turret error ", turret.getError());
 
         // Launcher
-        telemetry.addData("Target velocity ", launcher.getTargetVelocity());
-        telemetry.addData("Current velocity ", launcher.getVelocity());
-        telemetry.addData("Current Power ", launcher.getPower());
-        telemetry.addData("Target cover angle ", launcher.getTargetCoverAngle() + "\n");
-
-        // Pinpoint
-        telemetry.addData("Pinpoint Position ", pinpoint.getPose().position.x + ", " + pinpoint.getPose().position.y);
-        telemetry.addData("Rotation ", Math.toDegrees(pinpoint.getPose().heading.toDouble()));
-        telemetry.addData("Goal Distance ", pinpoint.getDistanceToGoal() + "\n");
+//        telemetry.addData("Target velocity ", launcher.getTargetVelocity());
+//        telemetry.addData("Current velocity ", launcher.getVelocity());
+//        telemetry.addData("Current Power ", launcher.getPower());
+//        telemetry.addData("Target cover angle ", launcher.getTargetCoverAngle() + "\n");
+//
+//        // Pinpoint
+//        telemetry.addData("Pinpoint Position ", pinpoint.getPose().position.x + ", " + pinpoint.getPose().position.y);
+//        telemetry.addData("Rotation ", Math.toDegrees(pinpoint.getPose().heading.toDouble()));
+//        telemetry.addData("Goal Distance ", pinpoint.getDistanceToGoal() + "\n");
 
 //        telemetry.addData("Desired Angle", pinpoint.getAngleToGoal());
 //        telemetry.addData("Actual Angle", (turret.getTurretAngle()));
@@ -254,8 +254,6 @@ public class Robot {
 //        else {
 //            telemetry.addData("Launch Command State ", "Null \n");
 //        }
-
-        telemetry.update();
     }
 
     private void stopLaunchCommand() {

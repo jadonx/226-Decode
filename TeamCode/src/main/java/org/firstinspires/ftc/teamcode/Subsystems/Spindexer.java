@@ -27,7 +27,7 @@ public class Spindexer {
     private double currentAngle;
     public static double targetAngle = 0;
     // private double kP = 0.002, kS = 0.04;
-    private final double kP = 0.012, kI = 0, kD = 0.005, kF = 0;
+    public static double kP = 0.012, kI = 0, kD = 0.005, kF = 0;
     private PIDFController pid = new PIDFController(kP, kI, kD, kF);;
 
     public enum SpindexerMode {
@@ -65,26 +65,9 @@ public class Spindexer {
         }
     }
 
-//    private void updateIntakeMode() {
-//        double error = calculateError();
-//
-//        // Feedforward to overcome static friction
-//        double ff = kS * Math.signum(error);
-//
-//        double output = (kP * error) + ff;
-//
-//        if (Math.abs(error) < 2) {
-//            output = ff * 0.2;
-//        }
-//
-//        // Clipping output
-//        output = Range.clip(output, -spindexerSpeed, spindexerSpeed);
-//
-//        spindexerServo.setPower(output);
-//    }
-
     private void updateIntakeMode() {
         double error = calculateError();
+        pid.setPIDF(kP, kI, kD, kF);
 
         double power = pid.calculate(0, error);
 
