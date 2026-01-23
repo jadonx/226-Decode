@@ -38,19 +38,7 @@ public class LaunchCommand {
 
         popper.setTargetVelocity(1800);
 
-        // launcher.calculateTargetVelocity(pinpoint.getDistanceToGoal());
-
         currentState = State.PRIME_SHOOTER;
-    }
-
-    public void startAuto() {
-        spindexer.setMode(Spindexer.SpindexerMode.INTAKE_MODE);
-        spindexer.setTargetAngle(spindexer.getIntakePositions()[0]);
-        this.spindexerSpeed = 0.15; // Speed of spindexer while launching
-        popper.pushInPopper();
-        popper.setTargetVelocity(1800);
-        launcher.setTargetVelocity(1300);
-        currentState = State.PREPARE_TO_SHOOT;
     }
 
     public void update() {
@@ -66,7 +54,6 @@ public class LaunchCommand {
         launcher.calculateTargetVelocity(distanceToGoal);
         launcher.update();
         spindexer.update();
-        // intake.runIntake(0.15F);
 
         switch (currentState) {
             case PRIME_SHOOTER:

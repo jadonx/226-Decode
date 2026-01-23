@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Commands.ColorIntakeCommand;
 import org.firstinspires.ftc.teamcode.Commands.LaunchCommand;
+import org.firstinspires.ftc.teamcode.Subsystems.ColorSensor;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.Subsystems.Archived.PinPoint;
@@ -19,6 +20,7 @@ public class CommandTest extends OpMode {
     LaunchCommand launchCommand;
 
     Spindexer spindexer;
+    ColorSensor colorSensor;
     Popper popper;
     Launcher launcher;
     PinPoint pinpoint;
@@ -27,12 +29,13 @@ public class CommandTest extends OpMode {
     @Override
     public void init() {
         spindexer = new Spindexer(hardwareMap);
+        colorSensor = new ColorSensor(hardwareMap);
         popper = new Popper(hardwareMap);
         launcher = new Launcher(hardwareMap);
         pinpoint = new PinPoint(hardwareMap, PinPoint.AllianceColor.RED, 0, 0, 0);
         intake = new Intake(hardwareMap);
 
-        colorIntakeCommand = new ColorIntakeCommand(spindexer);
+        colorIntakeCommand = new ColorIntakeCommand(spindexer, colorSensor);
         colorIntakeCommand.start();
     }
 

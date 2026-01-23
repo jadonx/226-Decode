@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Commands.ColorIntakeCommand;
+import org.firstinspires.ftc.teamcode.Subsystems.ColorSensor;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 
@@ -11,13 +12,15 @@ import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 public class SpindexerSortingTest extends OpMode {
     Spindexer spindexer;
     ColorIntakeCommand colorIntakeCommand;
+    ColorSensor colorSensor;
 
     Intake intake;
 
     @Override
     public void init() {
         spindexer = new Spindexer(hardwareMap);
-        colorIntakeCommand = new ColorIntakeCommand(spindexer);
+        colorSensor = new ColorSensor(hardwareMap);
+        colorIntakeCommand = new ColorIntakeCommand(spindexer, colorSensor);
         colorIntakeCommand.start();
         intake = new Intake(hardwareMap);
     }
