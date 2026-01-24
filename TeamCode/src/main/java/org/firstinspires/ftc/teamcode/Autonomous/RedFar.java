@@ -21,6 +21,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.LimeLight;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
 import org.firstinspires.ftc.teamcode.Subsystems.RoadRunnerPinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
+import org.firstinspires.ftc.teamcode.Subsystems.Supporters.PoseStorage;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
 
@@ -44,7 +45,7 @@ public class RedFar extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         Pose2d initialPose = new Pose2d(62, 14, Math.toRadians(180));
-
+        PoseStorage.updatePose(62, 14, 180);
         drive = new MecanumDrive(hardwareMap, initialPose);
 
         TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToLinearHeading(new Vector2d(51,18), Math.toRadians(90));

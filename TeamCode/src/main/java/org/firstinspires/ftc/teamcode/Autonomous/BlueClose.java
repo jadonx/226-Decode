@@ -26,6 +26,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.LimeLight;
 import org.firstinspires.ftc.teamcode.Subsystems.Popper;
 import org.firstinspires.ftc.teamcode.Subsystems.RoadRunnerPinPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
+import org.firstinspires.ftc.teamcode.Subsystems.Supporters.PoseStorage;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
 
@@ -84,6 +85,7 @@ public class BlueClose extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         Pose2d initialPose = new Pose2d(-61, -39, Math.toRadians(-90));
+        PoseStorage.updatePose(-61, -39, -90);
         drive = new MecanumDrive(hardwareMap, initialPose);
 
         TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToConstantHeading(new Vector2d(-14,-22));

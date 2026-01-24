@@ -59,7 +59,7 @@ public class Spindexer {
         updateUnwrappedAngle();
 
         if (isUnjamming) {
-            spindexerServo.setPower(-0.5);
+            spindexerServo.setPower(-0.3);
         }
         else if (spindexerMode == SpindexerMode.INTAKE_MODE) {
             updateIntakeMode();
@@ -78,6 +78,8 @@ public class Spindexer {
         if (error < 2) {
             power *= 0.4;
         }
+
+        power = Range.clip(power, -0.4, 0.4);
 
         spindexerServo.setPower(power);
     }

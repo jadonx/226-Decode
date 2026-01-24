@@ -59,18 +59,18 @@ public class Launcher {
     }
 
     public void calculateTargetVelocity(double distance){
-        targetVelocity = (-0.00000994707*Math.pow(distance,4))+(0.00325247*Math.pow(distance,3))-(0.368536*Math.pow(distance,2))+(22.77696*distance)+664.23389;
+        targetVelocity = (-0.00000380044*Math.pow(distance,4))+(0.00147547*Math.pow(distance,3))-(0.16748*Math.pow(distance,2))+(12.18982*distance)+896.3041;
     }
 
     public void calculateTargetAngle(double distance){
-        if(distance > 63){
+        if(distance > 110){
             targetCoverAngle = 0;
         }
         else {
-            targetCoverAngle = (-0.0000477774*Math.pow(distance,2))-(0.00520774*distance)+0.612273;
+            targetCoverAngle = 1.07204 / (1 + Math.pow(Math.E, -(-0.0689279 * distance + 4.59372)));
         }
 
-        targetCoverAngle = Range.clip(targetCoverAngle, 0, 0.7);
+        targetCoverAngle = Range.clip(targetCoverAngle, 0, 1);
 
         cover.setPosition(targetCoverAngle);
     }

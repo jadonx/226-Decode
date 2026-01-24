@@ -45,6 +45,7 @@ public class Robot {
     private ElapsedTime loopTimer;
 
     private boolean isUsingTurret;
+    private double turretLimelightOffset;
 
     private Gamepad gamepad1;
     private Gamepad gamepad2;
@@ -83,6 +84,11 @@ public class Robot {
         loopTimer.reset();
 
         isUsingTurret = false;
+        turretLimelightOffset = 0;
+
+        for (LynxModule hub : hubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
     }
 
     public void update() {
