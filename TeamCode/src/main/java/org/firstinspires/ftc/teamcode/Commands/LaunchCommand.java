@@ -59,8 +59,7 @@ public class LaunchCommand {
             case PRIME_SHOOTER:
                 break;
             case PREPARE_TO_SHOOT:
-                if (launcher.atTargetVelocity(20) && popper.atTargetVelocity(20)) {
-                    spindexer.setSpeed(spindexerSpeed);
+                if (launcher.atTargetVelocity(40)) {
                     spindexer.setMode(Spindexer.SpindexerMode.LAUNCH_MODE);
                     currentState = State.SHOOTING;
                 }

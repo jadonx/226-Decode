@@ -18,7 +18,7 @@ public class BlueTeleOp extends OpMode {
     public void init() {
         packet = new TelemetryPacket();
         dashboard = FtcDashboard.getInstance();
-        robot = new Robot(hardwareMap, RoadRunnerPinPoint.AllianceColor.BLUE, gamepad1, gamepad2, telemetry);
+        robot = new Robot(hardwareMap, RoadRunnerPinPoint.AllianceColor.BLUE, gamepad1, gamepad2, telemetry, packet, dashboard);
         robot.start();
     }
 

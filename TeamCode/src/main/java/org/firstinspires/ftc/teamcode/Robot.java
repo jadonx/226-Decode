@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -53,7 +55,10 @@ public class Robot {
     // Bulk caching
     List<LynxModule> hubs;
 
-    public Robot(HardwareMap hardwareMap, RoadRunnerPinPoint.AllianceColor allianceColor, Gamepad gamepad1, Gamepad gamepad2, Telemetry telemetry) {
+    TelemetryPacket packet;
+    FtcDashboard dashboard;
+
+    public Robot(HardwareMap hardwareMap, RoadRunnerPinPoint.AllianceColor allianceColor, Gamepad gamepad1, Gamepad gamepad2, Telemetry telemetry, TelemetryPacket packet, FtcDashboard dashboard) {
         drive = new FieldCentricDrive(hardwareMap);
         intake = new Intake(hardwareMap);
         launcher = new Launcher(hardwareMap);
@@ -73,6 +78,9 @@ public class Robot {
         loopTimer = new ElapsedTime();
 
         hubs = hardwareMap.getAll(LynxModule.class);
+
+        this.packet = packet;
+        this.dashboard = dashboard;
     }
 
     public void start() {
@@ -98,6 +106,7 @@ public class Robot {
 
         updateDrive();
         updateLauncherCover();
+        updateLauncher();
         updatePinPoint();
         updateTurret();
         updateStoredPosition();
@@ -189,6 +198,19 @@ public class Robot {
         launcher.calculateTargetAngle(pinpoint.getDistanceToGoal());
     }
 
+    private void updateLauncher() {
+        double distanceToGoal = pinpoint.getDistanceToGoal();
+        if (distanceToGoal > 130) {
+            spindexer.setSpeed(0.15);
+        }
+        else {
+            spindexer.setSpeed(0.2);
+        }
+
+        launcher.calculateTargetVelocity(distanceToGoal);
+        launcher.update();
+    }
+
     private void updatePinPoint() {
         pinpoint.updatePose();
     }
@@ -245,6 +267,11 @@ public class Robot {
         String holderStatuses = String.format("[%s, %s, %s]", spindexer.getHolderStatus(0), spindexer.getHolderStatus(1), spindexer.getHolderStatus(2));
         telemetry.addData("Spindexer Holders ", holderStatuses + "\n");
 
+        packet.put("launcher target vel ", launcher.getTargetVelocity());
+        packet.put("launcher current vel ", launcher.getVelocity());
+
+        dashboard.sendTelemetryPacket(packet);
+
 //        telemetry.addData("Spindexer wrapped pos ", spindexer.getWrappedAngle());
 //        telemetry.addData("Spindexer unwrapped pos ", spindexer.getUnwrappedAngle());
 
@@ -282,21 +309,5 @@ public class Robot {
         launchCommand = null;
         launcher.stopLauncher();
         popper.deactivatePopper();
-    }
-
-    public double getLauncherVel() {
-        return launcher.getVelocity();
-    }
-
-    public double getLauncherTargetVel() {
-        return launcher.getTargetVelocity();
-    }
-
-    public double getSpindexerWrapped() {
-        return spindexer.getWrappedAngle();
-    }
-
-    public double getSpindexerUnwrapped() {
-        return spindexer.getUnwrappedAngle();
     }
 }

@@ -22,7 +22,7 @@ public class RedTeleOp extends OpMode {
         packet = new TelemetryPacket();
         dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
-        robot = new Robot(hardwareMap, RoadRunnerPinPoint.AllianceColor.RED, gamepad1, gamepad2, telemetry);
+        robot = new Robot(hardwareMap, RoadRunnerPinPoint.AllianceColor.RED, gamepad1, gamepad2, telemetry, packet, dashboard);
         robot.start();
     }
 

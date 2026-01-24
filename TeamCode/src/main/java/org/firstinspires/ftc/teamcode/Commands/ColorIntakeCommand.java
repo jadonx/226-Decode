@@ -47,7 +47,7 @@ public class ColorIntakeCommand {
     public void update() {
         spindexer.update();
 
-        if (spindexer.atTargetAngle(8)) {
+        if (spindexer.atTargetAngle(5)) {
             colorSensor.update();
 
             if (!colorSensor.hasBall()) {
