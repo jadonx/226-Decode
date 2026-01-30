@@ -73,7 +73,9 @@ public class Robot {
         pinpoint = new RoadRunnerPinPoint(hardwareMap, allianceColor, startPose);
 
         this.gamepad1 = gamepad1;
-        this.gamepad2 = gamepad2;
+        if (gamepad2 == null) this.gamepad2 = gamepad1;
+        else this.gamepad2 = gamepad2;
+
         this.telemetry = telemetry;
         loopTimer = new ElapsedTime();
 
