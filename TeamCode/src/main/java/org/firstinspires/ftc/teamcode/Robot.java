@@ -105,17 +105,14 @@ public class Robot {
         }
 
         updateDrive();
+        updateIntake();
+        updateSpindexer();
         updateLauncherCover();
         updateLauncher();
         updatePinPoint();
         updateTurret();
         updateStoredPosition();
-        updateIntake();
         updateLight();
-
-        if (gamepad1.dpadLeftWasPressed()) {
-            spindexer.toggleUnjam();
-        }
 
         if (gamepad1.left_trigger > 0.1 && launchCommand != null) {
             stopLaunchCommand();
@@ -176,6 +173,16 @@ public class Robot {
         }
         else {
             intake.stopIntake();
+        }
+
+        if (gamepad1.rightBumperWasPressed()) {
+            intake.toggleSpinningAtRest();
+        }
+    }
+
+    private void updateSpindexer() {
+        if (gamepad1.dpadLeftWasPressed()) {
+            spindexer.toggleUnjam();
         }
     }
 
