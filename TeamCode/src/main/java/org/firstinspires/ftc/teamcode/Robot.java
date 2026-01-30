@@ -114,13 +114,13 @@ public class Robot {
         updateStoredPosition();
         updateLight();
 
-        if (gamepad1.left_trigger > 0.1 && launchCommand != null) {
+        if (gamepad2.left_trigger > 0.1 && launchCommand != null) {
             stopLaunchCommand();
             colorIntakeCommand.start();
         }
 
         if (launchCommand == null) {
-            if (gamepad1.aWasPressed() && launchCommand == null) {
+            if (gamepad2.aWasPressed() && launchCommand == null) {
                 launchCommand = new LaunchCommand(spindexer, popper, launcher, pinpoint, intake);
                 launchCommand.start();
             }
@@ -131,7 +131,7 @@ public class Robot {
         }
 
         if (launchCommand != null) {
-            if (gamepad1.bWasPressed()) {
+            if (gamepad2.bWasPressed()) {
                 launchCommand.startShootingSequence();
             }
 
@@ -181,8 +181,11 @@ public class Robot {
     }
 
     private void updateSpindexer() {
-        if (gamepad1.dpadLeftWasPressed()) {
-            spindexer.toggleUnjam();
+        if (gamepad2.dpadLeftWasPressed()) {
+            spindexer.toggleUnjam(false); // CCW
+        }
+        else if (gamepad2.dpadRightWasPressed()) {
+            spindexer.toggleUnjam(true); // CW
         }
     }
 
@@ -255,7 +258,7 @@ public class Robot {
             turret.setTarget(heading);
         }
 
-        if (gamepad1.rightBumperWasPressed() || gamepad1.dpadUpWasPressed()) {
+        if (gamepad2.dpadUpWasPressed()) {
             isUsingTurret = !isUsingTurret;
         }
     }

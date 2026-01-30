@@ -37,7 +37,7 @@ public class Spindexer {
     SpindexerMode spindexerMode;
     private double spindexerSpeed = 0.4;
     private boolean isUnjamming;
-    // public static double spindexerSpeed = 0.4;
+    private boolean isUnjammingCW;
 
     private double lastAngle = 0;
     private double unwrappedAngle = 0;
@@ -59,7 +59,12 @@ public class Spindexer {
         updateUnwrappedAngle();
 
         if (isUnjamming) {
-            spindexerServo.setPower(-0.3);
+            if (isUnjammingCW) {
+                spindexerServo.setPower(-0.3);
+            }
+            else {
+                spindexerServo.setPower(0.3);
+            }
         }
         else if (spindexerMode == SpindexerMode.INTAKE_MODE) {
             updateIntakeMode();
@@ -203,8 +208,9 @@ public class Spindexer {
         spindexerServo.setPower(power);
     }
 
-    public void toggleUnjam() {
+    public void toggleUnjam(boolean isUnjammingCW) {
         isUnjamming = !isUnjamming;
+        this.isUnjammingCW = isUnjammingCW;
     }
 
     /** Color sensing intake logic */
