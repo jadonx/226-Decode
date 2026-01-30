@@ -176,17 +176,13 @@ public class Robot {
         else {
             intake.stopIntake();
         }
-
-        if (gamepad1.rightBumperWasPressed()) {
-            intake.toggleSpinningAtRest();
-        }
     }
 
     private void updateSpindexer() {
-        if (gamepad2.dpadLeftWasPressed()) {
+        if (gamepad2.leftBumperWasPressed()) {
             spindexer.toggleUnjam(false); // CCW
         }
-        else if (gamepad2.dpadRightWasPressed()) {
+        else if (gamepad2.rightBumperWasPressed()) {
             spindexer.toggleUnjam(true); // CW
         }
     }
