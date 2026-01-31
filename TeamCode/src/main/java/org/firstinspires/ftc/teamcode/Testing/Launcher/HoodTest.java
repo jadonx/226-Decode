@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Testing;
+package org.firstinspires.ftc.teamcode.Testing.Launcher;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -8,18 +8,19 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.Constants;
 
 @Config
-@TeleOp(name="CoverTest", group="Test")
-public class CoverTest extends OpMode {
-    Servo cover;
-    public static double hoodPos;
+@TeleOp(name="HoodTest", group="Test")
+public class HoodTest extends OpMode {
+    Servo servo;
+
+    public static double hoodPos = 0.5;
 
     @Override
     public void init() {
-        cover = hardwareMap.get(Servo.class, Constants.HMServobackSpin);
+        servo = hardwareMap.get(Servo.class, Constants.HMServobackSpin);
     }
 
     @Override
     public void loop() {
-        cover.setPosition(hoodPos);
+        servo.setPosition(hoodPos);
     }
 }

@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.Constants;
 
 public class Intake {
     private DcMotor intake;
-    private final float MAX_POWER = 0.7f;
+    private final float MAX_POWER = 1.0f;
 
     public Intake(HardwareMap hardwareMap) {
         intake = hardwareMap.get(DcMotorEx.class, Constants.HMMotorIntake);
