@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Constants;
 
 public class ColorSensor {
@@ -15,6 +16,7 @@ public class ColorSensor {
 
     private float[] hsv = new float[3];
     private double currentHue;
+    private double currentDistance;
     private Spindexer.HolderStatus currentBall;
 
     private ElapsedTime timer;
@@ -35,11 +37,13 @@ public class ColorSensor {
             updateColor();
             currentHue = hsv[0];
 
-            if (currentHue > 215 && currentHue < 245) {
-                currentBall = Spindexer.HolderStatus.PURPLE;
-            }
-            else if (currentHue > 145 && currentHue < 175) {
-                currentBall = Spindexer.HolderStatus.GREEN;
+            if (currentDistance < 1.5) {
+                if (currentHue > 215 && currentHue < 245) {
+                    currentBall = Spindexer.HolderStatus.PURPLE;
+                }
+                else if (currentHue > 145 && currentHue < 175) {
+                    currentBall = Spindexer.HolderStatus.GREEN;
+                }
             }
             else {
                 currentBall = Spindexer.HolderStatus.NONE;
@@ -65,5 +69,7 @@ public class ColorSensor {
         int g = colorSensorFront.green();
         int b = colorSensorFront.blue();
         Color.RGBToHSV(r, g, b, hsv);
+
+        currentDistance = colorSensorFront.getDistance(DistanceUnit.INCH);
     }
 }

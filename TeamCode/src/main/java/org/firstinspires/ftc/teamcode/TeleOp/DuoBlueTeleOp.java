@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Robot;
 import org.firstinspires.ftc.teamcode.Subsystems.RoadRunnerPinPoint;
 
-@TeleOp(name="BlueTeleOp", group="!TeleOp")
-public class BlueTeleOp extends OpMode {
+@TeleOp(name="DuoBlueTeleOp", group="!TeleOp")
+public class DuoBlueTeleOp extends OpMode {
     Robot robot;
     FtcDashboard dashboard;
     TelemetryPacket packet;
@@ -18,7 +18,7 @@ public class BlueTeleOp extends OpMode {
     public void init() {
         packet = new TelemetryPacket();
         dashboard = FtcDashboard.getInstance();
-        robot = new Robot(hardwareMap, RoadRunnerPinPoint.AllianceColor.BLUE, gamepad1, null, telemetry, packet, dashboard);
+        robot = new Robot(hardwareMap, RoadRunnerPinPoint.AllianceColor.BLUE, gamepad1, gamepad2, telemetry, packet, dashboard);
         robot.start();
     }
 

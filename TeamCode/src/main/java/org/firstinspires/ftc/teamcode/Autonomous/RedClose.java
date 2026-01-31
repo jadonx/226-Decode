@@ -129,7 +129,7 @@ public class RedClose extends LinearOpMode {
                         autonomousActions.updateBotPosition(),
                         autonomousActions.updateLauncher(1330),
                         new SequentialAction(
-                                autonomousActions.moveCover(),
+                                autonomousActions.moveCover(0.25),
                                 autonomousActions.runPopper(),
                                 autonomousActions.setTurretTarget(-160),
                                 autonomousActions.pushInPopper(),

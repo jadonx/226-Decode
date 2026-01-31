@@ -76,14 +76,20 @@ public class AutonomousActions {
     }
 
     public class MoveCover implements Action {
+        private double hoodPos;
+
+        public MoveCover(double hoodPos) {
+            this.hoodPos = hoodPos;
+        }
+
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            launcher.setTargetCoverAngle(0);
+            launcher.setTargetCoverAngle(hoodPos);
             return false;
         }
     }
-    public Action moveCover() {
-        return new MoveCover();
+    public Action moveCover(double hoodPos) {
+        return new MoveCover(hoodPos);
     }
 
     public class UpdateLauncher implements Action {
