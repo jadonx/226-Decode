@@ -28,6 +28,8 @@ public class Spindexer {
     public static double targetAngle = 0;
     // private double kP = 0.002, kS = 0.04;
     public static double kP = 0.012, kI = 0, kD = 0.005, kF = 0;
+    public static int errorThreshold = 20;
+    public static double thresholdMultiplier = 0.75;
     private PIDFController pid = new PIDFController(kP, kI, kD, kF);;
 
     public enum SpindexerMode {
@@ -75,8 +77,13 @@ public class Spindexer {
 
         double power = pid.calculate(0, error);
 
-        if (error < 2) {
-            power *= 0.4;
+        if (error < errorThreshold) {
+            if (error < 2) {
+                power *= 0.4;
+            }
+            else {
+                power *= thresholdMultiplier;
+            }
         }
 
         power = Range.clip(power, -0.4, 0.4);
