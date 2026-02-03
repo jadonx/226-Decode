@@ -149,6 +149,7 @@ public class BlueClose extends LinearOpMode {
                                 autonomousActions.stopSpindexer(),
                                 openGate.build(),
                                 autonomousActions.runPopper(),
+                                autonomousActions.setSpindexerHolderStatuses(AutonomousActions.PPG),
                                 new ParallelAction(
                                         secondLaunch.build(),
                                         new SequentialAction(
@@ -167,6 +168,7 @@ public class BlueClose extends LinearOpMode {
                                 ),
                                 autonomousActions.stopSpindexer(),
                                 autonomousActions.runPopper(),
+                                autonomousActions.setSpindexerHolderStatuses(AutonomousActions.PGP),
                                 new ParallelAction(
                                         thirdLaunch.build(),
                                         new SequentialAction(
@@ -185,6 +187,7 @@ public class BlueClose extends LinearOpMode {
                                 ),
                                 autonomousActions.stopSpindexer(),
                                 autonomousActions.runPopper(),
+                                autonomousActions.setSpindexerHolderStatuses(AutonomousActions.GPP),
                                 new ParallelAction(
                                         fourthLaunch.build(),
                                         new SequentialAction(

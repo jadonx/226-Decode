@@ -148,6 +148,7 @@ public class RedClose extends LinearOpMode {
                                         autonomousActions.autoColorIntakeCommand(colorIntakeCommand)
                                 ),
                                 autonomousActions.stopSpindexer(),
+                                autonomousActions.setSpindexerHolderStatuses(AutonomousActions.PPG),
                                 openGate.build(),
                                 autonomousActions.runPopper(),
                                 new ParallelAction(
@@ -167,6 +168,7 @@ public class RedClose extends LinearOpMode {
                                         autonomousActions.autoColorIntakeCommand(colorIntakeCommand)
                                 ),
                                 autonomousActions.stopSpindexer(),
+                                autonomousActions.setSpindexerHolderStatuses(AutonomousActions.PGP),
                                 autonomousActions.runPopper(),
                                 new ParallelAction(
                                         thirdLaunch.build(),
@@ -185,6 +187,7 @@ public class RedClose extends LinearOpMode {
                                         autonomousActions.autoColorIntakeCommand(colorIntakeCommand)
                                 ),
                                 autonomousActions.stopSpindexer(),
+                                autonomousActions.setSpindexerHolderStatuses(AutonomousActions.GPP),
                                 autonomousActions.runPopper(),
                                 new ParallelAction(
                                         fourthLaunch.build(),
