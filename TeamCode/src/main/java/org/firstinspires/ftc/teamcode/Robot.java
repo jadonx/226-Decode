@@ -73,7 +73,9 @@ public class Robot {
         pinpoint = new RoadRunnerPinPoint(hardwareMap, allianceColor, startPose);
 
         this.gamepad1 = gamepad1;
-        this.gamepad2 = gamepad2;
+        if (gamepad2 == null) this.gamepad2 = gamepad1;
+        else this.gamepad2 = gamepad2;
+
         this.telemetry = telemetry;
         loopTimer = new ElapsedTime();
 
@@ -105,25 +107,22 @@ public class Robot {
         }
 
         updateDrive();
+        updateIntake();
+        updateSpindexer();
         updateLauncherCover();
         updateLauncher();
         updatePinPoint();
         updateTurret();
         updateStoredPosition();
-        updateIntake();
         updateLight();
 
-        if (gamepad1.dpadLeftWasPressed()) {
-            spindexer.toggleUnjam();
-        }
-
-        if (gamepad1.left_trigger > 0.1 && launchCommand != null) {
+        if (gamepad2.left_trigger > 0.1 && launchCommand != null) {
             stopLaunchCommand();
             colorIntakeCommand.start();
         }
 
         if (launchCommand == null) {
-            if (gamepad1.aWasPressed() && launchCommand == null) {
+            if (gamepad2.aWasPressed() && launchCommand == null) {
                 launchCommand = new LaunchCommand(spindexer, popper, launcher, pinpoint, intake);
                 launchCommand.start();
             }
@@ -134,7 +133,7 @@ public class Robot {
         }
 
         if (launchCommand != null) {
-            if (gamepad1.bWasPressed()) {
+            if (gamepad2.bWasPressed()) {
                 launchCommand.startShootingSequence();
             }
 
@@ -176,6 +175,15 @@ public class Robot {
         }
         else {
             intake.stopIntake();
+        }
+    }
+
+    private void updateSpindexer() {
+        if (gamepad2.leftBumperWasPressed()) {
+            spindexer.toggleUnjam(false); // CCW
+        }
+        else if (gamepad2.rightBumperWasPressed()) {
+            spindexer.toggleUnjam(true); // CW
         }
     }
 
@@ -248,7 +256,7 @@ public class Robot {
             turret.setTarget(heading);
         }
 
-        if (gamepad1.rightBumperWasPressed() || gamepad1.dpadUpWasPressed()) {
+        if (gamepad2.dpadUpWasPressed()) {
             isUsingTurret = !isUsingTurret;
         }
     }
