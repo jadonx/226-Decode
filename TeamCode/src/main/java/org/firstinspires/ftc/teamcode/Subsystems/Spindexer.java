@@ -26,9 +26,9 @@ public class Spindexer {
 
     private double currentAngle;
     public static double targetAngle = 0;
-    public static double kP = 0.002, kI = 0, kD = 0.2, kF = 0.05;
-    public static int errorThreshold = 20;
-    public static double thresholdMultiplier = 0.5;
+    public static double kP = 0.005, kI = 0, kD = 0, kF = 0;
+    public static int errorThreshold = 0;
+    public static double thresholdMultiplier = 0;
     private PIDFController pid = new PIDFController(kP, kI, kD, kF);
 
     private ElapsedTime pidTimer = new ElapsedTime();
