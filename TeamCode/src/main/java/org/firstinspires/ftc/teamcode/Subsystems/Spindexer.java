@@ -26,11 +26,14 @@ public class Spindexer {
 
     private double currentAngle;
     public static double targetAngle = 0;
-    // private double kP = 0.002, kS = 0.04;
-    public static double kP = 0.012, kI = 0, kD = 0.005, kF = 0;
+    public static double kP = 0.002, kI = 0, kD = 0.2, kF = 0.05;
     public static int errorThreshold = 20;
-    public static double thresholdMultiplier = 0.75;
-    private PIDFController pid = new PIDFController(kP, kI, kD, kF);;
+    public static double thresholdMultiplier = 0.5;
+    private PIDFController pid = new PIDFController(kP, kI, kD, kF);
+
+    private ElapsedTime pidTimer = new ElapsedTime();
+    private long lastTime = pidTimer.nanoseconds();
+    private double lastError = 0;
 
     public enum SpindexerMode {
         INTAKE_MODE,
@@ -54,6 +57,8 @@ public class Spindexer {
         spindexerServo.setDirection(DcMotorSimple.Direction.REVERSE);
         spindexerEncoder = hardwareMap.get(SpindexerEncoder.class, Constants.HMSpindexerEncoder);
         spindexerMode = SpindexerMode.INTAKE_MODE;
+
+        pidTimer.reset();
     }
 
     public void update() {
@@ -78,20 +83,25 @@ public class Spindexer {
 
     private void updateIntakeMode() {
         double error = calculateError();
-        pid.setPIDF(kP, kI, kD, kF);
 
-        double power = pid.calculate(0, error);
+        long currentTime = pidTimer.nanoseconds();
+        double deltaTime = (currentTime - lastTime) / 1.0e9;
+        double derivative = 0;
 
-        if (error < errorThreshold) {
-            if (error < 2) {
-                power *= 0.4;
-            }
-            else {
-                power *= thresholdMultiplier;
-            }
+        if (deltaTime > 0) {
+            derivative = (error - lastError) / deltaTime;
         }
 
-        power = Range.clip(power, -0.4, 0.4);
+        double power = kP * error + kD * derivative;
+
+        if (Math.abs(error) < 2) {
+            power = 0;
+        }
+        else if (Math.abs(error) < errorThreshold) {
+            power *= thresholdMultiplier;
+        }
+
+        power += Math.signum(error) * kF;
 
         spindexerServo.setPower(power);
     }
