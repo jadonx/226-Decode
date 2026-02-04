@@ -20,6 +20,7 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.Subsystems.Supporters.MotionProfiler;
 
 @Config
 public class Spindexer {
@@ -28,12 +29,11 @@ public class Spindexer {
 
     private double currentAngle;
     public static double targetAngle = 0;
-    public static double kP = 0.002, kI = 0, kD = 0, kF = 0.05;
-    public static double kP_max = 0, kP_min = 0, scale = 0;
-
-    private ElapsedTime pidTimer = new ElapsedTime();
-    private long lastTime = pidTimer.nanoseconds();
-    private double lastError = 0;
+    public static double kP = 0.002;
+    public static double maxVel = 0, maxAcc = 0;
+    public double reference;
+    private MotionProfiler profiler;
+    private ElapsedTime profilerTimer = new ElapsedTime();
 
     public enum SpindexerMode {
         INTAKE_MODE,
@@ -43,6 +43,7 @@ public class Spindexer {
     private double spindexerSpeed = 0.4;
     private boolean isUnjamming;
     private boolean isUnjammingCW;
+    private boolean startMotionProfile;
 
     private double lastAngle = 0;
     private double unwrappedAngle = 0;
@@ -57,8 +58,6 @@ public class Spindexer {
         spindexerServo.setDirection(DcMotorSimple.Direction.REVERSE);
         spindexerEncoder = hardwareMap.get(SpindexerEncoder.class, Constants.HMSpindexerEncoder);
         spindexerMode = SpindexerMode.INTAKE_MODE;
-
-        pidTimer.reset();
     }
 
     public void update() {
@@ -72,30 +71,37 @@ public class Spindexer {
             else {
                 spindexerServo.setPower(0.3);
             }
+            startMotionProfile = true;
         }
         else if (spindexerMode == SpindexerMode.INTAKE_MODE) {
+            if (startMotionProfile) {
+                startMotionProfile = false;
+                startProfile(targetAngle, maxVel, maxAcc);
+            }
+
             updateIntakeMode();
         }
         else if (spindexerMode == SpindexerMode.LAUNCH_MODE) {
             updateLaunchMode();
+            startMotionProfile = true;
         }
     }
 
+    private void startProfile(double targetAngle, double maxVel, double maxAcc) {
+        double distance = targetAngle - currentAngle;
+        profiler = new MotionProfiler(distance, maxVel, maxAcc);
+        profilerTimer.reset();
+    }
+
     private void updateIntakeMode() {
+        if (profiler == null) return;
+
+        double elapsedSec = profilerTimer.seconds();
+        reference = profiler.getReference(elapsedSec);
+
         double error = calculateError();
 
-        long currentTime = pidTimer.nanoseconds();
-        double deltaTime = (currentTime - lastTime) / 1.0e9;
-        double derivative = 0;
-
-        if (deltaTime > 0) {
-            derivative = (error - lastError) / deltaTime;
-        }
-
-        double absErr = Math.abs(error);
-        double kP_eff = kP_min + (kP_max - kP_min) * (absErr / scale); // * tanh(absErr / scale);
-
-        double power = kP * error + kD * derivative + Math.signum(error) * kF;
+        double power = kP * error;
 
         if (Math.abs(error) < 2) {
             power *= 0.5;
@@ -127,7 +133,7 @@ public class Spindexer {
         return false;
     }
 
-    private double calculateError() {
+    private double calculateError(double targetAngle, double currentAngle) {
         if (spindexerMode == SpindexerMode.INTAKE_MODE) {
             return AngleUnit.normalizeDegrees(targetAngle - currentAngle);
         }
