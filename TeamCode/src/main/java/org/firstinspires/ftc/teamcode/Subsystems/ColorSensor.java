@@ -18,6 +18,7 @@ public class ColorSensor {
     private double currentHue;
     private double currentDistance;
     private Spindexer.HolderStatus currentBall;
+    private boolean hasBall;
 
     private ElapsedTime timer;
     private final int UPDATE_TIME = 150;
@@ -34,18 +35,22 @@ public class ColorSensor {
 
     public void update() {
         if (timer.milliseconds() > UPDATE_TIME) {
-            updateColor();
+            updateDistance();
             currentHue = hsv[0];
 
             if (currentDistance < 1.5) {
-                if (currentHue > 215 && currentHue < 245) {
-                    currentBall = Spindexer.HolderStatus.PURPLE;
-                }
-                else if (currentHue > 145 && currentHue < 175) {
-                    currentBall = Spindexer.HolderStatus.GREEN;
-                }
+                hasBall = true;
+
+//                updateColor();
+//                if (currentHue > 215 && currentHue < 245) {
+//                    currentBall = Spindexer.HolderStatus.PURPLE;
+//                }
+//                else if (currentHue > 145 && currentHue < 175) {
+//                    currentBall = Spindexer.HolderStatus.GREEN;
+//                }
             }
             else {
+                hasBall = false;
                 currentBall = Spindexer.HolderStatus.NONE;
             }
 
@@ -58,18 +63,17 @@ public class ColorSensor {
     }
 
     public boolean hasBall() {
-        return currentBall != Spindexer.HolderStatus.NONE;
+        return hasBall;
+    }
+
+    private void updateDistance() {
+        currentDistance = colorSensorFront.getDistance(DistanceUnit.INCH);
     }
 
     private void updateColor() {
-//        int r = Math.max(colorSensorFront.red(), colorSensorBack.red());
-//        int g = Math.max(colorSensorFront.green(), colorSensorBack.green());
-//        int b = Math.max(colorSensorFront.blue(), colorSensorBack.blue());
         int r = colorSensorFront.red();
         int g = colorSensorFront.green();
         int b = colorSensorFront.blue();
         Color.RGBToHSV(r, g, b, hsv);
-
-        currentDistance = colorSensorFront.getDistance(DistanceUnit.INCH);
     }
 }
