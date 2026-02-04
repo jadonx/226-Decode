@@ -28,8 +28,8 @@ public class Spindexer {
 
     private double currentAngle;
     public static double targetAngle = 0;
-    public static double kP = 0.002, kI = 0, kD = 0, kF = 0.05;
-    public static double kP_max = 0, kP_min = 0, scale = 0;
+    public static double kP = 0.002, kI = 0, kD = 0.001, kF = 0.03;
+    public static double kP_max = 0.002, kP_min = 0.001, scale = 50;
 
     private ElapsedTime pidTimer = new ElapsedTime();
     private long lastTime = pidTimer.nanoseconds();
@@ -93,9 +93,9 @@ public class Spindexer {
         }
 
         double absErr = Math.abs(error);
-        double kP_eff = kP_min + (kP_max - kP_min) * tanh(absErr / scale); // * tanh(absErr / scale);
+        double kP_eff = kP_min + (kP_max - kP_min) * (absErr / scale); // * tanh(absErr / scale);
 
-        double power = kP * error + kD * derivative + Math.signum(error) * kF;
+        double power = kP_eff * error + kD * derivative + Math.signum(error) * kF;
 
         if (Math.abs(error) < 2) {
             power *= 0.5;
