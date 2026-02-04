@@ -70,6 +70,13 @@ public class ColorSensor {
         currentDistance = colorSensorFront.getDistance(DistanceUnit.INCH);
     }
 
+    private void updateDistance() {
+//        int r = Math.max(colorSensorFront.red(), colorSensorBack.red());
+//        int g = Math.max(colorSensorFront.green(), colorSensorBack.green());
+//        int b = Math.max(colorSensorFront.blue(), colorSensorBack.blue());
+        currentDistance = colorSensorFront.getDistance(DistanceUnit.INCH);
+    }
+
     private void updateColor() {
         int r = colorSensorFront.red();
         int g = colorSensorFront.green();

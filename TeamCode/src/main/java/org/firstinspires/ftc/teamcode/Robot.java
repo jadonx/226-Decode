@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -24,7 +25,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Supporters.PoseStorage;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
 import java.util.List;
-
+@Config
 public class Robot {
     private final FieldCentricDrive drive;
     private final Intake intake;
@@ -49,8 +50,13 @@ public class Robot {
     private boolean isUsingTurret;
     private double turretLimelightOffset;
 
+    RoadRunnerPinPoint.AllianceColor color;
+
     private Gamepad gamepad1;
     private Gamepad gamepad2;
+
+    public static double turretOffset = 5;
+    public static double turretOffsetDistance = 90;
 
     // Bulk caching
     List<LynxModule> hubs;
@@ -68,7 +74,7 @@ public class Robot {
         turret = new Turret(hardwareMap);
         limelight = new LimeLight(hardwareMap, allianceColor);
         light = new RGBIndicator(hardwareMap);
-
+        color = allianceColor;
         Pose2d startPose = new Pose2d(PoseStorage.getX(), PoseStorage.getY(), Math.toRadians(PoseStorage.getHeading()));
         pinpoint = new RoadRunnerPinPoint(hardwareMap, allianceColor, startPose);
 
@@ -246,6 +252,12 @@ public class Robot {
                 if (limelight.isResulted() && limelight.isGoalTargeted()) {
                     turret.setMode(Turret.TurretMode.LIMELIGHT);
                     turret.setLimelightError(-limelight.getTX());
+                    if(pinpoint.getDistanceToGoal() > turretOffsetDistance && color == RoadRunnerPinPoint.AllianceColor.RED){
+                        turret.setLimelightError(-limelight.getTX()-turretOffset);
+                    }
+                    if(pinpoint.getDistanceToGoal() > turretOffsetDistance && color == RoadRunnerPinPoint.AllianceColor.BLUE){
+                        turret.setLimelightError(-limelight.getTX()+turretOffset);
+                    }
                 } else {
                     turret.setMode(Turret.TurretMode.PINPOINT);
                     turret.setTarget(target);
@@ -296,7 +308,7 @@ public class Robot {
 //        // Pinpoint
 //        telemetry.addData("Pinpoint Position ", pinpoint.getPose().position.x + ", " + pinpoint.getPose().position.y);
 //        telemetry.addData("Rotation ", Math.toDegrees(pinpoint.getPose().heading.toDouble()));
-//        telemetry.addData("Goal Distance ", pinpoint.getDistanceToGoal() + "\n");
+          telemetry.addData("Goal Distance ", pinpoint.getDistanceToGoal() + "\n");
 
 //        telemetry.addData("Desired Angle", pinpoint.getAngleToGoal());
 //        telemetry.addData("Actual Angle", (turret.getTurretAngle()));
