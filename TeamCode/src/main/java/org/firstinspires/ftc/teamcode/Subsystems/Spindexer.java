@@ -93,7 +93,7 @@ public class Spindexer {
         }
 
         double absErr = Math.abs(error);
-        double kP_eff = kP_min + (kP_max - kP_min) * (absErr / scale); // * tanh(absErr / scale);
+        double kP_eff = kP_min + (kP_max - kP_min) * tanh(absErr / scale); // * tanh(absErr / scale);
 
         double power = kP * error + kD * derivative + Math.signum(error) * kF;
 
