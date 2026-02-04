@@ -44,6 +44,7 @@ public class SpindexerPIDFTest extends OpMode {
 
         packet.put("current ", spindexer.getWrappedAngle());
         packet.put("target ", spindexer.getTargetAngle());
+        packet.put("profiler ref ", spindexer.reference);
         dashboard.sendTelemetryPacket(packet);
     }
 }

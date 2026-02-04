@@ -28,6 +28,7 @@ public class Spindexer {
     private SpindexerEncoder spindexerEncoder;
 
     private double currentAngle;
+    private double profileStartAngle;
     public static double targetAngle = 0;
     public static double kP = 0.002;
     public static double maxVel = 0, maxAcc = 0;
@@ -88,6 +89,7 @@ public class Spindexer {
     }
 
     private void startProfile(double targetAngle, double maxVel, double maxAcc) {
+        profileStartAngle = currentAngle;
         double distance = targetAngle - currentAngle;
         profiler = new MotionProfiler(distance, maxVel, maxAcc);
         profilerTimer.reset();
@@ -99,7 +101,8 @@ public class Spindexer {
         double elapsedSec = profilerTimer.seconds();
         reference = profiler.getReference(elapsedSec);
 
-        double error = calculateError();
+        double desiredAngle = profileStartAngle + reference;
+        double error = calculateError(desiredAngle);
 
         double power = kP * error;
 
@@ -133,7 +136,7 @@ public class Spindexer {
         return false;
     }
 
-    private double calculateError(double targetAngle, double currentAngle) {
+    private double calculateError(double targetAngle) {
         if (spindexerMode == SpindexerMode.INTAKE_MODE) {
             return AngleUnit.normalizeDegrees(targetAngle - currentAngle);
         }
