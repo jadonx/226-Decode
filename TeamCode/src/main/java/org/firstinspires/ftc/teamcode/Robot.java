@@ -47,6 +47,7 @@ public class Robot {
     private int numLoops;
     private ElapsedTime loopTimer;
 
+    private boolean isCurrentlyShooting;
     private boolean isUsingTurret;
     private double turretLimelightOffset;
 
@@ -55,7 +56,7 @@ public class Robot {
     private Gamepad gamepad1;
     private Gamepad gamepad2;
 
-    public static double turretOffset = 5;
+    public static double turretOffset = 2.5;
     public static double turretOffsetDistance = 90;
 
     // Bulk caching
@@ -136,10 +137,12 @@ public class Robot {
 
         if (launchCommand == null || launchCommand.getCurrentState() == LaunchCommand.State.PRIME_SHOOTER) {
             colorIntakeCommand.update();
+            isCurrentlyShooting = false;
         }
 
         if (launchCommand != null) {
             if (gamepad2.bWasPressed()) {
+                isCurrentlyShooting = true;
                 launchCommand.startShootingSequence();
             }
 
@@ -249,7 +252,7 @@ public class Robot {
                 turret.setTarget(heading);
                 isUsingTurret = false;
             } else {
-                if (limelight.isResulted() && limelight.isGoalTargeted()) {
+                if (limelight.isResulted() && limelight.isGoalTargeted() && !isCurrentlyShooting) {
                     turret.setMode(Turret.TurretMode.LIMELIGHT);
                     turret.setLimelightError(-limelight.getTX());
                     if(pinpoint.getDistanceToGoal() > turretOffsetDistance && color == RoadRunnerPinPoint.AllianceColor.RED){

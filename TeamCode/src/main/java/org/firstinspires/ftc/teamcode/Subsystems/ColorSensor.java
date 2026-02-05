@@ -66,9 +66,7 @@ public class ColorSensor {
         return hasBall;
     }
 
-    private void updateDistance() {
-        currentDistance = colorSensorFront.getDistance(DistanceUnit.INCH);
-    }
+
 
     private void updateDistance() {
 //        int r = Math.max(colorSensorFront.red(), colorSensorBack.red());
