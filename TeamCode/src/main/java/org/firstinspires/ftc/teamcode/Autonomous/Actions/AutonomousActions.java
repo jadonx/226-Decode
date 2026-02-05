@@ -25,6 +25,10 @@ public class AutonomousActions {
     Popper popper;
     ColorIntakeCommand colorIntakeCommand;
 
+    public static final Spindexer.HolderStatus[] GPP = new Spindexer.HolderStatus[] {Spindexer.HolderStatus.GREEN, Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.PURPLE};
+    public static final Spindexer.HolderStatus[] PGP = new Spindexer.HolderStatus[] {Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.GREEN, Spindexer.HolderStatus.PURPLE};
+    public static final Spindexer.HolderStatus[] PPG = new Spindexer.HolderStatus[] {Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.PURPLE, Spindexer.HolderStatus.GREEN};
+
     public AutonomousActions(MecanumDrive drive, LimeLight limelight, Intake intake, Turret turret, Spindexer spindexer, Launcher launcher, Popper popper, ColorIntakeCommand colorIntakeCommand) {
         this.drive = drive;
         this.limelight = limelight;
@@ -210,18 +214,23 @@ public class AutonomousActions {
         return new SpindexerFullRotation(speed);
     }
 
-    public class SetSpindexerStartPosition implements Action {
+    public class SetSpindexerHolderStatuses implements Action {
+        private Spindexer.HolderStatus[] holderStatuses;
+
+        public SetSpindexerHolderStatuses(Spindexer.HolderStatus[] holderStatuses) {
+            this.holderStatuses = holderStatuses;
+        }
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            spindexer.setHolderStatus(0, Spindexer.HolderStatus.GREEN);
-            spindexer.setHolderStatus(1, Spindexer.HolderStatus.PURPLE);
-            spindexer.setHolderStatus(2, Spindexer.HolderStatus.PURPLE);
+            spindexer.setHolderStatus(0, holderStatuses[0]);
+            spindexer.setHolderStatus(1, holderStatuses[1]);
+            spindexer.setHolderStatus(2, holderStatuses[2]);
             return false;
         }
     }
-    public Action setSpindexerStartPosition() {
-        return new SetSpindexerStartPosition();
+    public Action setSpindexerHolderStatuses(Spindexer.HolderStatus[] holderStatuses) {
+        return new SetSpindexerHolderStatuses(holderStatuses);
     }
 
     public class MoveToSortedPosition implements Action {

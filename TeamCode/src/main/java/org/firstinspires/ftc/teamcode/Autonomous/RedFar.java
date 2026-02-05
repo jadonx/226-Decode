@@ -96,7 +96,7 @@ public class RedFar extends LinearOpMode {
                         autonomousActions.updateTurret(),
                         new SequentialAction(
                                 /** Setup Sequence */
-                                autonomousActions.setSpindexerStartPosition(),
+                                autonomousActions.setSpindexerHolderStatuses(AutonomousActions.GPP),
                                 autonomousActions.moveCover(0),
                                 autonomousActions.runPopper(),
                                 autonomousActions.setTurretTarget(157),
@@ -119,6 +119,7 @@ public class RedFar extends LinearOpMode {
                                         autonomousActions.autoColorIntakeCommand(colorIntakeCommand)
                                 ),
                                 autonomousActions.stopSpindexer(),
+                                autonomousActions.setSpindexerHolderStatuses(AutonomousActions.GPP),
                                 /** Second Shooting Sequence */
                                 autonomousActions.runPopper(),
                                 new ParallelAction(
@@ -139,6 +140,7 @@ public class RedFar extends LinearOpMode {
                                         autonomousActions.autoColorIntakeCommand(colorIntakeCommand)
                                 ),
                                 autonomousActions.stopSpindexer(),
+                                autonomousActions.setSpindexerHolderStatuses(AutonomousActions.PGP),
                                 /** Third Shooting Sequence */
                                 autonomousActions.runPopper(),
                                 new ParallelAction(
