@@ -35,9 +35,14 @@ public class SpindexerTest extends OpMode {
 
     @Override
     public void loop() {
+        spindexer.updateAngles();
         spindexer.setPower(gamepad1.left_stick_x);
 
         packet.put("wrapped angle ", spindexerEncoder.getWrappedAngle());
         dashboard.sendTelemetryPacket(packet);
+
+        telemetry.addData("wrapped ", spindexer.getWrappedAngle());
+        telemetry.addData("unwrapped ", spindexer.getUnwrappedAngle());
+        telemetry.update();
     }
 }

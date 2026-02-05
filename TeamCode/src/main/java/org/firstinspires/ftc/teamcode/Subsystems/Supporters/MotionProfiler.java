@@ -4,6 +4,7 @@ public class MotionProfiler {
     private double maxAcc;   // ticks/sec^2
     private double maxVel;   // ticks/sec
     private double distance; // ticks
+    private double sign;
 
     private double accelDt;
     private double cruiseDt;
@@ -14,7 +15,8 @@ public class MotionProfiler {
     public MotionProfiler(double distance, double maxVel, double maxAcc) {
         this.maxAcc = maxAcc;
         this.maxVel = maxVel;
-        this.distance = distance;
+        this.distance = Math.abs(distance);
+        sign = Math.signum(distance);
 
         // Time to accelerate to max velocity
         accelDt = maxVel / maxAcc;
@@ -60,6 +62,18 @@ public class MotionProfiler {
             ref = accelDist + cruiseDist + maxVel * decelTime - 0.5 * maxAcc * decelTime * decelTime;
         }
 
-        return Math.min(ref, distance);
+        return sign * Math.min(ref, distance);
+    }
+
+    public double getVelocity(double t) {
+        if (t < accelDt) {
+            return maxAcc * t;
+        } else if (t < accelDt + cruiseDt) {
+            return maxVel;
+        } else if (t < totalDt) {
+            return maxVel - maxAcc * (t - accelDt - cruiseDt);
+        } else {
+            return 0;
+        }
     }
 }

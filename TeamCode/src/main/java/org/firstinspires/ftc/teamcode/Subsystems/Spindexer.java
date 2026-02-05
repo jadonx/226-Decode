@@ -29,8 +29,8 @@ public class Spindexer {
 
     private double currentAngle;
     private double profileStartAngle;
-    public static double targetAngle = 0;
-    public static double kP = 0.002;
+    private double targetAngle = 0;
+    public static double kP = 0.002, kV = 0;
     public static double maxVel = 0, maxAcc = 0;
     public double reference;
     private MotionProfiler profiler;
@@ -62,8 +62,7 @@ public class Spindexer {
     }
 
     public void update() {
-        currentAngle = spindexerEncoder.getWrappedAngle();
-        updateUnwrappedAngle();
+        updateAngles();
 
         if (isUnjamming) {
             if (isUnjammingCW) {
@@ -88,9 +87,15 @@ public class Spindexer {
         }
     }
 
+    public void updateAngles() {
+        currentAngle = spindexerEncoder.getWrappedAngle();
+        updateUnwrappedAngle();
+    }
+
     private void startProfile(double targetAngle, double maxVel, double maxAcc) {
-        profileStartAngle = currentAngle;
-        double distance = targetAngle - currentAngle;
+        profileStartAngle = unwrappedAngle;
+        double targetUnwrapped = unwrappedAngle + AngleUnit.normalizeDegrees(targetAngle - currentAngle);
+        double distance = targetUnwrapped - unwrappedAngle;
         profiler = new MotionProfiler(distance, maxVel, maxAcc);
         profilerTimer.reset();
     }
@@ -98,17 +103,17 @@ public class Spindexer {
     private void updateIntakeMode() {
         if (profiler == null) return;
 
-        double elapsedSec = profilerTimer.seconds();
-        reference = profiler.getReference(elapsedSec);
+        double t = profilerTimer.seconds();
+        reference = profiler.getReference(t);
 
         double desiredAngle = profileStartAngle + reference;
-        double error = calculateError(desiredAngle);
+        double error = desiredAngle - unwrappedAngle; // calculateError(desiredAngle);
 
         double power = kP * error;
 
-        if (Math.abs(error) < 2) {
-            power *= 0.5;
-        }
+        // Velocity control
+        double vRef = profiler.getVelocity(t);
+        power += kV * vRef;
 
         spindexerServo.setPower(power);
     }
@@ -213,6 +218,10 @@ public class Spindexer {
     }
 
     public void setTargetAngle(double targetAngle) {
+        if (this.targetAngle != targetAngle && spindexerMode == SpindexerMode.INTAKE_MODE) {
+            // New target angle, start a new motion profile
+            startMotionProfile = true;
+        }
         this.targetAngle = targetAngle;
     }
 
