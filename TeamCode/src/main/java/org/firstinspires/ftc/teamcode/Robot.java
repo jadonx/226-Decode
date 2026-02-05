@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -24,7 +25,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Supporters.PoseStorage;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 
 import java.util.List;
-
+@Config
 public class Robot {
     private final FieldCentricDrive drive;
     private final Intake intake;
@@ -46,11 +47,17 @@ public class Robot {
     private int numLoops;
     private ElapsedTime loopTimer;
 
+    private boolean isCurrentlyShooting;
     private boolean isUsingTurret;
     private double turretLimelightOffset;
 
+    RoadRunnerPinPoint.AllianceColor color;
+
     private Gamepad gamepad1;
     private Gamepad gamepad2;
+
+    public static double turretOffset = 2.5;
+    public static double turretOffsetDistance = 90;
 
     // Bulk caching
     List<LynxModule> hubs;
@@ -68,7 +75,7 @@ public class Robot {
         turret = new Turret(hardwareMap);
         limelight = new LimeLight(hardwareMap, allianceColor);
         light = new RGBIndicator(hardwareMap);
-
+        color = allianceColor;
         Pose2d startPose = new Pose2d(PoseStorage.getX(), PoseStorage.getY(), Math.toRadians(PoseStorage.getHeading()));
         pinpoint = new RoadRunnerPinPoint(hardwareMap, allianceColor, startPose);
 
@@ -130,10 +137,12 @@ public class Robot {
 
         if (launchCommand == null || launchCommand.getCurrentState() == LaunchCommand.State.PRIME_SHOOTER) {
             colorIntakeCommand.update();
+            isCurrentlyShooting = false;
         }
 
         if (launchCommand != null) {
             if (gamepad2.bWasPressed()) {
+                isCurrentlyShooting = true;
                 launchCommand.startShootingSequence();
             }
 
@@ -247,9 +256,15 @@ public class Robot {
                 turret.setTarget(heading);
                 isUsingTurret = false;
             } else {
-                if (limelight.isResulted() && limelight.isGoalTargeted()) {
+                if (limelight.isResulted() && limelight.isGoalTargeted() && !isCurrentlyShooting) {
                     turret.setMode(Turret.TurretMode.LIMELIGHT);
                     turret.setLimelightError(-limelight.getTX());
+                    if(pinpoint.getDistanceToGoal() > turretOffsetDistance && color == RoadRunnerPinPoint.AllianceColor.RED){
+                        turret.setLimelightError(-limelight.getTX()-turretOffset);
+                    }
+                    if(pinpoint.getDistanceToGoal() > turretOffsetDistance && color == RoadRunnerPinPoint.AllianceColor.BLUE){
+                        turret.setLimelightError(-limelight.getTX()+turretOffset);
+                    }
                 } else {
                     turret.setMode(Turret.TurretMode.PINPOINT);
                     turret.setTarget(target);
@@ -300,7 +315,7 @@ public class Robot {
 //        // Pinpoint
 //        telemetry.addData("Pinpoint Position ", pinpoint.getPose().position.x + ", " + pinpoint.getPose().position.y);
 //        telemetry.addData("Rotation ", Math.toDegrees(pinpoint.getPose().heading.toDouble()));
-//        telemetry.addData("Goal Distance ", pinpoint.getDistanceToGoal() + "\n");
+          telemetry.addData("Goal Distance ", pinpoint.getDistanceToGoal() + "\n");
 
 //        telemetry.addData("Desired Angle", pinpoint.getAngleToGoal());
 //        telemetry.addData("Actual Angle", (turret.getTurretAngle()));

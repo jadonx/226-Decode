@@ -65,7 +65,12 @@ public class ColorSensor {
         return currentBall != Spindexer.HolderStatus.NONE;
     }
 
+
+
     private void updateDistance() {
+//        int r = Math.max(colorSensorFront.red(), colorSensorBack.red());
+//        int g = Math.max(colorSensorFront.green(), colorSensorBack.green());
+//        int b = Math.max(colorSensorFront.blue(), colorSensorBack.blue());
         currentDistance = colorSensorFront.getDistance(DistanceUnit.INCH);
     }
 

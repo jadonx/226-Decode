@@ -62,6 +62,7 @@ public class RedFar extends LinearOpMode {
         launcher = new Launcher(hardwareMap);
         popper = new Popper(hardwareMap);
         limelight = new LimeLight(hardwareMap, RoadRunnerPinPoint.AllianceColor.RED);
+        limelight.setPipeline(1);
 
         colorIntakeCommand = new ColorIntakeCommand(spindexer, colorSensor);
 

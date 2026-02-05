@@ -31,14 +31,16 @@ public class LimeLight {
 
     public LimeLight(HardwareMap hardwareMap, RoadRunnerPinPoint.AllianceColor allianceColor) {
         limelight = hardwareMap.get(Limelight3A.class, Constants.HMLimelight);
-        limelight.pipelineSwitch(1);
+
         limelight.start();
 
         if (allianceColor == RoadRunnerPinPoint.AllianceColor.RED) {
             goalID = 24;
+            limelight.pipelineSwitch(2);
         }
         else if (allianceColor == RoadRunnerPinPoint.AllianceColor.BLUE) {
             goalID = 20;
+            limelight.pipelineSwitch(3);
         }
     }
 
@@ -123,6 +125,10 @@ public class LimeLight {
     public double getDistance() {
         distance = getDistanceInches(getTY());
         return distance;
+    }
+
+    public void setPipeline(int pipeline){
+        limelight.pipelineSwitch(pipeline);
     }
 
     private double getDistanceInches(double tyDegrees) {

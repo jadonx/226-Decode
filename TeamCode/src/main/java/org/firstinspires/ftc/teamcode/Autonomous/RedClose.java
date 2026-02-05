@@ -106,7 +106,7 @@ public class RedClose extends LinearOpMode {
         launcher = new Launcher(hardwareMap);
         popper = new Popper(hardwareMap);
         limelight = new LimeLight(hardwareMap, RoadRunnerPinPoint.AllianceColor.RED);
-
+        limelight.setPipeline(1);
         colorIntakeCommand = new ColorIntakeCommand(spindexer, colorSensor);
 
         autonomousActions = new AutonomousActions(drive, limelight, intake, turret, spindexer, launcher, popper, colorIntakeCommand);
