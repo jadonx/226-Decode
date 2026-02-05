@@ -86,6 +86,11 @@ public class Turret {
         this.targetAngle = targetAngle;
     }
 
+    // Holds the current angle relative to the bot, the turret won't move if the bot is rotated
+    public void holdCurrentAngle() {
+        targetAngle = currentAngle;
+    }
+
     public double getTarget() {
         return targetAngle;
     }

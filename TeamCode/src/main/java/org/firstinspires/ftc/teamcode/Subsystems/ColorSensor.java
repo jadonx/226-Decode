@@ -21,7 +21,7 @@ public class ColorSensor {
     private boolean hasBall;
 
     private ElapsedTime timer;
-    private final int UPDATE_TIME = 150;
+    private final int UPDATE_TIME = 50;
 
     public ColorSensor(HardwareMap hardwareMap) {
         colorSensorFront = hardwareMap.get(RevColorSensorV3.class, Constants.HMFrontColorSensor);
@@ -39,7 +39,7 @@ public class ColorSensor {
             currentHue = hsv[0];
 
             if (currentDistance < 1.5) {
-                hasBall = true;
+                currentBall = Spindexer.HolderStatus.PURPLE;
 
 //                updateColor();
 //                if (currentHue > 215 && currentHue < 245) {
@@ -50,7 +50,6 @@ public class ColorSensor {
 //                }
             }
             else {
-                hasBall = false;
                 currentBall = Spindexer.HolderStatus.NONE;
             }
 
@@ -63,10 +62,15 @@ public class ColorSensor {
     }
 
     public boolean hasBall() {
-        return hasBall;
+        return currentBall != Spindexer.HolderStatus.NONE;
     }
 
+
+
     private void updateDistance() {
+//        int r = Math.max(colorSensorFront.red(), colorSensorBack.red());
+//        int g = Math.max(colorSensorFront.green(), colorSensorBack.green());
+//        int b = Math.max(colorSensorFront.blue(), colorSensorBack.blue());
         currentDistance = colorSensorFront.getDistance(DistanceUnit.INCH);
     }
 

@@ -105,7 +105,7 @@ public class BlueClose extends LinearOpMode {
         launcher = new Launcher(hardwareMap);
         popper = new Popper(hardwareMap);
         limelight = new LimeLight(hardwareMap, RoadRunnerPinPoint.AllianceColor.BLUE);
-
+        limelight.setPipeline(1);
         colorIntakeCommand = new ColorIntakeCommand(spindexer, colorSensor);
 
         autonomousActions = new AutonomousActions(drive, limelight, intake, turret, spindexer, launcher, popper, colorIntakeCommand);
@@ -149,6 +149,7 @@ public class BlueClose extends LinearOpMode {
                                 autonomousActions.stopSpindexer(),
                                 openGate.build(),
                                 autonomousActions.runPopper(),
+                                autonomousActions.setSpindexerHolderStatuses(AutonomousActions.PPG),
                                 new ParallelAction(
                                         secondLaunch.build(),
                                         new SequentialAction(
@@ -167,6 +168,7 @@ public class BlueClose extends LinearOpMode {
                                 ),
                                 autonomousActions.stopSpindexer(),
                                 autonomousActions.runPopper(),
+                                autonomousActions.setSpindexerHolderStatuses(AutonomousActions.PGP),
                                 new ParallelAction(
                                         thirdLaunch.build(),
                                         new SequentialAction(
@@ -185,6 +187,7 @@ public class BlueClose extends LinearOpMode {
                                 ),
                                 autonomousActions.stopSpindexer(),
                                 autonomousActions.runPopper(),
+                                autonomousActions.setSpindexerHolderStatuses(AutonomousActions.GPP),
                                 new ParallelAction(
                                         fourthLaunch.build(),
                                         new SequentialAction(
