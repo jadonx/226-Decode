@@ -250,29 +250,31 @@ public class Robot {
         limelight.getResult();
         limelight.getAprilTagID();
 
-        if (isUsingTurret) {
-            if (Math.abs(turretRel) > 135) {
+        if (!isCurrentlyShooting) {
+            if (isUsingTurret) {
+                if (Math.abs(turretRel) > 135) {
+                    turret.setMode(Turret.TurretMode.PINPOINT);
+                    turret.setTarget(heading);
+                    isUsingTurret = false;
+                } else {
+                    if (limelight.isResulted() && limelight.isGoalTargeted()) {
+                        turret.setMode(Turret.TurretMode.LIMELIGHT);
+                        turret.setLimelightError(-limelight.getTX());
+                        if (pinpoint.getDistanceToGoal() > turretOffsetDistance && color == RoadRunnerPinPoint.AllianceColor.RED) {
+                            turret.setLimelightError(-limelight.getTX() - turretOffset);
+                        }
+                        if (pinpoint.getDistanceToGoal() > turretOffsetDistance && color == RoadRunnerPinPoint.AllianceColor.BLUE) {
+                            turret.setLimelightError(-limelight.getTX() + turretOffset);
+                        }
+                    } else {
+                        turret.setMode(Turret.TurretMode.PINPOINT);
+                        turret.setTarget(target);
+                    }
+                }
+            } else {
                 turret.setMode(Turret.TurretMode.PINPOINT);
                 turret.setTarget(heading);
-                isUsingTurret = false;
-            } else {
-                if (limelight.isResulted() && limelight.isGoalTargeted() && !isCurrentlyShooting) {
-                    turret.setMode(Turret.TurretMode.LIMELIGHT);
-                    turret.setLimelightError(-limelight.getTX());
-                    if(pinpoint.getDistanceToGoal() > turretOffsetDistance && color == RoadRunnerPinPoint.AllianceColor.RED){
-                        turret.setLimelightError(-limelight.getTX()-turretOffset);
-                    }
-                    if(pinpoint.getDistanceToGoal() > turretOffsetDistance && color == RoadRunnerPinPoint.AllianceColor.BLUE){
-                        turret.setLimelightError(-limelight.getTX()+turretOffset);
-                    }
-                } else {
-                    turret.setMode(Turret.TurretMode.PINPOINT);
-                    turret.setTarget(target);
-                }
             }
-        } else {
-            turret.setMode(Turret.TurretMode.PINPOINT);
-            turret.setTarget(heading);
         }
 
         if (gamepad2.dpadUpWasPressed()) {
