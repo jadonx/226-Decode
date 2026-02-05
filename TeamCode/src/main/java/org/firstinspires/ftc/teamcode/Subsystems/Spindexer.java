@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
-import static java.lang.Math.tanh;
-
 import android.graphics.Color;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -28,12 +26,9 @@ public class Spindexer {
 
     private double currentAngle;
     public static double targetAngle = 0;
-    public static double kP = 0.002, kI = 0, kD = 0.001, kF = 0.03;
-    public static double kP_max = 0.0015, kP_min = 0.001, scale = 50;
-
-    private ElapsedTime pidTimer = new ElapsedTime();
-    private long lastTime = pidTimer.nanoseconds();
-    private double lastError = 0;
+    // private double kP = 0.002, kS = 0.04;
+    public static double kP = 0.012, kI = 0, kD = 0.005, kF = 0;
+    private PIDFController pid = new PIDFController(kP, kI, kD, kF);;
 
     public enum SpindexerMode {
         INTAKE_MODE,
@@ -57,8 +52,6 @@ public class Spindexer {
         spindexerServo.setDirection(DcMotorSimple.Direction.REVERSE);
         spindexerEncoder = hardwareMap.get(SpindexerEncoder.class, Constants.HMSpindexerEncoder);
         spindexerMode = SpindexerMode.INTAKE_MODE;
-
-        pidTimer.reset();
     }
 
     public void update() {
@@ -83,23 +76,15 @@ public class Spindexer {
 
     private void updateIntakeMode() {
         double error = calculateError();
+        // pid.setPIDF(kP, kI, kD, kF);
 
-        long currentTime = pidTimer.nanoseconds();
-        double deltaTime = (currentTime - lastTime) / 1.0e9;
-        double derivative = 0;
+        double power = pid.calculate(0, error);
 
-        if (deltaTime > 0) {
-            derivative = (error - lastError) / deltaTime;
+        if (error < 2) {
+            power *= 0.4;
         }
 
-        double absErr = Math.abs(error);
-        double kP_eff = kP_min + (kP_max - kP_min) * (absErr / scale); // * tanh(absErr / scale);
-
-        double power = kP_eff * error + kD * derivative + Math.signum(error) * kF;
-
-        if (Math.abs(error) < 2) {
-            power *= 0.5;
-        }
+        power = Range.clip(power, -0.4, 0.4);
 
         spindexerServo.setPower(power);
     }
