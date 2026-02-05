@@ -176,6 +176,10 @@ public class Robot {
         else {
             intake.stopIntake();
         }
+
+        if (gamepad1.rightBumperWasPressed()) {
+            intake.toggleIdleIntake();
+        }
     }
 
     private void updateSpindexer() {

@@ -10,6 +10,8 @@ import org.firstinspires.ftc.teamcode.Constants;
 public class Intake {
     private DcMotor intake;
     private final float MAX_POWER = 1.0f;
+    private final float IDLE_POWER = 0.6f;
+    private boolean isIdlingIntake = false;
 
     public Intake(HardwareMap hardwareMap) {
         intake = hardwareMap.get(DcMotorEx.class, Constants.HMMotorIntake);
@@ -24,7 +26,16 @@ public class Intake {
         intake.setPower(Math.max(-intakePower, -MAX_POWER));
     }
 
+    public void toggleIdleIntake() {
+        isIdlingIntake = !isIdlingIntake;
+    }
+
     public void stopIntake() {
-        intake.setPower(0);
+        if (isIdlingIntake) {
+            intake.setPower(IDLE_POWER);
+        }
+        else {
+            intake.setPower(0);
+        }
     }
 }

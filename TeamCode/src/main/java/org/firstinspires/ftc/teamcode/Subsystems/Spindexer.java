@@ -29,7 +29,7 @@ public class Spindexer {
     private double currentAngle;
     public static double targetAngle = 0;
     public static double kP = 0.002, kI = 0, kD = 0.001, kF = 0.03;
-    public static double kP_max = 0.002, kP_min = 0.001, scale = 50;
+    public static double kP_max = 0.0015, kP_min = 0.001, scale = 50;
 
     private ElapsedTime pidTimer = new ElapsedTime();
     private long lastTime = pidTimer.nanoseconds();
