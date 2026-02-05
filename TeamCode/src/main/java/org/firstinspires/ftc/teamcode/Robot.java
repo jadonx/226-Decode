@@ -157,7 +157,7 @@ public class Robot {
         }
 
         numLoops++;
-        telemetry.addData("Average Loop Times", ((double) loopTimer.milliseconds())/numLoops);
+        telemetry.addData("Average Loop Times", (loopTimer.milliseconds())/numLoops);
         updateTelemetry();
         telemetry.update();
 
@@ -276,6 +276,9 @@ public class Robot {
                 turret.setTarget(heading);
             }
         }
+        else {
+            turret.holdCurrentAngle();
+        }
 
         if (gamepad2.dpadUpWasPressed()) {
             isUsingTurret = !isUsingTurret;
@@ -296,10 +299,12 @@ public class Robot {
         String holderStatuses = String.format("[%s, %s, %s]", spindexer.getHolderStatus(0), spindexer.getHolderStatus(1), spindexer.getHolderStatus(2));
         telemetry.addData("Spindexer Holders ", holderStatuses + "\n");
 
-        packet.put("launcher target vel ", launcher.getTargetVelocity());
-        packet.put("launcher current vel ", launcher.getVelocity());
+        telemetry.addData("shooting ", isCurrentlyShooting);
 
-        dashboard.sendTelemetryPacket(packet);
+//        packet.put("launcher target vel ", launcher.getTargetVelocity());
+//        packet.put("launcher current vel ", launcher.getVelocity());
+//
+//        dashboard.sendTelemetryPacket(packet);
 
 //        telemetry.addData("Spindexer wrapped pos ", spindexer.getWrappedAngle());
 //        telemetry.addData("Spindexer unwrapped pos ", spindexer.getUnwrappedAngle());

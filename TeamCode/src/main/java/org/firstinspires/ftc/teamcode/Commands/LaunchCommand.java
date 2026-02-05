@@ -33,26 +33,13 @@ public class LaunchCommand {
         spindexer.setMode(Spindexer.SpindexerMode.INTAKE_MODE);
         spindexer.setTargetAngle(spindexer.getTargetAngle());
 
-        spindexerSpeed = 0.2; // Speed of spindexer while launching
-
-
         popper.setTargetVelocity(1800);
 
         currentState = State.PRIME_SHOOTER;
     }
 
     public void update() {
-        double distanceToGoal = pinpoint.getDistanceToGoal();
 
-        if (distanceToGoal > 130) {
-            spindexerSpeed = 0.15;
-        }
-        else {
-            spindexerSpeed = 0.2;
-        }
-
-        launcher.calculateTargetVelocity(distanceToGoal);
-        launcher.update();
         spindexer.update();
 
         switch (currentState) {

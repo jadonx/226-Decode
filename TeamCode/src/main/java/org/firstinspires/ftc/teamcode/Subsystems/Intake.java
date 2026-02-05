@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.Constants;
 public class Intake {
     private DcMotor intake;
     private final float MAX_POWER = 1.0f;
-    private final float IDLE_POWER = 0.6f;
+    private final float IDLE_POWER = 0.25f;
     private boolean isIdlingIntake = false;
 
     public Intake(HardwareMap hardwareMap) {
