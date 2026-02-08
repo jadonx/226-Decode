@@ -18,13 +18,15 @@ public class Turret {
     private CRServo turretLeft, turretRight;
     private IMU turretEncoder;
 
-    public static double kP = 0.0065; // Proportional gain on position error
+    public static double kP = -0.015; // Proportional gain on position error
     public static double kI = 0.0; // Integral gain on position error
-    public static double kD = 0.0006; // Derivative gain on position error
-    public static double kF = 0.055; // Feedforward to overcome static friction
+    public static double kD = -0.0009; // Derivative gain on position error
+    public static double kF = -0.1; // Feedforward to overcome static friction
+    public static double tolerance = 4;
+    private double power;
 
     private double currentAngle;
-    private double targetAngle = 0;
+    public static double targetAngle = 0;
     private double error;
 
     double lastError = 0;
@@ -67,19 +69,24 @@ public class Turret {
         }
         double pTerm = kP * error;
         double dTerm = kD * derivative;
-        double fTerm = Math.signum(error) * kF; // Static friction boooost!!!!
-        double power = pTerm + dTerm + fTerm;
+        double fTerm = kF * Math.signum(error); // Static friction boooost!!!!
+        power = (Math.abs(error) > tolerance) ? (pTerm + dTerm + fTerm) : (kF * 0.75) * Math.signum(error);
+
 
         power = Math.max(Math.min(power, 1), -1);
 
-        if (Math.abs(error) < 0.5) {
-            setPower(0);
-        } else {
-            setPower(power);
-        }
+        turretRight.setPower(power);
 
         lastError = error;
         lastTime = currentTime;
+    }
+
+    public double getPower() {
+        return power;
+    }
+
+    public void resetIMU() {
+        turretEncoder.resetYaw();
     }
 
     public void setTarget(double targetAngle) {

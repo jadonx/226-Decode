@@ -305,6 +305,8 @@ public class Robot {
 
         telemetry.addData("using turret ", isUsingTurret);
 
+        telemetry.addData("turret power ", turret.getPower());
+
 //        packet.put("launcher target vel ", launcher.getTargetVelocity());
 //        packet.put("launcher current vel ", launcher.getVelocity());
 //
