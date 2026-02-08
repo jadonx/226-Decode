@@ -40,7 +40,7 @@ public class RedFar extends LinearOpMode {
 
     AutonomousActions autonomousActions;
 
-    private final double spindexerSpeed = 0.15;
+    private final double spindexerSpeed = 0.12;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -91,7 +91,7 @@ public class RedFar extends LinearOpMode {
 
         Actions.runBlocking(
                 new ParallelAction(
-                        autonomousActions.updateLauncher(1750),
+                        autonomousActions.updateLauncher(1720),
                         autonomousActions.updateBotPosition(),
                         autonomousActions.updateTurret(),
                         new SequentialAction(
@@ -111,9 +111,11 @@ public class RedFar extends LinearOpMode {
                                         )
                                 ),
                                 autonomousActions.atLauncherTargetVelocity(),
+                                autonomousActions.wait(2000),
                                 autonomousActions.spindexerFullRotation(spindexerSpeed),
                                 /** First Intake Sequence */
                                 autonomousActions.deactivatePopper(),
+                                autonomousActions.runIntake(),
                                 new RaceAction(
                                         firstPickup.build(),
                                         autonomousActions.autoColorIntakeCommand(colorIntakeCommand)

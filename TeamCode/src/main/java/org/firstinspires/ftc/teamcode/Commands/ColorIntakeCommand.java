@@ -17,7 +17,7 @@ public class ColorIntakeCommand {
     private int[] intakePositions;
 
     private ElapsedTime holdingBallTimer;
-    private final int holdingBallThreshold = 50;
+    private final int holdingBallThreshold = 25;
 
     public enum State {
         WAIT_AT_FIRST_HOLDER,

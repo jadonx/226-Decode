@@ -50,6 +50,7 @@ public class Robot {
     private boolean isCurrentlyShooting;
     private boolean isUsingTurret;
     private double turretLimelightOffset;
+    private double distanceToGoal;
 
     RoadRunnerPinPoint.AllianceColor color;
 
@@ -57,7 +58,7 @@ public class Robot {
     private Gamepad gamepad2;
 
     public static double turretOffset = 2.5;
-    public static double turretOffsetDistance = 90;
+    public static double turretOffsetDistance = 100;
 
     // Bulk caching
     List<LynxModule> hubs;
@@ -220,7 +221,7 @@ public class Robot {
     }
 
     private void updateLauncher() {
-        double distanceToGoal = pinpoint.getDistanceToGoal();
+        distanceToGoal = pinpoint.getDistanceToGoal();
         if (distanceToGoal > 130) {
             spindexer.setSpeed(0.15);
         }
@@ -260,11 +261,14 @@ public class Robot {
                     if (limelight.isResulted() && limelight.isGoalTargeted()) {
                         turret.setMode(Turret.TurretMode.LIMELIGHT);
                         turret.setLimelightError(-limelight.getTX());
-                        if (pinpoint.getDistanceToGoal() > turretOffsetDistance && color == RoadRunnerPinPoint.AllianceColor.RED) {
-                            turret.setLimelightError(-limelight.getTX() - turretOffset);
-                        }
-                        if (pinpoint.getDistanceToGoal() > turretOffsetDistance && color == RoadRunnerPinPoint.AllianceColor.BLUE) {
-                            turret.setLimelightError(-limelight.getTX() + turretOffset);
+                        if (distanceToGoal > turretOffsetDistance) {
+                            if (color == RoadRunnerPinPoint.AllianceColor.RED) {
+                                turret.setLimelightError(-limelight.getTX() - turretOffset);
+                            }
+                            else {
+                                // BLUE SIDE
+                                turret.setLimelightError(-limelight.getTX() + turretOffset);
+                            }
                         }
                     } else {
                         turret.setMode(Turret.TurretMode.PINPOINT);
@@ -295,11 +299,11 @@ public class Robot {
 //        telemetry.addData("Actual Angle", (turret.getTurretAngle()));
 //        telemetry.addData("Robot Angle", (Math.abs(pinpoint.getPose().getHeading(AngleUnit.DEGREES))) - turret.getTurretAngle());
         // Spindexer
-        telemetry.addData("Spindexer Mode ", spindexer.getMode());
-        String holderStatuses = String.format("[%s, %s, %s]", spindexer.getHolderStatus(0), spindexer.getHolderStatus(1), spindexer.getHolderStatus(2));
-        telemetry.addData("Spindexer Holders ", holderStatuses + "\n");
+//        telemetry.addData("Spindexer Mode ", spindexer.getMode());
+//        String holderStatuses = String.format("[%s, %s, %s]", spindexer.getHolderStatus(0), spindexer.getHolderStatus(1), spindexer.getHolderStatus(2));
+//        telemetry.addData("Spindexer Holders ", holderStatuses + "\n");
 
-        telemetry.addData("shooting ", isCurrentlyShooting);
+        telemetry.addData("using turret ", isUsingTurret);
 
 //        packet.put("launcher target vel ", launcher.getTargetVelocity());
 //        packet.put("launcher current vel ", launcher.getVelocity());

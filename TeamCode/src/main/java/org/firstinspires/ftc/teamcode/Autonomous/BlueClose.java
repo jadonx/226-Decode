@@ -75,7 +75,7 @@ public class BlueClose extends LinearOpMode {
             telemetry.addData("Target angle ", turretAngle);
             telemetry.update();
 
-            return !(detectionTimer.milliseconds() > 1500 || limelight.hasMotif());
+            return !(detectionTimer.milliseconds() > 1200);
         }
     }
     public Action limeLightDetectMotif() {
@@ -89,12 +89,12 @@ public class BlueClose extends LinearOpMode {
         drive = new MecanumDrive(hardwareMap, initialPose);
 
         TrajectoryActionBuilder firstLaunch = drive.actionBuilder(initialPose).strafeToConstantHeading(new Vector2d(-14,-22));
-        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-11,-31)).strafeToConstantHeading(new Vector2d(-11,-48), new TranslationalVelConstraint(5.5));
+        TrajectoryActionBuilder firstPickup = firstLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-10,-31.5)).strafeToConstantHeading(new Vector2d(-10,-48), new TranslationalVelConstraint(5.5));
         TrajectoryActionBuilder openGate = firstPickup.endTrajectory().fresh().strafeToLinearHeading(new Vector2d(-4, -55.5), Math.toRadians(180)).waitSeconds(0.5);
         TrajectoryActionBuilder secondLaunch = openGate.endTrajectory().fresh().strafeToLinearHeading(new Vector2d(-14,-22), Math.toRadians(-90));
-        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(13, -31)).strafeToConstantHeading(new Vector2d(13,-48) , new TranslationalVelConstraint(5.5));
+        TrajectoryActionBuilder secondPickup = secondLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(11.5, -31.5)).strafeToConstantHeading(new Vector2d(11.5,-48) , new TranslationalVelConstraint(5.5));
         TrajectoryActionBuilder thirdLaunch = secondPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,-22));
-        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(36.5, -31.5)).strafeToConstantHeading(new Vector2d(36.5,-48), new TranslationalVelConstraint(5.5));
+        TrajectoryActionBuilder thirdPickup = thirdLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(36, -32)).strafeToConstantHeading(new Vector2d(36,-50), new TranslationalVelConstraint(5.5));
         TrajectoryActionBuilder fourthLaunch = thirdPickup.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-14,-22));
         TrajectoryActionBuilder park = fourthLaunch.endTrajectory().fresh().strafeToConstantHeading(new Vector2d(-7,-34));
 
@@ -139,8 +139,9 @@ public class BlueClose extends LinearOpMode {
                                                 autonomousActions.setTurretTarget(-135)
                                         )
                                 ),
-                                autonomousActions.spindexerFullRotation(0.2),
                                 autonomousActions.runIntake(),
+                                autonomousActions.spindexerFullRotation(0.2),
+                                // autonomousActions.runIntake(),
                                 autonomousActions.deactivatePopper(),
                                 new RaceAction(
                                         firstPickup.build(),
@@ -158,10 +159,10 @@ public class BlueClose extends LinearOpMode {
                                                 autonomousActions.pushInPopper()
                                         )
                                 ),
-                                autonomousActions.stopIntake(),
+                                // autonomousActions.stopIntake(),
                                 autonomousActions.spindexerFullRotation(0.2),
                                 autonomousActions.deactivatePopper(),
-                                autonomousActions.runIntake(),
+                                // autonomousActions.runIntake(),
                                 new RaceAction(
                                         secondPickup.build(),
                                         autonomousActions.autoColorIntakeCommand(colorIntakeCommand)
@@ -177,10 +178,10 @@ public class BlueClose extends LinearOpMode {
                                                 autonomousActions.pushInPopper()
                                         )
                                 ),
-                                autonomousActions.stopIntake(),
+                                // autonomousActions.stopIntake(),
                                 autonomousActions.spindexerFullRotation(0.2),
                                 autonomousActions.deactivatePopper(),
-                                autonomousActions.runIntake(),
+                                // autonomousActions.runIntake(),
                                 new RaceAction(
                                         thirdPickup.build(),
                                         autonomousActions.autoColorIntakeCommand(colorIntakeCommand)
@@ -196,9 +197,10 @@ public class BlueClose extends LinearOpMode {
                                                 autonomousActions.pushInPopper()
                                         )
                                 ),
-                                autonomousActions.stopIntake(),
+                                // autonomousActions.stopIntake(),
                                 autonomousActions.spindexerFullRotation(0.2),
                                 autonomousActions.deactivatePopper(),
+                                autonomousActions.stopIntake(),
                                 park.build()
                         )
                 )

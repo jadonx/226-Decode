@@ -21,7 +21,7 @@ public class Turret {
     public static double kP = 0.0065; // Proportional gain on position error
     public static double kI = 0.0; // Integral gain on position error
     public static double kD = 0.0006; // Derivative gain on position error
-    public static double kF = 0.05; // Feedforward to overcome static friction
+    public static double kF = 0.055; // Feedforward to overcome static friction
 
     private double currentAngle;
     private double targetAngle = 0;
@@ -88,7 +88,7 @@ public class Turret {
 
     // Holds the current angle relative to the bot, the turret won't move if the bot is rotated
     public void holdCurrentAngle() {
-        targetAngle = currentAngle;
+        setPower(0);
     }
 
     public double getTarget() {

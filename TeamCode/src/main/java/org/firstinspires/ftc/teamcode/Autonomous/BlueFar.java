@@ -40,7 +40,7 @@ public class BlueFar extends LinearOpMode {
 
     AutonomousActions autonomousActions;
 
-    private final double spindexerSpeed = 0.15;
+    private final double spindexerSpeed = 0.12;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -97,7 +97,7 @@ public class BlueFar extends LinearOpMode {
 
         Actions.runBlocking(
                 new ParallelAction(
-                        autonomousActions.updateLauncher(1750),
+                        autonomousActions.updateLauncher(1720),
                         autonomousActions.updateBotPosition(),
                         autonomousActions.updateTurret(),
                         new SequentialAction(
@@ -106,6 +106,7 @@ public class BlueFar extends LinearOpMode {
                                 autonomousActions.moveCover(0),
                                 autonomousActions.runPopper(),
                                 autonomousActions.setTurretTarget(-157),
+                                autonomousActions.runIntake(),
                                 /** First Shooting Sequence */
                                 new ParallelAction(
                                         firstLaunch.build(),
@@ -116,6 +117,7 @@ public class BlueFar extends LinearOpMode {
                                         )
                                 ),
                                 autonomousActions.atLauncherTargetVelocity(),
+                                autonomousActions.wait(2000),
                                 autonomousActions.spindexerFullRotation(spindexerSpeed),
                                 /** First Intake Sequence */
                                 autonomousActions.deactivatePopper(),

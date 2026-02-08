@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Commands.ColorIntakeCommand;
 import org.firstinspires.ftc.teamcode.Roadrunner.MecanumDrive;
@@ -285,5 +286,24 @@ public class AutonomousActions {
     }
     public Action stopIntake() {
         return new StopIntake();
+    }
+
+    public class Wait implements Action {
+        private int milliseconds;
+        private ElapsedTime timer;
+
+        public Wait(int milliseconds) {
+            this.milliseconds = milliseconds;
+            timer = new ElapsedTime();
+            timer.reset();
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            return timer.milliseconds() < milliseconds;
+        }
+    }
+    public Action wait(int milliseconds) {
+        return new Wait(milliseconds);
     }
 }
